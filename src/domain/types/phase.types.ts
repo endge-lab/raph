@@ -1,7 +1,7 @@
 import type { Branded } from '@/domain/types/brand.types'
 import type { DataPath } from '@/domain/entities/DataPath'
 import type { RaphNode } from '@/domain/core/RaphNode'
-import type { RaphNodeType } from '@/domain/types/base.types'
+import type { RaphFrameContext, RaphNodeType } from '@/domain/types/base.types'
 
 /**
  * Название фазы
@@ -44,6 +44,7 @@ export type PhaseEvent = {
 export type PhaseExecutorContext = {
   phase: PhaseName
   node: RaphNode<any>
+  frame: RaphFrameContext
   events?: PhaseEvent[]
 }
 

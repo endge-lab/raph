@@ -1,6 +1,6 @@
 import type { RaphApp } from '@/domain/core/RaphApp'
 import type { RaphNode } from '@/domain/core/RaphNode'
-import type { RaphProperties } from '@/domain/types/base.types'
+import type { RaphFrameContext, RaphProperties } from '@/domain/types/base.types'
 
 export type RaphLocalPhaseName = string
 
@@ -62,6 +62,7 @@ export interface RaphLocalPhase<P extends RaphProperties> {
 
 export interface RaphLocalPhaseContext<P extends RaphProperties> {
   phase: RaphLocalPhase<P>
+  frame: RaphFrameContext
   root: RaphNode<P>
   dirty: RaphNode<P>[]
 }

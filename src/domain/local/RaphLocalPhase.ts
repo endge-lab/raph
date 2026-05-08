@@ -1,5 +1,5 @@
 import type { RaphNode } from '@/domain/core/RaphNode'
-import type { RaphProperties } from '@/domain/types/base.types'
+import type { RaphFrameContext, RaphProperties } from '@/domain/types/base.types'
 import type {
   RaphLocalNodeCallback,
   RaphLocalPhaseMode,
@@ -64,11 +64,13 @@ export class RaphLocalPhaseRuntime<P extends RaphProperties = RaphProperties> {
   }
 
   run(payload: {
+    frame: RaphFrameContext
     root: RaphNode<P>
     dirty: RaphNode<P>[]
   }): void {
     this.process({
       phase: this,
+      frame: payload.frame,
       root: payload.root,
       dirty: payload.dirty,
     })

@@ -4,6 +4,8 @@ import type {
   DataObject,
   DataPathDef,
   PhaseDirty,
+  RaphFrameContext,
+  RaphLoopLease,
   RaphOptions,
   RaphPriorityStrategy,
   RaphProperties,
@@ -93,7 +95,18 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
   private __lastUPSUpdate = performance.now()
   private __upsCount = 0
   private __isLoopActive = false
+  private __manualLoopActive = false
+  private __loopLeases = new Set<object>()
   private __lastTime = performance.now()
+  private __frameStartedAt: number | null = null
+  private __lastFrameNow: number | null = null
+  private __frameNumber = 0
+  private __frameContext: RaphFrameContext = {
+    now: 0,
+    delta: 0,
+    elapsed: 0,
+    frame: 0,
+  }
   private __animationFrameId: number | null = null
   private __upsResetTimeout: number | null = null
 
@@ -702,6 +715,19 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     this.__lastRunAt = performance.now()
 
     const now = this.__lastRunAt
+    const delta = this.__lastFrameNow === null ? 0 : Math.min(100, Math.max(0, now - this.__lastFrameNow))
+    this.__lastFrameNow = now
+    if (this.__frameStartedAt === null) {
+      this.__frameStartedAt = now
+    }
+    this.__frameContext = {
+      now,
+      delta,
+      elapsed: now - this.__frameStartedAt,
+      frame: this.__frameNumber++,
+    }
+    const frame = this.__frameContext
+
     this.__upsCount++
     if (now - this.__lastUPSUpdate >= 1000) {
       this.__ups = this.__upsCount
@@ -734,7 +760,7 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
           for (const node of this._orderedAllNodes()) {
             if (bit) { node.clearDirtyPhase(bit) }
             const events = q.events?.get(node.id) ?? undefined
-            ctxs.push({ phase: phase.name, node, events })
+            ctxs.push({ phase: phase.name, node, frame, events })
           }
           q.buckets.clear()
           q.events.clear()
@@ -750,7 +776,7 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
               const node = arr[i]
               if (bit) { node.clearDirtyPhase(bit) }
               const events = q.events?.get(node.id) ?? undefined
-              ctxs.push({ phase: phase.name, node, events })
+              ctxs.push({ phase: phase.name, node, frame, events })
             }
 
             q.buckets.delete(bucketIdx)
@@ -761,7 +787,7 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
           q.heap.clear()
         }
         else if (phase.always) {
-          ctxs.push({ phase: phase.name, node: this._root })
+          ctxs.push({ phase: phase.name, node: this._root, frame })
         }
 
         const expandedCtxs = this._expandRuntimeContexts(phase, ctxs)
@@ -773,7 +799,7 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
       else if ('each' in phase && typeof phase.each === 'function') {
         // По бакетам
         if (!hasDirty && phase.always) {
-          phase.each({ phase: phase.name, node: this._root })
+          phase.each({ phase: phase.name, node: this._root, frame })
           Raph.events.emit('node:notified', { node: this._root, event: null })
           continue
         }
@@ -791,7 +817,7 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
             const node = arr[i]
             if (bit) { node.clearDirtyPhase(bit) }
             const events = q.events?.get(node.id) ?? undefined
-            ctxs.push({ phase: phase.name, node, events })
+            ctxs.push({ phase: phase.name, node, frame, events })
           }
 
           q.buckets.delete(bucketIdx)
@@ -864,6 +890,28 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
    * заданному планировщику
    */
   startLoop(): void {
+    this.__manualLoopActive = true
+    this._ensureLoop()
+  }
+
+  acquireLoop(owner: string): RaphLoopLease {
+    const token = {}
+    let released = false
+    this.__loopLeases.add(token)
+    this._ensureLoop()
+
+    return {
+      owner,
+      release: () => {
+        if (released) return
+        released = true
+        this.__loopLeases.delete(token)
+        this._stopLoopIfIdle()
+      },
+    }
+  }
+
+  private _ensureLoop(): void {
     if (this.__isLoopActive) { return }
     this.__isLoopActive = true
 
@@ -887,6 +935,15 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
    * Остановить цикл обновления.
    */
   stopLoop(): void {
+    this.__manualLoopActive = false
+    this._stopLoopIfIdle()
+  }
+
+  private _stopLoopIfIdle(): void {
+    if (this.__manualLoopActive || this.__loopLeases.size > 0) {
+      return
+    }
+
     this.__isLoopActive = false
 
     //
@@ -940,6 +997,19 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
    * Полная очистка RaphApp состояния
    */
   reset(): void {
+    this.__manualLoopActive = false
+    this.__loopLeases.clear()
+    this._stopLoopIfIdle()
+    this.__lastFrameNow = null
+    this.__frameStartedAt = null
+    this.__frameNumber = 0
+    this.__frameContext = {
+      now: 0,
+      delta: 0,
+      elapsed: 0,
+      frame: 0,
+    }
+
     for (const child of [...this._root.children]) {
       child.dispose()
     }
@@ -1082,7 +1152,8 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     ctxs: PhaseExecutorContext[],
   ): PhaseExecutorContext[] {
     if (phase.mode === 'all' || phase.traversal === 'all') {
-      return this._orderedAllNodes().map(node => ({ phase: phase.name, node }))
+      const frame = ctxs[0]?.frame ?? this.__frameContext
+      return this._orderedAllNodes().map(node => ({ phase: phase.name, node, frame }))
     }
 
     if (phase.traversal === 'dirty-and-down') {
@@ -1098,6 +1169,7 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
           result.push({
             phase: phase.name,
             node,
+            frame: ctx.frame,
             events: node === ctx.node ? ctx.events : undefined,
           })
         })
@@ -1118,6 +1190,7 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
             result.push({
               phase: phase.name,
               node,
+              frame: ctx.frame,
               events: node === ctx.node ? ctx.events : undefined,
             })
           }
@@ -1140,6 +1213,7 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
       always: localPhase.always,
       all: (ctxs) => {
         localPhase.run({
+          frame: ctxs[0]?.frame ?? this.__frameContext,
           root: this._root,
           dirty: ctxs.map(ctx => ctx.node as RaphNode<Props>),
         })
@@ -1195,6 +1269,10 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
    */
   get loopEnabled(): boolean {
     return this.__isLoopActive
+  }
+
+  get frame(): RaphFrameContext {
+    return this.__frameContext
   }
 
   /**

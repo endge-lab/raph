@@ -85,6 +85,18 @@ export type RaphPriorityStrategy = 'depth-weight-desc' | 'legacy-depth-weight-as
  */
 export type RaphScheduler = (cb: VoidFunction) => void
 
+export interface RaphFrameContext {
+  now: number
+  delta: number
+  elapsed: number
+  frame: number
+}
+
+export interface RaphLoopLease {
+  readonly owner: string
+  release(): void
+}
+
 /**
  * Данные фазы для обработки грязных узлов
  */
