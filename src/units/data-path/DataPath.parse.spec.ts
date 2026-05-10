@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { DataPath } from '@/domain/entities/DataPath'
 import { SegKind } from '@/domain/types/path.types'
 
-const kinds = (dp: DataPath) => dp.segments().map((s) => s.kind)
+const kinds = (dp: DataPath) => dp.segments().map(s => s.kind)
 
 describe('DataPath.fromString / segments()', () => {
   it('разбирает простые ключи через точку', () => {

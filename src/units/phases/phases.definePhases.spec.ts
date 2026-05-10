@@ -13,7 +13,7 @@ describe('RaphApp.definePhases', () => {
     const execA = vi.fn((ctx: PhaseExecutorContext) => {})
     const execB = vi.fn((ctx: PhaseExecutorContext) => {})
 
-    const phases: RaphPhase[] = [
+    const phases: Array<RaphPhase> = [
       {
         name: 'phase-A' as PhaseName,
         traversal: 'dirty-only',
@@ -31,7 +31,7 @@ describe('RaphApp.definePhases', () => {
     raph.definePhases(phases)
 
     // порядок сохраняется в .phases
-    expect(raph.phases.map((p) => p.name)).toEqual(['phase-A', 'phase-B'])
+    expect(raph.phases.map(p => p.name)).toEqual(['phase-A', 'phase-B'])
     // executors - те же самые ссылки
     expect(raph.phases[0].each).toBe(execA)
     expect(raph.phases[1].each).toBe(execB)
@@ -107,7 +107,7 @@ describe('RaphApp.definePhases', () => {
     expect(raph.getPhase('old-2' as PhaseName)).toBeUndefined()
 
     // новые фазы существуют в новом порядке
-    expect(raph.phases.map((p) => p.name)).toEqual(['new-2', 'new-1'])
+    expect(raph.phases.map(p => p.name)).toEqual(['new-2', 'new-1'])
     expect(raph.getPhase('new-2' as PhaseName)).toBeDefined()
     expect(raph.getPhase('new-2' as PhaseName)!.each).toBe(execN)
   })

@@ -111,8 +111,8 @@ export interface RaphLoopLease {
  */
 export type PhaseDirty = {
   // key = computedWeight -> список нод
-  buckets: Map<number, RaphNode<any>[]>
-  events: Map<string, PhaseEvent[]>
+  buckets: Map<number, Array<RaphNode<any>>>
+  events: Map<string, Array<PhaseEvent>>
 
   // мин-куча индексов активных бакетов (минимальный индекс = к следующей обработке)
   heap: MinHeap

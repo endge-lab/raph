@@ -5,13 +5,13 @@ import type {
   RaphLocalPhaseMode,
   RaphLocalPhaseRunner,
 } from '@/domain/local/local.types'
-import { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
+import type { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
 
 /**
  * Хранит runtime-описание local phase и правила ее выполнения.
  */
 export class RaphLocalPhaseRuntime<P extends RaphProperties = RaphProperties> {
-  readonly properties: RaphLocalPropertyRuntime<P, any>[] = []
+  readonly properties: Array<RaphLocalPropertyRuntime<P, any>> = []
 
   /**
    * Создает instance и подготавливает внутреннее состояние.
@@ -37,7 +37,7 @@ export class RaphLocalPhaseRuntime<P extends RaphProperties = RaphProperties> {
    * Выполняет внутреннюю операцию finalize.
    */
   finalize(): void {
-    const sorted: RaphLocalPropertyRuntime<P, any>[] = []
+    const sorted: Array<RaphLocalPropertyRuntime<P, any>> = []
     const visited = new Set<string>()
     const visiting = new Set<string>()
     const byName = new Map<string, RaphLocalPropertyRuntime<P, any>>()
@@ -81,7 +81,7 @@ export class RaphLocalPhaseRuntime<P extends RaphProperties = RaphProperties> {
   run(payload: {
     frame: RaphFrameContext
     root: RaphNode<P>
-    dirty: RaphNode<P>[]
+    dirty: Array<RaphNode<P>>
   }): void {
     this.process({
       phase: this,

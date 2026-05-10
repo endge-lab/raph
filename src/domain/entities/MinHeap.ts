@@ -4,7 +4,7 @@
  */
 export class MinHeap {
   //
-  private _a: number[]
+  private _a: Array<number>
   private _size: number
 
   //
@@ -101,7 +101,7 @@ export class MinHeap {
   /**
    * Построить кучу из массива чисел.
    */
-  buildFrom(src: readonly number[]): void {
+  buildFrom(src: ReadonlyArray<number>): void {
     const n = src.length
     this._a.length = n
     for (let i = 0; i < n; i++) this._a[i] = src[i]

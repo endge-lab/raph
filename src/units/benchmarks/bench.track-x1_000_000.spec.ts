@@ -18,7 +18,7 @@ describe('bench.track-x1_000_000', () => {
   const TOTAL_DEPS = NODE_COUNT * DEPS_PER_NODE
 
   let raph: RaphApp
-  const nodes: RaphNode[] = []
+  const nodes: Array<RaphNode> = []
 
   beforeAll(() => {
     raph = new RaphApp()
@@ -35,8 +35,8 @@ describe('bench.track-x1_000_000', () => {
   it(`регистрирует ${TOTAL_DEPS.toLocaleString()} зависимостей быстро`, () => {
     // подготавливаем детерминированный набор зависимостей для каждого узла
     // формат включает точные индексы и параметры с wildcard для нагрузки на парсер
-    const depsByNode: string[][] = nodes.map((_, i) => {
-      const deps: string[] = []
+    const depsByNode: Array<Array<string>> = nodes.map((_, i) => {
+      const deps: Array<string> = []
       for (let d = 0; d < DEPS_PER_NODE; d++) {
         // чередуем индексы массива, свойства и параметры с wildcard
         if (d % 3 === 0) deps.push(`data[${d % 10}].val`)
@@ -77,7 +77,7 @@ describe('bench.track-x1_000_000', () => {
     expect(elapsed).toBeLessThan(1000)
 
     // оставляем следы для ручной проверки при локальном запуске
-    // eslint-disable-next-line no-console
+
     console.log(
       `[bench.track-x1_000_000] зарегистрировано=${registered}, время=${elapsed.toFixed(
         2,
@@ -96,7 +96,6 @@ describe('bench.track-x1_000_000', () => {
     // Ожидаем, что снятие зависимостей будет таким же быстрым (не более ~500 мс для всех)
     expect(elapsed).toBeLessThan(1000)
 
-    // eslint-disable-next-line no-console
     console.log(
       `[bench.track-x1_000_000] время снятия всех зависимостей=${elapsed.toFixed(
         2,

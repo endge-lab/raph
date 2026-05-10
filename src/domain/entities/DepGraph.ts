@@ -194,17 +194,17 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
    * Полный топологический порядок всего графа (Kahn).
    * (Можно использовать для отладки; в рантайме обычно хватает depth.)
    */
-  topoOrder(): N[] {
+  topoOrder(): Array<N> {
     // локальная копия степеней внутри всего графа
     const indeg = new Map<string, number>()
     for (const id of this._nodes.keys())
-      indeg.set(id, this._parents.get(id)!.size)
+      {indeg.set(id, this._parents.get(id)!.size)}
 
     // очередь вершин с inDeg=0, упорядочим по depth/weight при желании вне
-    const q: string[] = []
+    const q: Array<string> = []
     for (const [id, d] of indeg) if (d === 0) q.push(id)
 
-    const out: N[] = []
+    const out: Array<N> = []
     while (q.length) {
       const id = q.shift()!
       const n = this._nodes.get(id)
@@ -247,7 +247,7 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     }
 
     if (traversal === 'dirty-and-down') {
-      const queue: string[] = []
+      const queue: Array<string> = []
       for (const n of base) {
         if (!this._nodes.has(n.id)) continue
         if (!out.has(n)) out.add(n)
@@ -267,7 +267,7 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     }
 
     if (traversal === 'dirty-and-up') {
-      const queue: string[] = []
+      const queue: Array<string> = []
       for (const n of base) {
         if (!this._nodes.has(n.id)) continue
         if (!out.has(n)) out.add(n)
@@ -295,7 +295,7 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
   private _wouldCreateCycle(parentId: string, childId: string): boolean {
     if (parentId === childId) return true
     const seen = new Set<string>()
-    const q: string[] = [childId]
+    const q: Array<string> = [childId]
     while (q.length) {
       const id = q.pop()!
       if (!seen.add(id)) continue
@@ -314,7 +314,7 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     if (newDepth === this._depth.get(startId)) return
     this._depth.set(startId, newDepth)
 
-    const q: string[] = []
+    const q: Array<string> = []
     for (const ch of this._children.get(startId) ?? EMPTY_SET_STR) q.push(ch)
 
     while (q.length) {

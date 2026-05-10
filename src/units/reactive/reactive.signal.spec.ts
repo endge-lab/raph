@@ -25,13 +25,13 @@ describe('RaphSignal (DAG)', () => {
 
     // фаза, слушающая любые изменения сигналов
     const PHASE = 'test' as PhaseName
-    const execCalls: string[] = []
+    const execCalls: Array<string> = []
     Raph.definePhases([
       {
         name: PHASE,
         traversal: 'dirty-only',
         routes: ['__signals.*'],
-        each: (ctx) => {
+        each: ctx => {
           execCalls.push(ctx.node.id)
         },
       },

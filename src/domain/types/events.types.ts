@@ -20,12 +20,12 @@ export interface RaphEventPayloads {
     ctxs: Array<{
       phase: PhaseName
       node: RaphNode
-      events?: PhaseEvent[]
+      events?: Array<PhaseEvent>
     }>
   }
 
   //
-  'phases:reinit': { phases: RaphPhase[] }
+  'phases:reinit': { phases: Array<RaphPhase> }
 
   //
   'debug:nodes': {}

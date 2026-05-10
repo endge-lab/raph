@@ -31,7 +31,6 @@ import type {
   RaphObserveDataOptions,
   RaphRuntimeOptions,
 } from '@/domain/types/runtime.types'
-
 import { RAPH_DEBUG, RAPH_EVENTS, RAPH_MAX_UPS } from '@/domain/core/RaphShared'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 import { ControlFlowQueue } from '@/domain/entities/ControlFlowQueue'
@@ -39,8 +38,8 @@ import { ControlFlowRegistry } from '@/domain/entities/ControlFlowRegistry'
 import { DataPath } from '@/domain/entities/DataPath'
 import { DepGraph } from '@/domain/entities/DepGraph'
 import { MinHeap } from '@/domain/entities/MinHeap'
-import { RaphLocalPhaseRuntime } from '@/domain/local/RaphLocalPhase'
-import { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
+import type { RaphLocalPhaseRuntime } from '@/domain/local/RaphLocalPhase'
+import type { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
 import { RaphPropagation } from '@/domain/local/local.types'
 import { SchedulerType } from '@/domain/types/base.types'
 import { SegKind } from '@/domain/types/path.types'
@@ -86,7 +85,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
   //
   // Фазы
   //
-  private _phasesArray: RaphPhase[] = []
+  private _phasesArray: Array<RaphPhase> = []
   private _phasesMap: Map<PhaseName, RaphPhase> = new Map()
 
   //
@@ -177,7 +176,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
   /**
    * Заменить набор пользовательских фаз приложения.
    */
-  definePhases(phases: RaphPhase[]): void {
+  definePhases(phases: Array<RaphPhase>): void {
     this._phasesArray = phases
     this.reinitPhases()
   }
@@ -399,7 +398,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     path: DataPathDef,
     vars?: Record<string, any>,
   ): {
-    resolved: ResolvedEntry[]
+    resolved: Array<ResolvedEntry>
     canonical: string
     canonicalDataPath: DataPath
   } {
@@ -418,7 +417,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
       prefixStr = prefixStr ? `${prefixStr}.${k}` : k
     }
 
-    const resolved: ResolvedEntry[] = []
+    const resolved: Array<ResolvedEntry> = []
 
     for (const s of segs) {
       switch (s.kind) {
@@ -875,7 +874,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
 
       if ('all' in phase && typeof phase.all === 'function') {
         // Собираем все dirty-ноды по всем bucket
-        const ctxs: PhaseExecutorContext[] = []
+        const ctxs: Array<PhaseExecutorContext> = []
 
         if (phase.mode === 'all' && hasDirty) {
           for (const node of this._orderedAllNodes()) {
@@ -925,7 +924,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
           continue
         }
 
-        const ctxs: PhaseExecutorContext[] = []
+        const ctxs: Array<PhaseExecutorContext> = []
 
         while (!q.heap.empty) {
           const bucketIdx = q.heap.pop()!
@@ -1158,7 +1157,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
    */
   subscribe(
     ownerNode: RaphNode<any>,
-    maskOrMasks: DataPathDef | DataPathDef[],
+    maskOrMasks: DataPathDef | Array<DataPathDef>,
     callback: ControlFlowCallback,
     opts?: ControlFlowSubscribeOptions,
   ): () => void {
@@ -1262,7 +1261,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
   /**
    * Выполняет внутреннюю операцию resolve observer nodes.
    */
-  private _resolveObserverNodes(node: RaphNode<any>, traversal: Traversal): RaphNode<any>[] {
+  private _resolveObserverNodes(node: RaphNode<any>, traversal: Traversal): Array<RaphNode<any>> {
     if (!this._graph.hasNode(node)) {
       return []
     }
@@ -1272,8 +1271,8 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     }
 
     if (traversal === 'dirty-and-down') {
-      const result: RaphNode<any>[] = []
-      node.traverseAll((child) => {
+      const result: Array<RaphNode<any>> = []
+      node.traverseAll(child => {
         if (this._graph.hasNode(child)) {
           result.push(child)
         }
@@ -1282,7 +1281,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     }
 
     if (traversal === 'dirty-and-up') {
-      const result: RaphNode<any>[] = []
+      const result: Array<RaphNode<any>> = []
       let current: RaphNode<any> | null = node
       while (current) {
         if (this._graph.hasNode(current)) {
@@ -1320,7 +1319,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
   /**
    * Выполняет внутреннюю операцию ordered all nodes.
    */
-  private _orderedAllNodes(): RaphNode<any>[] {
+  private _orderedAllNodes(): Array<RaphNode<any>> {
     return this._graph.topoOrder()
   }
 
@@ -1329,8 +1328,8 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
    */
   private _expandRuntimeContexts(
     phase: RaphPhase,
-    ctxs: PhaseExecutorContext[],
-  ): PhaseExecutorContext[] {
+    ctxs: Array<PhaseExecutorContext>,
+  ): Array<PhaseExecutorContext> {
     if (phase.mode === 'all' || phase.traversal === 'all') {
       const frame = ctxs[0]?.frame ?? this.__frameContext
       return this._orderedAllNodes().map(node => ({ phase: phase.name, node, frame }))
@@ -1338,10 +1337,10 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
 
     if (phase.traversal === 'dirty-and-down') {
       const seen = new Set<string>()
-      const result: PhaseExecutorContext[] = []
+      const result: Array<PhaseExecutorContext> = []
 
       for (const ctx of ctxs) {
-        ctx.node.traverseAll((node) => {
+        ctx.node.traverseAll(node => {
           if (seen.has(node.id) || !this._graph.hasNode(node)) {
             return
           }
@@ -1360,7 +1359,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
 
     if (phase.traversal === 'dirty-and-up') {
       const seen = new Set<string>()
-      const result: PhaseExecutorContext[] = []
+      const result: Array<PhaseExecutorContext> = []
 
       for (const ctx of ctxs) {
         let node: RaphNode<any> | null = ctx.node
@@ -1394,7 +1393,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
       routes: [],
       mode: localPhase.mode,
       always: localPhase.always,
-      all: (ctxs) => {
+      all: ctxs => {
         localPhase.run({
           frame: ctxs[0]?.frame ?? this.__frameContext,
           root: this._root,

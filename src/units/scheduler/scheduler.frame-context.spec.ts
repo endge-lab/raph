@@ -18,8 +18,8 @@ describe('RaphApp frame context', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const eachFrames: number[] = []
-    const allFrames: number[] = []
+    const eachFrames: Array<number> = []
+    const allFrames: Array<number> = []
 
     raph.definePhases([
       {
@@ -34,7 +34,7 @@ describe('RaphApp frame context', () => {
         name: 'all-phase' as PhaseName,
         traversal: 'dirty-only',
         routes: ['items.*'],
-        all: (ctxs: PhaseExecutorContext[]) => {
+        all: (ctxs: Array<PhaseExecutorContext>) => {
           allFrames.push(...ctxs.map(ctx => ctx.frame.frame))
         },
       },

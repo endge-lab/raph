@@ -9,7 +9,7 @@ describe('RaphKernel transaction', () => {
     const kernel = new RaphKernel()
     const runtime = kernel.createRuntime({ id: 'runtime', scheduler: SchedulerType.Sync })
     const node = new RaphNode(runtime, { id: 'node' })
-    const eventBatches: number[] = []
+    const eventBatches: Array<number> = []
 
     runtime.definePhases([
       {

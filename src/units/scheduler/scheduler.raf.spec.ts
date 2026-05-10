@@ -149,7 +149,7 @@ describe('RaphApp.scheduler-raf', () => {
     // Executor вызван для обоих узлов (порядок может отличаться)
     expect(exec.mock.calls.length).toBe(2)
     const seen = new Set(
-      exec.mock.calls.map((c) => (c[0] as PhaseExecutorContext).node.id),
+      exec.mock.calls.map(c => (c[0] as PhaseExecutorContext).node.id),
     )
     expect(seen).toEqual(new Set(['A', 'B']))
 
@@ -192,7 +192,7 @@ describe('RaphApp.scheduler-raf', () => {
     vi.advanceTimersByTime(16)
 
     const handled = new Set(
-      exec.mock.calls.map((c) => (c[0] as PhaseExecutorContext).node.id),
+      exec.mock.calls.map(c => (c[0] as PhaseExecutorContext).node.id),
     )
     expect(handled).toEqual(new Set(['l1', 'l2a', 'l2b', 'l3']))
   })

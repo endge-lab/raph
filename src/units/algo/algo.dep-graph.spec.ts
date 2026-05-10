@@ -8,7 +8,7 @@ describe('Dep Graph', () => {
   it('выполняет в порядке по depth, а внутри уровня - по weight (больше раньше)', () => {
     const app = new RaphApp()
     app.options({ scheduler: SchedulerType.Sync })
-    const calls: string[] = []
+    const calls: Array<string> = []
 
     app.definePhases([
       {
@@ -39,9 +39,9 @@ describe('Dep Graph', () => {
 
     // Пометим все узлы грязными разом (порядок добавления не должен влиять)
     for (const n of [E, C, A, D, B])
-      app.dirty('P' as PhaseName, n, {
+      {app.dirty('P' as PhaseName, n, {
         invalidate: false,
-      })
+      })}
     app.run()
 
     // Ожидаем:

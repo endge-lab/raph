@@ -9,7 +9,7 @@ describe('RaphRuntime.observeData', () => {
     const kernel = new RaphKernel()
     const runtime = kernel.createRuntime({ id: 'runtime', scheduler: SchedulerType.Sync })
     const node = new RaphNode(runtime, { id: 'node' })
-    const receivedEvents: number[] = []
+    const receivedEvents: Array<number> = []
     let runs = 0
 
     runtime.definePhases([

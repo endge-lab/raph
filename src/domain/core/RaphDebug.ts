@@ -32,8 +32,8 @@ type NodeInfo = {
 export type NodeTree = {
   id: string
   type?: string
-  children: NodeTree[]
-  routes: string[]
+  children: Array<NodeTree>
+  routes: Array<string>
 }
 
 /**
@@ -42,9 +42,9 @@ export type NodeTree = {
 export type NodeFlatDump = {
   id: string
   type?: string
-  parentIds: string[]
-  childIds: string[]
-  routes: string[]
+  parentIds: Array<string>
+  childIds: Array<string>
+  routes: Array<string>
 }
 
 /**
@@ -52,7 +52,7 @@ export type NodeFlatDump = {
  */
 export class RaphDebug {
   private enabled = false
-  private off: EventOff[] = []
+  private off: Array<EventOff> = []
   private getApp?: () => RaphRuntime<any>
   private events?: EventBus<any>
 
@@ -98,8 +98,8 @@ export class RaphDebug {
   /**
    * Вернуть плоский snapshot нод для таблиц и инспекторов.
    */
-  getFlat(): NodeFlatDump[] {
-    const out: NodeFlatDump[] = []
+  getFlat(): Array<NodeFlatDump> {
+    const out: Array<NodeFlatDump> = []
     for (const [id, info] of this.nodes) {
       out.push({
         id,
@@ -117,7 +117,7 @@ export class RaphDebug {
   /**
    * Вернуть дерево нод для визуального отображения.
    */
-  getTree(): NodeTree[] {
+  getTree(): Array<NodeTree> {
     const app = this.getApp?.()
     if (!app) return []
 
@@ -128,7 +128,7 @@ export class RaphDebug {
       const info = this.ensureInfo(n)
       const kids = Array.from(app.graph.childrenOf(n))
         .sort((a, b) => a.id.localeCompare(b.id))
-        .map((ch) => build(ch))
+        .map(ch => build(ch))
       seen.add(n.id)
       return {
         id: n.id,
@@ -140,7 +140,7 @@ export class RaphDebug {
 
     const forest = Array.from(roots)
       .sort((a, b) => a.id.localeCompare(b.id))
-      .map((r) => build(r))
+      .map(r => build(r))
 
     for (const id of this.nodes.keys()) {
       if (seen.has(id)) continue
@@ -186,7 +186,7 @@ export class RaphDebug {
       events.on(
         'nodes:notified',
         (_payload: {
-          ctxs: Array<{ phase: string; node: RaphNode; events?: any[] }>
+          ctxs: Array<{ phase: string; node: RaphNode; events?: Array<any> }>
         }) => {
           const currentApp = this.getApp?.()
           if (!currentApp) return
@@ -211,7 +211,9 @@ export class RaphDebug {
     for (const f of this.off) {
       try {
         f()
-      } catch {}
+      } catch {
+        //
+      }
     }
     this.off = []
   }

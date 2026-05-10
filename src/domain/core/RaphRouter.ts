@@ -37,7 +37,7 @@ export class RaphRouter<P = string> {
   /**
    * Выполняет внутреннюю операцию get segs.
    */
-  private _getSegs(input: DataPathDef): readonly DataPathSegment[] {
+  private _getSegs(input: DataPathDef): ReadonlyArray<DataPathSegment> {
     const key = this._toKey(input)
     const hit = this._segCache.get(key)
     if (hit) return hit
@@ -61,7 +61,7 @@ export class RaphRouter<P = string> {
    */
   private _cacheMatchWrite(pathKey: string, res: Set<P>): void {
     if (this._matchCache.size > RaphRouter.MAX_MATCH_CACHE)
-      this._matchCache.clear()
+      {this._matchCache.clear()}
     this._matchCache.set(pathKey, { v: this._version, res })
   }
 
@@ -79,7 +79,7 @@ export class RaphRouter<P = string> {
    */
   private _cachePrefixWrite(pathKey: string, res: Set<P>): void {
     if (this._prefixCache.size > RaphRouter.MAX_PREFIX_CACHE)
-      this._prefixCache.clear()
+      {this._prefixCache.clear()}
     this._prefixCache.set(pathKey, { v: this._version, res })
   }
 
@@ -144,7 +144,7 @@ export class RaphRouter<P = string> {
 
   /** Снять payload из всех узлов роутера (и deep, и end). */
   removePayload(payload: P): void {
-    const stack: RouterNode<P>[] = [this._root]
+    const stack: Array<RouterNode<P>> = [this._root]
     while (stack.length) {
       const n = stack.pop()!
 
@@ -184,7 +184,7 @@ export class RaphRouter<P = string> {
   remove(mask: DataPathDef, payload?: P): void {
     const segs = this._getSegs(mask)
 
-    const stack: {
+    const stack: Array<{
       node: RouterNode<P>
       via?: {
         typ: 'exact' | 'wc' | 'param'
@@ -192,7 +192,7 @@ export class RaphRouter<P = string> {
         pk?: string
         pvKey?: string
       }
-    }[] = []
+    }> = []
     let node = this._root
     stack.push({ node })
 
@@ -261,7 +261,7 @@ export class RaphRouter<P = string> {
     const out = new Set<P>()
 
     type Frame = { node: RouterNode<P>; i: number }
-    const stack: Frame[] = [{ node: this._root, i: 0 }]
+    const stack: Array<Frame> = [{ node: this._root, i: 0 }]
 
     while (stack.length) {
       const { node, i } = stack.pop()!
@@ -334,7 +334,7 @@ export class RaphRouter<P = string> {
   ): Array<{ payload: P; params: MatchParams }> {
     const segs = this._getSegs(path)
     type Frame = { node: RouterNode<P>; i: number; caps: MatchParams }
-    const stack: Frame[] = [{ node: this._root, i: 0, caps: {} }]
+    const stack: Array<Frame> = [{ node: this._root, i: 0, caps: {} }]
     const out: Array<{ payload: P; params: MatchParams }> = []
 
     while (stack.length) {
@@ -434,7 +434,7 @@ export class RaphRouter<P = string> {
         i: number
         params: Record<string, unknown>
       }
-      const stack: Frame[] = [{ node: this._root, i: 0, params: {} }]
+      const stack: Array<Frame> = [{ node: this._root, i: 0, params: {} }]
 
       while (stack.length) {
         const { node, i, params } = stack.pop()!
@@ -442,13 +442,13 @@ export class RaphRouter<P = string> {
         // deep: всегда валидны (включая пустой хвост)
         if (node.deep) {
           for (const p of node.deep)
-            exact.push({ payload: p, params: { ...params } })
+            {exact.push({ payload: p, params: { ...params } })}
         }
 
         if (i === segs.length) {
           if (node.end) {
             for (const p of node.end)
-              exact.push({ payload: p, params: { ...params } })
+              {exact.push({ payload: p, params: { ...params } })}
           }
           continue
         }
@@ -504,14 +504,14 @@ export class RaphRouter<P = string> {
     const below: Array<{ payload: P; params: Record<string, unknown> }> = []
 
     type Seed = { node: RouterNode<P>; params: Record<string, unknown> }
-    const seeds: Seed[] = (() => {
+    const seeds: Array<Seed> = (() => {
       type Frame = {
         node: RouterNode<P>
         i: number
         params: Record<string, unknown>
       }
-      const start: Frame[] = [{ node: this._root, i: 0, params: {} }]
-      const out: Seed[] = []
+      const start: Array<Frame> = [{ node: this._root, i: 0, params: {} }]
+      const out: Array<Seed> = []
 
       while (start.length) {
         const { node, i, params } = start.pop()!
@@ -580,11 +580,11 @@ export class RaphRouter<P = string> {
 
         if (node.deep) {
           for (const p of node.deep)
-            below.push({ payload: p, params: { ...params } })
+            {below.push({ payload: p, params: { ...params } })}
         }
         if (node.end) {
           for (const p of node.end)
-            below.push({ payload: p, params: { ...params } })
+            {below.push({ payload: p, params: { ...params } })}
         }
 
         if (node.exact) {
@@ -690,7 +690,7 @@ export class RaphRouter<P = string> {
 
     // 2) DFS по поддереву, собираем deep и end
     const out = new Set<P>()
-    const stack: RouterNode<P>[] = [node]
+    const stack: Array<RouterNode<P>> = [node]
 
     while (stack.length) {
       const n = stack.pop()!

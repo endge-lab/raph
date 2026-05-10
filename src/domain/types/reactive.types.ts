@@ -25,4 +25,4 @@ export interface RaphEffectOptions {
 /**
  * Описывает тип WatchCallback.
  */
-export type WatchCallback = (payload: { events: PhaseEvent[] }) => void
+export type WatchCallback = (payload: { events: Array<PhaseEvent> }) => void

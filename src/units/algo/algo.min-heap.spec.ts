@@ -15,7 +15,7 @@ describe('MinHeap: функциональные тесты', () => {
     const vals = [7, 1, 5, 2, 9, 3, 3, 0, -1, 10]
     for (const v of vals) h.push(v)
 
-    const out: number[] = []
+    const out: Array<number> = []
     while (!h.empty) out.push(h.pop()!)
     const sorted = [...vals].sort((a, b) => a - b)
 
@@ -38,7 +38,7 @@ describe('MinHeap: функциональные тесты', () => {
 
   it('replaceTop заменяет минимум и восстанавливает кучу', () => {
     const h = new MinHeap()
-    ;[5, 4, 3, 2, 1].forEach((x) => h.push(x))
+    ;[5, 4, 3, 2, 1].forEach(x => h.push(x))
 
     const prevMin = h.replaceTop(10)
     expect(prevMin).toBe(1)
@@ -58,7 +58,7 @@ describe('MinHeap: функциональные тесты', () => {
     const arr = Array.from({ length: N_SMALL }, () => rng() % 1_000_000 | 0)
     h.buildFrom(arr)
 
-    const out: number[] = []
+    const out: Array<number> = []
     while (!h.empty) out.push(h.pop()!)
 
     const sorted = [...arr].sort((a, b) => a - b)
@@ -117,7 +117,7 @@ describe('MinHeap: функциональные тесты', () => {
     const rng = makeLCG(1337)
     const data = Array.from({ length: N_SMALL }, () => rng() % 10_000 | 0)
     for (const x of data) h.push(x)
-    const out: number[] = []
+    const out: Array<number> = []
     while (!h.empty) out.push(h.pop()!)
 
     const sorted = [...data].sort((a, b) => a - b)

@@ -29,7 +29,7 @@ describe('RaphApp.run - порядок выполнения', () => {
     raph.addNode(n1)
     raph.addNode(n2)
 
-    const calls: string[] = []
+    const calls: Array<string> = []
 
     raph.definePhases([
       {
@@ -73,7 +73,7 @@ describe('RaphApp.run - порядок выполнения', () => {
     raph.addNode(b)
     raph.addNode(c)
 
-    const order: string[] = []
+    const order: Array<string> = []
     raph.definePhases([
       {
         name: 'phase' as PhaseName,
@@ -111,7 +111,7 @@ describe('RaphApp.run - порядок выполнения', () => {
     p.addChild(c2)
     c1.addChild(g1)
 
-    const seen: string[] = []
+    const seen: Array<string> = []
     raph.definePhases([
       {
         name: 'phase' as PhaseName,
@@ -141,7 +141,7 @@ describe('RaphApp.run - порядок выполнения', () => {
     p.addChild(c)
     c.addChild(g)
 
-    const seq: string[] = []
+    const seq: Array<string> = []
     raph.definePhases([
       {
         name: 'phase' as PhaseName,
@@ -174,7 +174,7 @@ describe('RaphApp.run - порядок выполнения', () => {
     a.addChild(c)
     c.addChild(d)
 
-    const seq: string[] = []
+    const seq: Array<string> = []
     raph.definePhases([
       {
         name: 'phase-all' as PhaseName,
@@ -208,7 +208,7 @@ describe('RaphApp.run - порядок выполнения', () => {
     raph.addNode(n20)
     raph.addNode(n30)
 
-    const order: string[] = []
+    const order: Array<string> = []
     raph.definePhases([
       {
         name: 'phase' as PhaseName,
@@ -245,7 +245,7 @@ describe('RaphApp.run - порядок выполнения', () => {
     c1.addChild(g1)
     p.addChild(c2)
 
-    const calls: string[] = []
+    const calls: Array<string> = []
 
     raph.definePhases([
       {

@@ -34,7 +34,7 @@ function fmt(num: number, digits = 3) {
 
 function logBench(title: string, data: Record<string, number | string>) {
   const parts = Object.entries(data).map(([k, v]) => `${k}=${v}`)
-  // eslint-disable-next-line no-console
+
   console.info(`[bench][${title}] ${parts.join(', ')}`)
 }
 
@@ -47,7 +47,7 @@ describe('RaphRouter – бенчмарки', () => {
 
   it('add() производительность: точные ключи (N=50k)', () => {
     const N = 50_000
-    const patterns: string[] = []
+    const patterns: Array<string> = []
     for (let i = 0; i < N; i++) patterns.push(`com.k${i}.v`)
 
     const t0 = now()
@@ -247,7 +247,7 @@ describe('RaphRouter – бенчмарки', () => {
     const tAdd1 = now()
 
     const Q = 200_000
-    const queries: string[] = []
+    const queries: Array<string> = []
     for (let i = 0; i < Q; i++) {
       const r = rnd()
       if (r < 0.25) queries.push(`com.k${i % addN}.v`)

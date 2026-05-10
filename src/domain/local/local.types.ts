@@ -54,7 +54,7 @@ export interface RaphLocalPropertyDescriptor<
   phase: RaphLocalPhaseName
   propagation?: RaphPropagation
   compute?: RaphLocalPropertyCompute<P, K>
-  dependsOn?: (keyof P)[]
+  dependsOn?: Array<keyof P>
   defaultValue?: P[K]
 }
 
@@ -94,7 +94,7 @@ export interface RaphLocalPhaseContext<P extends RaphProperties> {
   phase: RaphLocalPhase<P>
   frame: RaphFrameContext
   root: RaphNode<P>
-  dirty: RaphNode<P>[]
+  dirty: Array<RaphNode<P>>
 }
 
 /**

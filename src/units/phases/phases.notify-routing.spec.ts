@@ -61,7 +61,7 @@ describe('RaphApp.notify routing', () => {
 
     expect(exec).toHaveBeenCalled() // хотя бы один вызов
     const callsForPhase = exec.mock.calls.filter(
-      (c) => c[0].phase === ('phase' as PhaseName),
+      c => c[0].phase === ('phase' as PhaseName),
     )
     expect(callsForPhase.length).toBeGreaterThan(0)
   })
@@ -164,12 +164,12 @@ describe('RaphApp.notify routing', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const seen: string[] = []
+    const seen: Array<string> = []
     raph.definePhases([
       {
         name: 'phase' as PhaseName,
         traversal: 'dirty-only',
-        each: (ctx) => {
+        each: ctx => {
           seen.push(ctx.node.id)
         },
         routes: ['data.*'],
@@ -188,12 +188,12 @@ describe('RaphApp.notify routing', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const seen: string[] = []
+    const seen: Array<string> = []
     raph.definePhases([
       {
         name: 'phase' as PhaseName,
         traversal: 'dirty-and-down',
-        each: (ctx) => {
+        each: ctx => {
           seen.push(ctx.node.id)
         },
         routes: ['data.*'],
@@ -214,12 +214,12 @@ describe('RaphApp.notify routing', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const seen: string[] = []
+    const seen: Array<string> = []
     raph.definePhases([
       {
         name: 'phase' as PhaseName,
         traversal: 'dirty-and-up',
-        each: (ctx) => {
+        each: ctx => {
           seen.push(ctx.node.id)
         },
         routes: ['data.*'],
@@ -243,7 +243,7 @@ describe('RaphApp.notify routing', () => {
       {
         name: 'phase' as PhaseName,
         traversal: 'all',
-        each: (ctx) => {
+        each: ctx => {
           // root у RaphNode имеет id вида "root-..." (или определён вашей реализацией)
           seen.add(ctx.node.id)
         },
@@ -258,7 +258,7 @@ describe('RaphApp.notify routing', () => {
     raph.set('data.any', 777)
 
     // По крайней мере все пользовательские узлы из нашего дерева должны быть
-    ;[a, a1, b, b1, b2].forEach((n) => expect(seen.has(n.id)).toBe(true))
+    ;[a, a1, b, b1, b2].forEach(n => expect(seen.has(n.id)).toBe(true))
   })
 
   it('маршруты с несколькими сегментами и суффиксным wildcard работают корректно', () => {

@@ -30,7 +30,7 @@ describe('RaphApp Base', () => {
     // Raph.watch('FLT_ARR', () => {
     //   console.log('Watch FLT_ARR')
     // })
-    Raph.watch('FLT_ARR.legs[id=$id].*', (p) => {
+    Raph.watch('FLT_ARR.legs[id=$id].*', p => {
       console.log('Watch FLT_ARR.legs[*]')
       console.log(p)
     })
@@ -45,7 +45,7 @@ describe('RaphApp Base', () => {
     Raph.set('FLT_ARR.legs[id=1].name', 'second')
   })
 
-  function expectSetEqual<T>(set: Set<T>, arr: T[]): void {
+  function expectSetEqual<T>(set: Set<T>, arr: Array<T>): void {
     expect(set.size).toBe(arr.length)
     for (const v of arr) expect(set.has(v)).toBe(true)
   }

@@ -44,7 +44,7 @@ describe('RaphApp.traversal', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const calls: string[] = []
+    const calls: Array<string> = []
 
     raph.definePhases([
       {
@@ -74,7 +74,7 @@ describe('RaphApp.traversal', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const calls: string[] = []
+    const calls: Array<string> = []
     raph.definePhases([
       {
         name: 'phase-down' as PhaseName,
@@ -103,7 +103,7 @@ describe('RaphApp.traversal', () => {
   it('dirty-and-down: устраняет дублирование при пересечении dirty-нод', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
-    const calls: string[] = []
+    const calls: Array<string> = []
 
     raph.definePhases([
       {
@@ -132,7 +132,7 @@ describe('RaphApp.traversal', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const calls: string[] = []
+    const calls: Array<string> = []
     raph.definePhases([
       {
         name: 'phase-up' as PhaseName,
@@ -162,7 +162,7 @@ describe('RaphApp.traversal', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const calls: string[] = []
+    const calls: Array<string> = []
     raph.definePhases([
       {
         name: 'phase-all' as PhaseName,
@@ -194,8 +194,8 @@ describe('RaphApp.traversal', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const downCalls: string[] = []
-    const upCalls: string[] = []
+    const downCalls: Array<string> = []
+    const upCalls: Array<string> = []
 
     raph.definePhases([
       {

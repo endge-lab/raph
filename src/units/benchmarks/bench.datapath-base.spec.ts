@@ -45,7 +45,7 @@ describe('DefaultDataAdapter deep & nested set() bench', () => {
 
     const deepMs = (t1 - t0).toFixed(2)
     const mixedMs = (t3 - t2).toFixed(2)
-    // eslint-disable-next-line no-console
+
     console.info(
       `[DataAdapter] deep=${DEPTH}*${REPEATS} => ${deepMs}ms; mixed rows=${GROUPS}, items=${ITEMS} => ${mixedMs}ms`,
     )

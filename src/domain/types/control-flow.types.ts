@@ -51,7 +51,7 @@ export interface ControlFlowPayload {
   /**
    * Батч событий текущего тика.
    */
-  events: PhaseEvent[]
+  events: Array<PhaseEvent>
 
   /**
    * Первый набор захваченных параметров.
@@ -63,7 +63,7 @@ export interface ControlFlowPayload {
    * Полный список совпадений текущего тика.
    * Нужен, чтобы не терять параметры при нескольких match за один flush.
    */
-  matches: ControlFlowMatch[]
+  matches: Array<ControlFlowMatch>
 }
 
 /**
@@ -94,12 +94,12 @@ export interface ControlFlowSubscriptionRecord {
   /**
    * Исходные маски, которые были переданы при подписке.
    */
-  masks: DataPathDef[]
+  masks: Array<DataPathDef>
 
   /**
    * Нормализованные маршруты, зарегистрированные в роутере.
    */
-  routes: DataPath[]
+  routes: Array<DataPath>
 
   /**
    * Callback, который вызывается после стабилизации dataflow-контура.
@@ -134,5 +134,5 @@ export interface DirtyControlFlowSubscription {
   /**
    * Полный список совпадений за тик.
    */
-  matches: ControlFlowMatch[]
+  matches: Array<ControlFlowMatch>
 }

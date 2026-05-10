@@ -6,7 +6,7 @@ function time<T>(label: string, fn: () => T) {
   const res = fn()
   const t1 = performance.now()
   const dt = t1 - t0
-  // eslint-disable-next-line no-console
+
   console.info(`${label}: ${dt.toFixed(2)}ms`)
   return { res, ms: dt }
 }
@@ -49,7 +49,7 @@ describe('RaphRouter - бенчмарки с параметрическими п
     r.add('users[id=$uid].profile.tags[id=$tid]', 'D')
 
     const Q = 50_000
-    const results: number[] = []
+    const results: Array<number> = []
 
     // прогрев кэшей
     ;(r as any).matchWithParams('orders[id=1].items[id=2].price')
@@ -150,7 +150,7 @@ describe('RaphRouter - бенчмарки с параметрическими п
           res = (r as any).matchIncludingPrefixWithParams(`orders[id=${oid}]`)
           // должны приходить payload'ы с params.oid
           if (res?.length) {
-            const anyWithOid = res.find((x) => x.params && 'oid' in x.params)
+            const anyWithOid = res.find(x => x.params && 'oid' in x.params)
             if (anyWithOid) {
               expect(anyWithOid.params.oid).toBe(oid)
               counter.cap++
@@ -165,7 +165,7 @@ describe('RaphRouter - бенчмарки с параметрическими п
           // здесь должен быть захват { oid, iid }
           if (res?.length) {
             const withBoth = res.find(
-              (x) => x.params && x.params.oid === oid && x.params.iid === iid,
+              x => x.params && x.params.oid === oid && x.params.iid === iid,
             )
             if (withBoth) counter.cap++
           }
@@ -185,7 +185,7 @@ describe('RaphRouter - бенчмарки с параметрическими п
 
   it('removePayload / удаление масок не ухудшает кэши', () => {
     const r = new RaphRouter<string>()
-    const ids: string[] = []
+    const ids: Array<string> = []
     for (let i = 0; i < 5000; i++) {
       const m1 = `orders[id=$oid].items[id=$iid_${i}].price`
       const m2 = `users[id=$uid_${i}].profile.*`

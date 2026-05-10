@@ -38,7 +38,7 @@ export type PhaseEvent = {
   canonical: string
   canonicalDataPath: DataPath
 
-  resolved: ResolvedEntry[]
+  resolved: Array<ResolvedEntry>
 
   // захваченные параметры (если были)
   // params?: Record<string, unknown>
@@ -51,7 +51,7 @@ export type PhaseExecutorContext = {
   phase: PhaseName
   node: RaphNode<any>
   frame: RaphFrameContext
-  events?: PhaseEvent[]
+  events?: Array<PhaseEvent>
 }
 
 /**
@@ -65,7 +65,7 @@ export type PhaseEachExecutor = (
  * Описывает тип PhaseAllExecutor.
  */
 export type PhaseAllExecutor = (
-  ctxs: PhaseExecutorContext[],
+  ctxs: Array<PhaseExecutorContext>,
 ) => unknown | Promise<unknown>
 
 /**
@@ -74,10 +74,10 @@ export type PhaseAllExecutor = (
 export type RaphPhase = {
   name: PhaseName
   traversal: Traversal
-  routes: string[]
+  routes: Array<string>
   always?: boolean
   mode?: 'dirty' | 'all'
   each?: PhaseEachExecutor
   all?: PhaseAllExecutor
-  nodes?: ((node: RaphNode<any>) => boolean) | RaphNodeType[]
+  nodes?: ((node: RaphNode<any>) => boolean) | Array<RaphNodeType>
 }

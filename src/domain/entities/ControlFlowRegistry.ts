@@ -7,7 +7,6 @@ import type {
   ControlFlowSubscriptionId,
   ControlFlowSubscriptionRecord,
 } from '@/domain/types/control-flow.types'
-
 import { DataPath } from '@/domain/entities/DataPath'
 
 /**
@@ -56,7 +55,7 @@ export class ControlFlowRegistry {
    */
   subscribe(
     ownerNode: RaphNode<any>,
-    maskOrMasks: DataPathDef | DataPathDef[],
+    maskOrMasks: DataPathDef | Array<DataPathDef>,
     callback: ControlFlowCallback,
     opts?: ControlFlowSubscribeOptions,
   ): ControlFlowSubscriptionRecord {
@@ -133,7 +132,7 @@ export class ControlFlowRegistry {
    * Получить все подписки owner-ноды.
    * Возвращает снимок массива, чтобы вызывающая сторона могла безопасно итерироваться.
    */
-  getSubscriptionIdsByOwner(ownerId: string): ControlFlowSubscriptionId[] {
+  getSubscriptionIdsByOwner(ownerId: string): Array<ControlFlowSubscriptionId> {
     return [...(this._subscriptionsByOwner.get(ownerId) ?? [])]
   }
 

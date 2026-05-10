@@ -69,8 +69,8 @@ describe('DefaultDataAdapter - простые корректностные те�
 
     // элемент создан, x установлен, id проставлен/сохранён
     expect(a.get('com[id=101].x')).toBe(5)
-    const arr = a.get('com') as any[]
-    const created = arr.find((el) => el?.id === 101)
+    const arr = a.get('com') as Array<any>
+    const created = arr.find(el => el?.id === 101)
     expect(created).toBeTruthy()
     expect(created.x).toBe(5)
   })

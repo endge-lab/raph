@@ -68,7 +68,7 @@ function createRuntimeIsolationFixture() {
   ]
 
   for (const runtime of runtimes) {
-    const phases: RaphPhase[] = []
+    const phases: Array<RaphPhase> = []
     for (let i = 0; i < 10; i++) {
       phases.push({
         name: `${runtime.id}-phase-${i}` as PhaseName,

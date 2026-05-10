@@ -52,7 +52,7 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
 
   // ordered tree для instant/local сценариев
   private _parent: RaphNode<any> | null = null
-  private _children: RaphNode<any>[] = []
+  private _children: Array<RaphNode<any>> = []
 
   // local values не проходят через DataAdapter
   private _localValues: Record<string, unknown> = {}
@@ -158,7 +158,7 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     }
 
     const values = rest as Partial<P>
-    for (const key of Object.keys(values) as (keyof P)[]) {
+    for (const key of Object.keys(values) as Array<keyof P>) {
       const value = values[key]
       if (value !== undefined) {
         this.set(key, value as P[typeof key])
@@ -335,8 +335,8 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
   /**
    * Возвращает children.
    */
-  get children(): RaphNode<P>[] {
-    return this._children as RaphNode<P>[]
+  get children(): Array<RaphNode<P>> {
+    return this._children as Array<RaphNode<P>>
   }
 
   /**

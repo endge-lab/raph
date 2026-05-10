@@ -14,7 +14,7 @@ type PropertyOptions = {
   phase: string
   default?: any
   propagation?: RaphPropagation
-  dependsOn?: string[]
+  dependsOn?: Array<string>
   compute?: (self: any) => any
 }
 
@@ -84,13 +84,13 @@ export function RaphLocalAfter(options: NodeHandlerOptions): MethodDecorator {
  */
 export function extractRaphLocalProperties<P extends RaphProperties>(
   instance: any,
-): RaphLocalPropertyDescriptor<P, keyof P>[] {
+): Array<RaphLocalPropertyDescriptor<P, keyof P>> {
   const raw = propertyMetadata.get(instance.constructor)
   if (!raw) {
     return []
   }
 
-  const result: RaphLocalPropertyDescriptor<P, keyof P>[] = []
+  const result: Array<RaphLocalPropertyDescriptor<P, keyof P>> = []
 
   for (const [key, options] of raw.entries()) {
     const name = key as keyof P
@@ -113,7 +113,7 @@ export function extractRaphLocalProperties<P extends RaphProperties>(
       name,
       phase: options.phase,
       propagation,
-      dependsOn: (options.dependsOn ?? []) as (keyof P)[],
+      dependsOn: (options.dependsOn ?? []) as Array<keyof P>,
       defaultValue,
       compute,
     })
@@ -155,7 +155,7 @@ export function extractRaphLocalPhases<P extends RaphProperties>(
  */
 export function extractRaphLocalAfterHandlers(
   instance: any,
-): { phase: string, methodName: string }[] {
+): Array<{ phase: string, methodName: string }> {
   const raw = nodeHandlerMetadata.get(instance.constructor)
   if (!raw) {
     return []

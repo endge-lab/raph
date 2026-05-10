@@ -9,7 +9,7 @@ import { RaphNode } from '@/domain/core/RaphNode'
 function buildDeepChain(n: number) {
   const app = new RaphApp()
   const g = new DepGraph()
-  const nodes: RaphNode[] = []
+  const nodes: Array<RaphNode> = []
   for (let i = 0; i < n; i++) {
     const node = new RaphNode(app, { id: `A${i}`, weight: i & 7 })
     g.addNode(node)
@@ -31,8 +31,8 @@ function buildDeepChain(n: number) {
 function buildRegularTree(branching: number, levels: number) {
   const app = new RaphApp()
   const g = new DepGraph()
-  const byLevel: RaphNode[][] = []
-  const all: RaphNode[] = []
+  const byLevel: Array<Array<RaphNode>> = []
+  const all: Array<RaphNode> = []
 
   // root
   const root = new RaphNode(app, { id: 'R0', weight: 0 })
@@ -42,7 +42,7 @@ function buildRegularTree(branching: number, levels: number) {
 
   for (let lvl = 1; lvl <= levels; lvl++) {
     const prev = byLevel[lvl - 1]
-    const cur: RaphNode[] = []
+    const cur: Array<RaphNode> = []
     for (let p = 0; p < prev.length; p++) {
       for (let b = 0; b < branching; b++) {
         const id = `R${lvl}_${p}_${b}`
@@ -81,8 +81,8 @@ describe('DepGraph bench & correctness', () => {
     const LEVELS = 6
     const BRANCH = 5
 
-    const nodes: RaphNode[] = []
-    const ids: string[] = []
+    const nodes: Array<RaphNode> = []
+    const ids: Array<string> = []
 
     const t0 = performance.now()
 
@@ -157,7 +157,6 @@ describe('DepGraph bench & correctness', () => {
     const downMs = (tDown1 - tDown0).toFixed(2)
     const upMs = (tUp1 - tUp0).toFixed(2)
 
-    // eslint-disable-next-line no-console
     console.info(
       `[DepGraph] nodes=${nodes.length}, build=${buildMs}ms, expandDown=${downMs}ms, expandUp=${upMs}ms`,
     )
@@ -193,7 +192,7 @@ describe('DepGraph bench & correctness', () => {
     expect(all.size).toBe(N)
 
     // Логи - для отладки скоростей локально
-    // eslint-disable-next-line no-console
+
     console.info(
       `[DepGraph/deep] N=${N} down=${downMs.toFixed(
         2,
@@ -235,7 +234,6 @@ describe('DepGraph bench & correctness', () => {
     expect(up.size).toBeLessThanOrEqual(total)
     expect(all.size).toBe(total)
 
-    // eslint-disable-next-line no-console
     console.info(
       `[DepGraph/tree] total=${total} seeds=${byLevel[1].length} down=${downMs.toFixed(
         2,
@@ -253,7 +251,6 @@ describe('DepGraph bench & correctness', () => {
     expect(res.size).toBe(base.size)
     for (const n of base) expect(res.has(n)).toBe(true)
 
-    // eslint-disable-next-line no-console
     console.info(`[DepGraph/only] N=${N} only=${ms.toFixed(2)}ms`)
   })
 })

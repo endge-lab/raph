@@ -27,7 +27,7 @@ export class RaphKernel {
   private readonly _dataObserverRouter = new RaphRouter<RaphDataObserver<any>>()
   private _dataObserverCounter = 0
   private _transactionDepth = 0
-  private readonly _pendingEvents: RaphKernelPendingEvent[] = []
+  private readonly _pendingEvents: Array<RaphKernelPendingEvent> = []
 
   /**
    * Создает instance и подготавливает shared data-store.
@@ -230,7 +230,7 @@ export class RaphKernel {
   /**
    * Выполняет внутреннюю операцию deliver events.
    */
-  private _deliverEvents(events: RaphKernelPendingEvent[]): void {
+  private _deliverEvents(events: Array<RaphKernelPendingEvent>): void {
     const runtimesToInvalidate = new Set<RaphRuntime<any>>()
 
     for (const pending of events) {

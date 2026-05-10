@@ -61,7 +61,7 @@ describe('bench.notify x1_000', () => {
     expect(execCount).toBe(ITER)
 
     // Отладочная метрика - не "ожидание", просто лог в отчёт
-    // eslint-disable-next-line no-console
+
     console.info(
       `[bench.notify x${ITER}] total=${totalMs.toFixed(
         3,
@@ -118,7 +118,6 @@ describe('bench.notify x1_000', () => {
     expect(seen.has('c')).toBe(true)
     expect(seen.has('d')).toBe(true)
 
-    // eslint-disable-next-line no-console
     console.info(`[bench.notify fanout x${ITER}] total=${totalMs.toFixed(3)}ms`)
   })
 })

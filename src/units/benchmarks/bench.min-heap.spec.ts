@@ -26,7 +26,7 @@ describe('MinHeap: бенчмарки (CI-friendly)', () => {
     const t1 = performance.now()
 
     const elapsed = t1 - t0
-    // eslint-disable-next-line no-console
+
     console.log(
       `[MinHeap bench] push+pop N=${N_MED}, time=${elapsed.toFixed(2)}ms, perOp=${(
         (elapsed * 1000) /
@@ -47,7 +47,7 @@ describe('MinHeap: бенчмарки (CI-friendly)', () => {
     const t1 = performance.now()
 
     const elapsed = t1 - t0
-    // eslint-disable-next-line no-console
+
     console.log(
       `[MinHeap bench] buildFrom+pop N=${N_MED}, time=${elapsed.toFixed(
         2,
@@ -78,7 +78,6 @@ describe('MinHeap: бенчмарки (CI-friendly)', () => {
     t1 = performance.now()
     const tPush = t1 - t0
 
-    // eslint-disable-next-line no-console
     console.log(
       `[MinHeap bench] N=${N_SMALL} :: buildFrom=${tBuild.toFixed(
         2,

@@ -90,13 +90,13 @@ describe('RaphApp.scheduler-sync', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const seen: string[] = []
+    const seen: Array<string> = []
     raph.definePhases([
       {
         name: 'sync-phase' as PhaseName,
         traversal: 'dirty-and-down',
         routes: ['com.*'],
-        each: (ctx) => {
+        each: ctx => {
           seen.push(ctx.node.id)
         },
       },

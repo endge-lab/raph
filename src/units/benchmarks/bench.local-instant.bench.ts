@@ -80,7 +80,7 @@ function createBenchTree(size: number) {
   const root = new BenchNode(app, 'root')
   app.addNode(root)
 
-  const nodes: BenchNode[] = [root]
+  const nodes: Array<BenchNode> = [root]
   for (let i = 1; i < size; i++) {
     const node = new BenchNode(app, `n${i}`)
     nodes[(i - 1) >> 1].addChild(node)

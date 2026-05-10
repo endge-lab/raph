@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
@@ -38,7 +37,6 @@ describe('bench.control-flow', () => {
     expect(calls).toBe(ITER)
     expect(eventsSeen).toBe(ITER)
 
-    // eslint-disable-next-line no-console
     console.info(
       `[bench.control-flow single x${ITER}] total=${totalMs.toFixed(3)}ms`,
     )
@@ -75,7 +73,6 @@ describe('bench.control-flow', () => {
     expect(calls).toBe(SUBS)
     expect(eventsSeen).toBe(SUBS * ITER)
 
-    // eslint-disable-next-line no-console
     console.info(
       `[bench.control-flow fanout subs=${SUBS} events=${ITER}] total=${totalMs.toFixed(
         3,

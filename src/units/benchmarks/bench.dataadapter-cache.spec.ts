@@ -38,11 +38,11 @@ describe('DefaultDataAdapter - perf & correctness (indexed vs non-indexed)', () 
           const iter = ITERS[SIZE]
           // два адаптера с одинаковыми данными
           const aNoIdx = new DefaultDataAdapter(
-            { com: base.map((o) => ({ ...o })) },
+            { com: base.map(o => ({ ...o })) },
             { indexEnabled: false },
           )
           const aIdx = new DefaultDataAdapter(
-            { com: base.map((o) => ({ ...o })) },
+            { com: base.map(o => ({ ...o })) },
             { indexEnabled: true },
           )
 
@@ -76,7 +76,7 @@ describe('DefaultDataAdapter - perf & correctness (indexed vs non-indexed)', () 
           }, iter)
 
           // лог
-          // eslint-disable-next-line no-console
+
           console.log(
             `[GET] size=${SIZE}, iter=${iter}  no-index=${hr(rNoIdx.opsPerSec)} ops/s  indexed=${hr(rIdx.opsPerSec)} ops/s  speedup=${hr(rIdx.opsPerSec / rNoIdx.opsPerSec)}x`,
           )
@@ -92,11 +92,11 @@ describe('DefaultDataAdapter - perf & correctness (indexed vs non-indexed)', () 
         () => {
           const iter = ITERS[SIZE]
           const aNoIdx = new DefaultDataAdapter(
-            { com: base.map((o) => ({ ...o })) },
+            { com: base.map(o => ({ ...o })) },
             { indexEnabled: false },
           )
           const aIdx = new DefaultDataAdapter(
-            { com: base.map((o) => ({ ...o })) },
+            { com: base.map(o => ({ ...o })) },
             { indexEnabled: true },
           )
 
@@ -122,7 +122,7 @@ describe('DefaultDataAdapter - perf & correctness (indexed vs non-indexed)', () 
           }, iter)
 
           // лог
-          // eslint-disable-next-line no-console
+
           console.log(
             `[SET] size=${SIZE}, iter=${iter}  no-index=${hr(rNoIdx.opsPerSec)} ops/s  indexed=${hr(rIdx.opsPerSec)} ops/s  speedup=${hr(rIdx.opsPerSec / rNoIdx.opsPerSec)}x`,
           )

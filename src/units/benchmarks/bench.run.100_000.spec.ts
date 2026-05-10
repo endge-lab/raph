@@ -28,7 +28,7 @@ describe('bench.run() большая графовая структура и мн
     const LEVELS = 5
     const BRANCH = 6
 
-    const ids: string[] = []
+    const ids: Array<string> = []
 
     const makeTree = (
       parent: RaphNode | null,
@@ -69,7 +69,7 @@ describe('bench.run() большая графовая структура и мн
     const mkPhase = (
       name: string,
       traversal: 'dirty-only' | 'dirty-and-down' | 'dirty-and-up' | 'all',
-      routes: string[],
+      routes: Array<string>,
     ): RaphPhase => ({
       name: name as PhaseName,
       traversal,
@@ -79,7 +79,7 @@ describe('bench.run() большая графовая структура и мн
       },
     })
 
-    const phases: RaphPhase[] = [
+    const phases: Array<RaphPhase> = [
       mkPhase('p-data-dirty', 'dirty-only', ['data.*']),
       mkPhase('p-com-down', 'dirty-and-down', ['com.*']),
       mkPhase('p-com-up', 'dirty-and-up', ['com.*']),
@@ -122,7 +122,6 @@ describe('bench.run() большая графовая структура и мн
     const totalExec = Object.values(execCounters).reduce((a, b) => a + b, 0)
     expect(totalExec).toBeGreaterThan(0)
 
-    // eslint-disable-next-line no-console
     console.info(
       `[bench.run()] nodes=${ids.length}, phases=${phases.length}, execCalls=${totalExec}, time=${total.toFixed(
         3,
@@ -130,7 +129,7 @@ describe('bench.run() большая графовая структура и мн
     )
 
     // Дополнительно выведем распределение по фазам:
-    // eslint-disable-next-line no-console
+
     console.info(
       Object.entries(execCounters)
         .sort((a, b) => b[1] - a[1])

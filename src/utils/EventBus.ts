@@ -40,8 +40,8 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
   /**
    * @param predefinedEvents Предопределённые события, для которых заранее создаются записи в карте.
    */
-  constructor(predefinedEvents: (keyof StaticEvents)[] = []) {
-    predefinedEvents.forEach((event) => {
+  constructor(predefinedEvents: Array<keyof StaticEvents> = []) {
+    predefinedEvents.forEach(event => {
       this.listeners.set(event as string, new Set())
     })
   }
@@ -144,7 +144,7 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
    *
    * @returns Массив названий событий.
    */
-  eventNames(): string[] {
+  eventNames(): Array<string> {
     return [...this.listeners.entries()]
       .filter(([, set]) => set.size > 0)
       .map(([event]) => event)
@@ -182,5 +182,5 @@ export type GlobalEvents = {
 }
 
 export const AppBus = new EventBus<GlobalEvents>(
-  Object.keys({} as GlobalEvents) as (keyof GlobalEvents)[],
+  Object.keys({} as GlobalEvents) as Array<keyof GlobalEvents>,
 )

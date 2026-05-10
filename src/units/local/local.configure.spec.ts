@@ -20,7 +20,7 @@ interface LocalProps extends RaphProperties {
 }
 
 class LocalNode extends RaphNode<LocalProps> {
-  readonly afterCalls: string[] = []
+  readonly afterCalls: Array<string> = []
 
   constructor(app = new RaphApp<LocalProps>(), id = 'node') {
     super(app, { id })
@@ -71,7 +71,7 @@ class LocalNode extends RaphNode<LocalProps> {
 }
 
 class LocalRuntime {
-  readonly phases: string[] = []
+  readonly phases: Array<string> = []
 
   @RaphLocalPhase({ name: 'before', priority: -1, always: true })
   before(): void {

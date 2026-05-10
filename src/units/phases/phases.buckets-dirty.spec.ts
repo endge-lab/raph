@@ -10,7 +10,7 @@ import { SchedulerType } from '@/domain/types/base.types'
 function getPhaseDirty(app: RaphApp, name: PhaseName) {
   const dirty = (app as any)._dirty as Map<
     PhaseName,
-    { buckets: Map<number, RaphNode[]>; heap: any; inHeap: Set<number> }
+    { buckets: Map<number, Array<RaphNode>>; heap: any; inHeap: Set<number> }
   >
   return dirty.get(name)
 }
@@ -88,7 +88,7 @@ describe('RaphApp.dirty-buckets (Map + MinHeap)', () => {
     const q = getPhaseDirty(app, PHASE)!
     const idx = findBucketIndex(q, n)!
     const arr = q.buckets.get(idx)!
-    expect(arr.filter((x) => x === n).length).toBe(1)
+    expect(arr.filter(x => x === n).length).toBe(1)
   })
 
   it('кладёт несколько нод в один и тот же бакет, если их индексы совпадают', () => {
@@ -184,7 +184,7 @@ describe('RaphApp.dirty-buckets (Map + MinHeap)', () => {
     app.options({ scheduler: SchedulerType.Sync })
 
     const PHASE = 'phase-order' as PhaseName
-    const order: string[] = []
+    const order: Array<string> = []
     app.definePhases([
       {
         name: PHASE,
@@ -279,7 +279,7 @@ describe('RaphApp.dirty-buckets (Map + MinHeap)', () => {
 
     const q = getPhaseDirty(app, PHASE)!
     const all = Array.from(q.buckets.values()).flat()
-    expect(all.some((n) => n.id === 'src')).toBe(true)
-    expect(all.some((n) => n.id === 'dep')).toBe(true)
+    expect(all.some(n => n.id === 'src')).toBe(true)
+    expect(all.some(n => n.id === 'dep')).toBe(true)
   })
 })

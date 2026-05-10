@@ -6,7 +6,7 @@ import type { PhaseName } from '@/domain/types/phase.types'
 describe('RaphApp track/untrack (router-based)', () => {
   function makeRaphWithPhase(route: string) {
     const raph = new RaphApp()
-    const fired: RaphNode[] = []
+    const fired: Array<RaphNode> = []
 
     raph.definePhases([
       {
@@ -93,12 +93,12 @@ describe('RaphApp track/untrack (router-based)', () => {
 
     // событие по com.x
     raph.set('com.x', 1)
-    expect(fired.some((f) => f.node === node)).toBe(true)
+    expect(fired.some(f => f.node === node)).toBe(true)
 
     // сбросим фиксацию и проверим второй маршрут
     fired.length = 0
     raph.set('data.y', 2)
-    expect(fired.some((f) => f.node === node)).toBe(true)
+    expect(fired.some(f => f.node === node)).toBe(true)
   })
 
   it('untrack должен удалять узел из всех масок, если dep не указан', () => {

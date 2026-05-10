@@ -33,10 +33,10 @@ export class DefaultDataAdapter implements DataAdapter {
   private _opts: Required<DefaultAdapterOptions>
 
   /** WeakMap: array -> (paramKey -> (value -> index)) */
-  private _indexes: WeakMap<any[], Map<string, Map<any, number>>> =
+  private _indexes: WeakMap<Array<any>, Map<string, Map<any, number>>> =
     new WeakMap()
   /** WeakMap: array -> dirty flag (true => нужно перестроить индексы при следующем обращении) */
-  private _indexDirty: WeakMap<any[], boolean> = new WeakMap()
+  private _indexDirty: WeakMap<Array<any>, boolean> = new WeakMap()
 
   /**
    * Создает instance и подготавливает внутреннее состояние.
@@ -55,7 +55,7 @@ export class DefaultDataAdapter implements DataAdapter {
   options(next: Partial<DefaultAdapterOptions>): void {
     if (next.arrayDelete) this._opts.arrayDelete = next.arrayDelete
     if (typeof next.autoCreate === 'boolean')
-      this._opts.autoCreate = next.autoCreate
+      {this._opts.autoCreate = next.autoCreate}
 
     if (typeof next.indexEnabled === 'boolean') {
       const prev = this._opts.indexEnabled
@@ -191,8 +191,8 @@ export class DefaultDataAdapter implements DataAdapter {
 
         case SegKind.Index: {
           if (!Array.isArray(cur))
-            throw new Error('set: ожидался массив для индекса')
-          const arr: any[] = cur
+            {throw new Error('set: ожидался массив для индекса')}
+          const arr: Array<any> = cur
           const idx = s.index as number
 
           if (arr[idx] == null && this._opts.autoCreate) {
@@ -210,9 +210,9 @@ export class DefaultDataAdapter implements DataAdapter {
 
         case SegKind.Param: {
           if (!Array.isArray(cur))
-            throw new Error('set: параметризованный доступ ожидает массив')
+            {throw new Error('set: параметризованный доступ ожидает массив')}
 
-          const arr = cur as any[]
+          const arr = cur as Array<any>
           const pkey = s.pkey!
           let pval: unknown = s.pval!
           if (typeof pval === 'string' && pval.startsWith('$')) {
@@ -269,7 +269,7 @@ export class DefaultDataAdapter implements DataAdapter {
       case SegKind.Key: {
         if (cur == null) {
           if (!this._opts.autoCreate)
-            throw new Error('set: target container is null (autoCreate=false)')
+            {throw new Error('set: target container is null (autoCreate=false)')}
           cur = {}
         }
         cur[leaf.key as any] = value
@@ -278,8 +278,8 @@ export class DefaultDataAdapter implements DataAdapter {
 
       case SegKind.Index: {
         if (!Array.isArray(cur))
-          throw new Error('set: ожидался массив для индекса в листе')
-        const arr = cur as any[]
+          {throw new Error('set: ожидался массив для индекса в листе')}
+        const arr = cur as Array<any>
         const i = leaf.index as number
         arr[i] = value
 
@@ -293,14 +293,14 @@ export class DefaultDataAdapter implements DataAdapter {
 
       case SegKind.Param: {
         if (!Array.isArray(cur))
-          throw new Error('set: параметризованный лист ожидает массив')
+          {throw new Error('set: параметризованный лист ожидает массив')}
         if (!this._isPlainObject(value)) {
           throw new Error(
             'set: значение для [param=value] должно быть plain-object',
           )
         }
 
-        const arr = cur as any[]
+        const arr = cur as Array<any>
         const pkey = leaf.pkey!
         let pval: unknown = leaf.pval!
         if (typeof pval === 'string' && pval.startsWith('$')) {
@@ -326,7 +326,7 @@ export class DefaultDataAdapter implements DataAdapter {
         }
 
         // Сохраняем ссылочную стабильность: чистим и мёржим
-        Object.keys(el).forEach((k) => delete (el as any)[k])
+        Object.keys(el).forEach(k => delete (el as any)[k])
         Object.assign(el, value as object)
         ;(el as any)[pkey] = pval
 
@@ -388,7 +388,7 @@ export class DefaultDataAdapter implements DataAdapter {
 
       case SegKind.Index: {
         if (!Array.isArray(cur)) return
-        const arr = cur as any[]
+        const arr = cur as Array<any>
         const i = leaf.index as number
         if (this._opts.arrayDelete === 'splice') {
           if (i >= 0 && i < arr.length) {
@@ -405,7 +405,7 @@ export class DefaultDataAdapter implements DataAdapter {
 
       case SegKind.Param: {
         if (!Array.isArray(cur)) return
-        const arr = cur as any[]
+        const arr = cur as Array<any>
         const pkey = leaf.pkey!
         let pval: unknown = leaf.pval!
         if (typeof pval === 'string' && pval.startsWith('$')) {
@@ -504,7 +504,7 @@ export class DefaultDataAdapter implements DataAdapter {
 
   /** Найти индекс элемента по ключу и значению параметра. */
   private _findIndexByParam(
-    arr: any[],
+    arr: Array<any>,
     pkey: string,
     pval: unknown,
     opts?: { vars?: Record<string, any> },
@@ -529,7 +529,7 @@ export class DefaultDataAdapter implements DataAdapter {
   }
 
   /** Подготовить и вернуть индекс массива по нужному ключу. */
-  private _ensureIndex(arr: any[], pkey: string): Map<any, number> {
+  private _ensureIndex(arr: Array<any>, pkey: string): Map<any, number> {
     let byKey = this._indexes.get(arr)
     const dirty = this._indexDirty.get(arr) === true
 
@@ -579,7 +579,7 @@ export class DefaultDataAdapter implements DataAdapter {
   }
 
   /** Простой линейный поиск (fallback/наполнение индекса) */
-  private _linearFindIndex(arr: any[], pkey: string, pval: unknown): number {
+  private _linearFindIndex(arr: Array<any>, pkey: string, pval: unknown): number {
     for (let i = 0; i < arr.length; i++) {
       const el = arr[i]
       if (!this._isPlainObject(el)) continue
@@ -590,7 +590,7 @@ export class DefaultDataAdapter implements DataAdapter {
 
   /** Обновить/вставить значение в индекс (если индекс уже существует). */
   private _indexUpsert(
-    arr: any[],
+    arr: Array<any>,
     pkey: string,
     pval: unknown,
     idx: number,
@@ -607,7 +607,7 @@ export class DefaultDataAdapter implements DataAdapter {
   }
 
   /** Точечное удаление значения из индекса (для unset по Param). */
-  private _indexDeleteValue(arr: any[], pkey: string, pval: unknown): void {
+  private _indexDeleteValue(arr: Array<any>, pkey: string, pval: unknown): void {
     if (!this._opts.indexEnabled) return
     const byKey = this._indexes.get(arr)
     if (!byKey) return
@@ -617,7 +617,7 @@ export class DefaultDataAdapter implements DataAdapter {
   }
 
   /** Полная инвалидация индексов конкретного массива (например, после splice). */
-  private _indexInvalidateArray(arr: any[]): void {
+  private _indexInvalidateArray(arr: Array<any>): void {
     if (!this._opts.indexEnabled) return
     this._indexes.delete(arr)
     this._indexDirty.set(arr, true)

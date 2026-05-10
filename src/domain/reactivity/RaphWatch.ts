@@ -18,7 +18,7 @@ export class RaphWatch extends RaphNode {
   constructor(
     app: RaphRuntime,
     id: string,
-    masks: DataPathDef[] | ReadonlyArray<DataPathDef>,
+    masks: Array<DataPathDef> | ReadonlyArray<DataPathDef>,
     cb: WatchCallback,
     weight = 0,
   ) {

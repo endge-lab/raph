@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-
 import { Raph } from '@/domain/core/Raph'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
@@ -13,7 +12,7 @@ describe('control flow subscriptions', () => {
     const owner = new RaphNode(raph, { id: 'owner-1' })
     raph.addNode(owner)
 
-    const calls: string[] = []
+    const calls: Array<string> = []
 
     raph.subscribe(owner, 'ui.menu.open', ({ events }) => {
       calls.push(events[0]?.canonical ?? '')
@@ -32,7 +31,7 @@ describe('control flow subscriptions', () => {
     const owner = new RaphNode(raph, { id: 'owner-2' })
     raph.addNode(owner)
 
-    const batches: string[][] = []
+    const batches: Array<Array<string>> = []
 
     raph.subscribe(owner, 'data.*', ({ events }) => {
       batches.push(events.map(event => event.canonical))
@@ -119,7 +118,7 @@ describe('control flow subscriptions', () => {
       id: `control-flow-sugar-${Date.now()}`,
     })
 
-    const calls: string[] = []
+    const calls: Array<string> = []
 
     const dispose = Raph.subscribe(
       owner,

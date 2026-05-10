@@ -13,8 +13,8 @@ function roundTripString(s: string): void {
   expect(DataPath.match(s, s2)).toBe(true)
   expect(DataPath.match(s2, s)).toBe(true)
   // Сегменты должны совпасть по видам
-  expect(dp2.segments().map((x) => x.kind)).toEqual(
-    dp.segments().map((x) => x.kind),
+  expect(dp2.segments().map(x => x.kind)).toEqual(
+    dp.segments().map(x => x.kind),
   )
 }
 
@@ -49,8 +49,8 @@ describe('DataPath.toStringPath / toPlain (сериализация)', () => {
     const plain = dp.toPlain()
     const dp2 = DataPath.fromPlain(plain)
 
-    const kinds1 = dp.segments().map((s) => s.kind)
-    const kinds2 = dp2.segments().map((s) => s.kind)
+    const kinds1 = dp.segments().map(s => s.kind)
+    const kinds2 = dp2.segments().map(s => s.kind)
     expect(kinds2).toEqual(kinds1)
 
     // проверим, что tail‑wildcard остался «глубоким»

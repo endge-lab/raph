@@ -16,7 +16,7 @@ describe('RaphRouter - бенчмарк кеша', () => {
     // Включаем кеш, если он реализован.
     // @ts-expect-error - опционально, чтобы не падать, если метода нет.
     if (typeof router.enableCache === 'function') {
-      // @ts-ignore
+      // @ts-expect-error Проверяем устойчивость к отсутствующему cache.
       router.enableCache(5000) // ёмкость кеша, если поддерживается
     }
 
@@ -49,7 +49,7 @@ describe('RaphRouter - бенчмарк кеша', () => {
 
     // 2) Формируем набор путей для запроса
     //    (гарантированные совпадения разных типов)
-    const paths: string[] = []
+    const paths: Array<string> = []
     const N = 4000
 
     for (let i = 0; i < N; i++) {
@@ -108,7 +108,6 @@ describe('RaphRouter - бенчмарк кеша', () => {
     // (Если кеша нет - всё равно пройдёт за счёт <=)
     expect(warmMs).toBeLessThanOrEqual(coldMs * 0.8 + 1 /* зазор на шум */)
 
-    // eslint-disable-next-line no-console
     console.info(
       `[router-bench] cold=${coldMs.toFixed(3)}ms, warm=${warmMs.toFixed(
         3,
@@ -121,7 +120,7 @@ describe('RaphRouter - бенчмарк кеша', () => {
 
     // @ts-expect-error - опционально
     if (typeof router.enableCache === 'function') {
-      // @ts-ignore
+      // @ts-expect-error Проверяем устойчивость к отсутствующему cache.
       router.enableCache(1024)
     }
 
@@ -152,7 +151,6 @@ describe('RaphRouter - бенчмарк кеша', () => {
     const t1 = performance.now()
     const warmMs = t1 - t0
 
-    // eslint-disable-next-line no-console
     console.info(
       `[router-bench: single-key] iters=${WARM_ITERS}, time=${warmMs.toFixed(
         3,

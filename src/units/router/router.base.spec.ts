@@ -8,7 +8,7 @@ describe('Router', () => {
     router = new RaphRouter()
   })
 
-  function expectSetEqual<T>(set: Set<T>, arr: T[]): void {
+  function expectSetEqual<T>(set: Set<T>, arr: Array<T>): void {
     expect(set.size).toBe(arr.length)
     for (const v of arr) expect(set.has(v)).toBe(true)
   }

@@ -1,7 +1,6 @@
 import type { RaphNode } from '@/domain/core/RaphNode'
 import type { RaphProperties } from '@/domain/types/base.types'
-import { RaphPropagation } from '@/domain/local/local.types'
-import type { RaphLocalPropertyCompute } from '@/domain/local/local.types'
+import type { RaphPropagation , RaphLocalPropertyCompute } from '@/domain/local/local.types'
 
 /**
  * Хранит runtime-описание local property и способ ее вычисления.
@@ -15,7 +14,7 @@ export class RaphLocalPropertyRuntime<P extends RaphProperties, K extends keyof 
     public readonly phase: string,
     public readonly propagation: RaphPropagation,
     private readonly compute?: RaphLocalPropertyCompute<P, K>,
-    public readonly dependsOn: (keyof P)[] = [],
+    public readonly dependsOn: Array<keyof P> = [],
     public readonly defaultValue?: P[K],
   ) {}
 

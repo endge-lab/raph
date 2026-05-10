@@ -19,10 +19,9 @@ import type { RaphRuntimeOptions } from '@/domain/types/runtime.types'
 import type { WatchCallback } from '@/domain/types/reactive.types'
 import type { RaphDebug } from '@/domain/core/RaphDebug'
 import type { EventBus } from '@/utils/EventBus'
-
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphKernel } from '@/domain/core/RaphKernel'
-import { RaphRuntime } from '@/domain/core/RaphRuntime'
+import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import {
   RAPH_DEBUG,
   RAPH_EVENTS,
@@ -62,8 +61,8 @@ export class Raph {
   // Core данные
   //
   private static _app: RaphApp | null = null
-  private static _contextStack: RaphNode[] = []
-  private static _userPhases: RaphPhase[] = []
+  private static _contextStack: Array<RaphNode> = []
+  private static _userPhases: Array<RaphPhase> = []
 
   //
   // Системные генераторы
@@ -119,7 +118,7 @@ export class Raph {
   /**
    * Полностью заменить набор пользовательских фаз.
    */
-  static definePhases(phases: RaphPhase[]): void {
+  static definePhases(phases: Array<RaphPhase>): void {
     this._userPhases = [...phases]
     this._syncPhases()
   }
@@ -318,7 +317,7 @@ export class Raph {
    * Возвращает disposer.
    */
   static watch(
-    maskOrMasks: DataPathDef | DataPathDef[],
+    maskOrMasks: DataPathDef | Array<DataPathDef>,
     cb: WatchCallback,
     opts?: { weight?: number },
   ): () => void {
@@ -436,7 +435,7 @@ export class Raph {
    */
   static subscribe(
     node: RaphNode,
-    maskOrMasks: DataPathDef | DataPathDef[],
+    maskOrMasks: DataPathDef | Array<DataPathDef>,
     callback: ControlFlowCallback,
     opts?: ControlFlowSubscribeOptions,
   ): () => void
@@ -444,7 +443,7 @@ export class Raph {
    * Выполняет внутреннюю операцию subscribe.
    */
   static subscribe(node: RaphNode, opts: {
-    mask: DataPathDef | DataPathDef[]
+    mask: DataPathDef | Array<DataPathDef>
     callback: ControlFlowCallback
     vars?: Record<string, any>
     wildcardDynamic?: boolean
@@ -457,9 +456,9 @@ export class Raph {
     node: RaphNode,
     maskOrMasksOrOpts:
       | DataPathDef
-      | DataPathDef[]
+      | Array<DataPathDef>
       | {
-        mask: DataPathDef | DataPathDef[]
+        mask: DataPathDef | Array<DataPathDef>
         callback: ControlFlowCallback
         vars?: Record<string, any>
         wildcardDynamic?: boolean
@@ -606,7 +605,7 @@ export class Raph {
    * Возвращает встроенные системные фазы Raph.
    * Эти фазы всегда присутствуют в default app и не должны описываться в приложении вручную.
    */
-  private static _makeSystemPhases(): RaphPhase[] {
+  private static _makeSystemPhases(): Array<RaphPhase> {
     return [
       {
         name: '__computed' as PhaseName,

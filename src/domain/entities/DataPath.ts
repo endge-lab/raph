@@ -15,17 +15,17 @@ import { SegKind } from '@/domain/types/path.types'
  *  - id=* (значение-параметр wildcard) - не поддерживаем
  */
 export class DataPath {
-  private readonly _segs: DataPathSegment[]
+  private readonly _segs: Array<DataPathSegment>
 
   // Глобальные кэши
   static _cacheFromString = new Map<string, DataPath>()
   static _cacheToString = new WeakMap<DataPath, string>()
-  static _cacheSegments = new Map<string, DataPathSegment[]>()
+  static _cacheSegments = new Map<string, Array<DataPathSegment>>()
 
   /**
    * Создает instance и подготавливает внутреннее состояние.
    */
-  private constructor(segs: DataPathSegment[]) {
+  private constructor(segs: Array<DataPathSegment>) {
     this._segs = segs
 
     // deepWildcard помечаем только для ключевого '*' (dot wildcard) на хвосте, не для '[*]'
@@ -145,7 +145,6 @@ export class DataPath {
 
           if (c === '\\') {
             // экранирование внутри кавычек
-            out // ничего, просто перепрыгиваем символ
             i += 2
             continue
           }
@@ -214,8 +213,8 @@ export class DataPath {
   /**
    * Разобрать строку пути в массив сегментов.
    */
-  private static _parseSegments(path: string): DataPathSegment[] {
-    const segs: DataPathSegment[] = []
+  private static _parseSegments(path: string): Array<DataPathSegment> {
+    const segs: Array<DataPathSegment> = []
     const n = path.length
     let i = 0
 
@@ -230,7 +229,7 @@ export class DataPath {
       if (path[i] === '[') {
         i++ // пропустить '['
         let depth = 1
-        const sb: string[] = []
+        const sb: Array<string> = []
         while (i < n && depth > 0) {
           const ch = path[i]
 
@@ -345,7 +344,7 @@ export class DataPath {
   /** Преобразовать plain-описание в DataPath. */
   static fromPlain(plain: Record<string, any>): DataPath {
     const src = Array.isArray(plain?.segs) ? plain.segs : []
-    const segs: DataPathSegment[] = []
+    const segs: Array<DataPathSegment> = []
     for (const s of src) {
       if (!s || typeof s !== 'object') continue
       switch (s.t) {
@@ -375,7 +374,7 @@ export class DataPath {
 
   /** Сериализовать путь в plain-объект. */
   toPlain(): Record<string, any> {
-    const segs = this._segs.map((s) => {
+    const segs = this._segs.map(s => {
       switch (s.kind) {
         case SegKind.Key:
           return { t: 'key', k: (s as any).key }
@@ -450,8 +449,8 @@ export class DataPath {
     mask: string | DataPath | Record<string, any>,
     target: string | DataPath | Record<string, any>,
   ): boolean {
-    const m = DataPath.from(mask)._segs as any[]
-    const t = DataPath.from(target)._segs as any[]
+    const m = DataPath.from(mask)._segs as Array<any>
+    const t = DataPath.from(target)._segs as Array<any>
     let i = 0
     let j = 0
 
