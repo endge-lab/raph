@@ -1,10 +1,19 @@
 import type { RaphNode } from '@/domain/core/RaphNode'
-import { Raph } from '@/domain/core/Raph'
+import type { RaphRuntime } from '@/domain/core/RaphRuntime'
+import type { EventBus } from '@/utils/EventBus'
 
 /**
  * Описывает тип EventOff.
  */
 type EventOff = () => void
+
+/**
+ * Описывает настройки RaphDebug.
+ */
+type RaphDebugOptions = {
+  getApp: () => RaphRuntime<any>
+  events: EventBus<any>
+}
 
 /**
  * Описывает тип NodeInfo.
@@ -44,9 +53,20 @@ export type NodeFlatDump = {
 export class RaphDebug {
   private enabled = false
   private off: EventOff[] = []
+  private getApp?: () => RaphRuntime<any>
+  private events?: EventBus<any>
 
   // id -> агрегированная инфа (подписки + связи)
   private nodes = new Map<string, NodeInfo>()
+
+  /** Вкл/выкл отладчик (подписки/отписки на события) */
+  /**
+   * Настроить источники runtime/event bus.
+   */
+  configure(options: RaphDebugOptions): void {
+    this.getApp = options.getApp
+    this.events = options.events
+  }
 
   /** Вкл/выкл отладчик (подписки/отписки на события) */
   /**
@@ -98,12 +118,15 @@ export class RaphDebug {
    * Вернуть дерево нод для визуального отображения.
    */
   getTree(): NodeTree[] {
-    const roots = Array.from(Raph.app.graph.roots())
+    const app = this.getApp?.()
+    if (!app) return []
+
+    const roots = Array.from(app.graph.roots())
     const seen = new Set<string>()
 
     const build = (n: RaphNode): NodeTree => {
       const info = this.ensureInfo(n)
-      const kids = Array.from(Raph.app.graph.childrenOf(n))
+      const kids = Array.from(app.graph.childrenOf(n))
         .sort((a, b) => a.id.localeCompare(b.id))
         .map((ch) => build(ch))
       seen.add(n.id)
@@ -121,7 +144,7 @@ export class RaphDebug {
 
     for (const id of this.nodes.keys()) {
       if (seen.has(id)) continue
-      const n = Raph.app.getNode(id)
+      const n = app.getNode(id)
       if (n) forest.push(build(n))
     }
 
@@ -135,35 +158,42 @@ export class RaphDebug {
    */
   private attach(): void {
     this.enabled = true
+    const events = this.events
+    const app = this.getApp?.()
+    if (!events || !app) {
+      return
+    }
 
     // 1) Иерархия графа изменилась
     this.off.push(
-      Raph.events.on('nodes:changed', () => {
+      events.on('nodes:changed', () => {
         this.rebuildHierarchyFromGraph()
-        Raph.events.emit('debug:nodes', {})
+        events.emit('debug:nodes', {})
       }),
     )
 
     // 2) Узел подписался на маску
     this.off.push(
-      Raph.events.on('node:tracked', (p: { node: RaphNode; path: string }) => {
+      events.on('node:tracked', (p: { node: RaphNode; path: string }) => {
         const info = this.ensureInfo(p.node)
         if (typeof p.path === 'string' && p.path) info.routes.add(p.path)
-        Raph.events.emit('debug:nodes', {})
+        events.emit('debug:nodes', {})
       }),
     )
 
     // 3) При каждом батче уведомлений считаем метрику и пушим в bus
     this.off.push(
-      Raph.events.on(
+      events.on(
         'nodes:notified',
         (_payload: {
           ctxs: Array<{ phase: string; node: RaphNode; events?: any[] }>
         }) => {
-          Raph.events.emit('debug:metrics', {
-            ups: Raph.app.ups,
-            eps: Raph.app.eps,
-            nps: Raph.app.nps,
+          const currentApp = this.getApp?.()
+          if (!currentApp) return
+          events.emit('debug:metrics', {
+            ups: currentApp.ups,
+            eps: currentApp.eps,
+            nps: currentApp.nps,
           })
         },
       ),
@@ -209,6 +239,9 @@ export class RaphDebug {
 
   /** Пересборка только parent/child из графа; подписки не трогаем. */
   private rebuildHierarchyFromGraph(): void {
+    const app = this.getApp?.()
+    if (!app) return
+
     for (const info of this.nodes.values()) {
       info.parents.clear()
       info.children.clear()
@@ -218,7 +251,7 @@ export class RaphDebug {
     const dfs = (n: RaphNode) => {
       if (!seen.add(n.id)) return
       const cur = this.ensureInfo(n)
-      for (const ch of Raph.app.graph.childrenOf(n)) {
+      for (const ch of app.graph.childrenOf(n)) {
         const child = this.ensureInfo(ch)
         cur.children.add(ch.id)
         child.parents.add(n.id)
@@ -226,15 +259,15 @@ export class RaphDebug {
       }
     }
 
-    for (const r of Raph.app.graph.roots()) dfs(r)
+    for (const r of app.graph.roots()) dfs(r)
     for (const [id] of this.nodes) {
       if (seen.has(id)) continue
-      const n = Raph.app.getNode(id)
+      const n = app.getNode(id)
       if (n) dfs(n)
     }
 
     for (const [id, info] of Array.from(this.nodes.entries())) {
-      if (Raph.app.getNode(id)) continue
+      if (app.getNode(id)) continue
       if (info.routes.size === 0) this.nodes.delete(id)
     }
   }

@@ -4,7 +4,7 @@ import type {
   EffectCleanup,
   RaphEffectOptions,
 } from '@/domain/types/reactive.types'
-import type { RaphApp } from '@/domain/core/RaphApp'
+import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import { Raph } from '@/domain/core/Raph'
 
 /**
@@ -18,7 +18,7 @@ export class RaphEffect extends RaphNode {
   /**
    * Создать реактивный effect и при необходимости выполнить его сразу.
    */
-  constructor(app: RaphApp, fn: () => EffectCleanup, opts: RaphEffectOptions) {
+  constructor(app: RaphRuntime, fn: () => EffectCleanup, opts: RaphEffectOptions) {
     super(app, { id: opts.id, weight: opts.weight ?? 0, type: 'effect' })
     this._fn = fn
 

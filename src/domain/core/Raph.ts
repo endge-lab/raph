@@ -15,10 +15,21 @@ import type {
   PhaseName,
   RaphPhase,
 } from '@/domain/types/phase.types'
+import type { RaphRuntimeOptions } from '@/domain/types/runtime.types'
 import type { WatchCallback } from '@/domain/types/reactive.types'
+import type { RaphDebug } from '@/domain/core/RaphDebug'
+import type { EventBus } from '@/utils/EventBus'
 
 import { RaphApp } from '@/domain/core/RaphApp'
-import { RaphDebug } from '@/domain/core/RaphDebug'
+import { RaphKernel } from '@/domain/core/RaphKernel'
+import { RaphRuntime } from '@/domain/core/RaphRuntime'
+import {
+  RAPH_DEBUG,
+  RAPH_EVENTS,
+  RAPH_MAX_DEPTH,
+  RAPH_MAX_UPS,
+  RAPH_WEIGHT_LIMIT,
+} from '@/domain/core/RaphShared'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { DataPath } from '@/domain/entities/DataPath'
 import {
@@ -38,23 +49,20 @@ import type {
 import { RaphEffect } from '@/domain/reactivity/RaphEffect'
 import { RaphSignal } from '@/domain/reactivity/RaphSignal'
 import { RaphWatch } from '@/domain/reactivity/RaphWatch'
-import { EventBus } from '@/utils/EventBus'
 
 /**
  * Предоставляет статические операции для настройки Raph graph, phases и dirty processing.
  */
 export class Raph {
-  static MAX_UPS = 144
-  static WEIGHT_LIMIT = 100
-  static MAX_DEPTH = 5
+  static MAX_UPS = RAPH_MAX_UPS
+  static WEIGHT_LIMIT = RAPH_WEIGHT_LIMIT
+  static MAX_DEPTH = RAPH_MAX_DEPTH
 
   //
   // Core данные
   //
   private static _app: RaphApp | null = null
-  private static _debug = new RaphDebug()
   private static _contextStack: RaphNode[] = []
-  private static _events = new EventBus<RaphEventPayloads>()
   private static _userPhases: RaphPhase[] = []
 
   //
@@ -68,7 +76,10 @@ export class Raph {
   // Инициализация
   //
   static {
-    // this.definePhases([])
+    RAPH_DEBUG.configure({
+      getApp: () => Raph.app,
+      events: RAPH_EVENTS,
+    })
   }
 
   //
@@ -217,6 +228,23 @@ export class Raph {
     nodeCtor: () => N,
   ): RaphLocalConfiguration<P> {
     return this.configureLocal(appCtor, nodeCtor)
+  }
+
+  /**
+   * Создать shared data kernel.
+   */
+  static createKernel(options?: ConstructorParameters<typeof RaphKernel>[0]): RaphKernel {
+    return new RaphKernel(options)
+  }
+
+  /**
+   * Создать runtime lane на базе shared kernel.
+   */
+  static createRuntime<P extends RaphProperties = RaphProperties>(
+    kernel: RaphKernel,
+    options: RaphRuntimeOptions = {},
+  ): RaphRuntime<P> {
+    return kernel.createRuntime<P>(options)
   }
 
   /**
@@ -492,14 +520,14 @@ export class Raph {
    * Вернуть debug-объект Raph.
    */
   static get debug(): RaphDebug {
-    return Raph._debug
+    return RAPH_DEBUG
   }
 
   /**
    * Вернуть глобальную event-шину Raph.
    */
   static get events(): EventBus<RaphEventPayloads> {
-    return Raph._events
+    return RAPH_EVENTS
   }
 
   /**

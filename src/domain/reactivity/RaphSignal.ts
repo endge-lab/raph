@@ -1,6 +1,6 @@
 import { RaphNode } from '@/domain/core/RaphNode'
 import type { DataPath } from '@/domain/entities/DataPath'
-import type { RaphApp } from '@/domain/core/RaphApp'
+import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import { Raph } from '@/domain/core/Raph'
 
 /**
@@ -20,7 +20,7 @@ export class RaphSignal<T> extends RaphNode {
   /**
    * Создать сигнал или computed-сигнал и зарегистрировать его в графе.
    */
-  constructor(app: RaphApp, id: string, path: DataPath, compute?: () => T) {
+  constructor(app: RaphRuntime, id: string, path: DataPath, compute?: () => T) {
     super(app, { id, weight: 0, type: 'signal' })
     this.path = path
     this.compute = compute

@@ -2,7 +2,7 @@
 //
 import { RaphNode } from '@/domain/core/RaphNode'
 import type { WatchCallback } from '@/domain/types/reactive.types'
-import type { RaphApp } from '@/domain/core/RaphApp'
+import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import type { DataPathDef } from '@/domain/types/base.types'
 import type { PhaseExecutorContext } from '@/domain/types/phase.types'
 
@@ -16,7 +16,7 @@ export class RaphWatch extends RaphNode {
    * Создать watch-ноду и подписать её на набор масок.
    */
   constructor(
-    app: RaphApp,
+    app: RaphRuntime,
     id: string,
     masks: DataPathDef[] | ReadonlyArray<DataPathDef>,
     cb: WatchCallback,

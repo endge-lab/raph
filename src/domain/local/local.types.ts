@@ -1,4 +1,4 @@
-import type { RaphApp } from '@/domain/core/RaphApp'
+import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import type { RaphNode } from '@/domain/core/RaphNode'
 import type { RaphFrameContext, RaphProperties } from '@/domain/types/base.types'
 
@@ -101,7 +101,7 @@ export interface RaphLocalPhaseContext<P extends RaphProperties> {
  * Описывает контракт RaphLocalConfiguration.
  */
 export interface RaphLocalConfiguration<P extends RaphProperties = RaphProperties> {
-  app: RaphApp<P>
+  app: RaphRuntime<P>
   props: Record<keyof P, unknown>
   phases: Record<string, RaphLocalPhase<P>>
 }

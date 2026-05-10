@@ -1,4 +1,4 @@
-import type { RaphApp } from '@/domain/core/RaphApp'
+import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import type { RaphProperties } from '@/domain/types/base.types'
 import type { PhaseName } from '@/domain/types/phase.types'
 
@@ -42,7 +42,7 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
   private _type: string = 'default'
 
   //
-  private _app: RaphApp<any>
+  private _app: RaphRuntime<any>
 
   // пользовательское значение приоритета обработки (на одном уровне)
   private _weight: number = 0
@@ -69,7 +69,7 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
    * Создает instance и подготавливает внутреннее состояние.
    */
   constructor(
-    app: RaphApp<any>,
+    app: RaphRuntime<any>,
     opts?: RaphNodeOptions,
   ) {
     this._app = app
@@ -244,7 +244,7 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
   /**
    * Выполняет внутреннюю операцию attach app.
    */
-  _attachApp(app: RaphApp<any>): void {
+  _attachApp(app: RaphRuntime<any>): void {
     this._app = app
     for (const child of this._children) {
       child._attachApp(app)
@@ -279,15 +279,15 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
   /**
    * Вернуть приложение, которому принадлежит нода.
    */
-  get app(): RaphApp<P> {
-    return this._app as RaphApp<P>
+  get app(): RaphRuntime<P> {
+    return this._app as RaphRuntime<P>
   }
 
   /**
    * Возвращает raph.
    */
-  get raph(): RaphApp<P> {
-    return this._app as RaphApp<P>
+  get raph(): RaphRuntime<P> {
+    return this._app as RaphRuntime<P>
   }
 
   /**
