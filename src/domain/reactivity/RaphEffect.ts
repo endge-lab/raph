@@ -7,6 +7,9 @@ import type {
 import type { RaphApp } from '@/domain/core/RaphApp'
 import { Raph } from '@/domain/core/Raph'
 
+/**
+ * Описывает reactive effect, который выполняется при изменении dependencies.
+ */
 export class RaphEffect extends RaphNode {
   private readonly _fn: () => EffectCleanup
   private _cleanup?: () => void

@@ -46,10 +46,16 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
     })
   }
 
+  /**
+   * Выполняет внутреннюю операцию on.
+   */
   on<K extends keyof StaticEvents>(
     event: K,
     callback: EventCallback<StaticEvents[K]>,
   ): () => void
+  /**
+   * Выполняет внутреннюю операцию on.
+   */
   on(event: string, callback: EventCallback): () => void
   /**
    * Подписаться на событие и вернуть disposer.
@@ -64,10 +70,16 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
     return () => {}
   }
 
+  /**
+   * Выполняет внутреннюю операцию once.
+   */
   once<K extends keyof StaticEvents>(
     event: K,
     callback: EventCallback<StaticEvents[K]>,
   ): void
+  /**
+   * Выполняет внутреннюю операцию once.
+   */
   once(event: string, callback: EventCallback): void
   /**
    * Подписаться на событие ровно один раз.
@@ -80,10 +92,16 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
     this.on(event, wrapper)
   }
 
+  /**
+   * Выполняет внутреннюю операцию off.
+   */
   off<K extends keyof StaticEvents>(
     event: K,
     callback: EventCallback<StaticEvents[K]>,
   ): void
+  /**
+   * Выполняет внутреннюю операцию off.
+   */
   off(event: string, callback: EventCallback): void
   /**
    * Удалить конкретный обработчик события.
@@ -92,7 +110,13 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
     this.listeners.get(event)?.delete(callback)
   }
 
+  /**
+   * Выполняет внутреннюю операцию emit.
+   */
   emit<K extends keyof StaticEvents>(event: K, payload: StaticEvents[K]): void
+  /**
+   * Выполняет внутреннюю операцию emit.
+   */
   emit(event: string, payload?: any): void
   /**
    * Отправить событие всем текущим подписчикам.
@@ -143,6 +167,9 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
 }
 
 // Универсальный EventBus для глобальных событий приложения
+/**
+ * Описывает тип GlobalEvents.
+ */
 export type GlobalEvents = {
   // Единая точка всех асинхронных UI-сообщений.
   notify: {

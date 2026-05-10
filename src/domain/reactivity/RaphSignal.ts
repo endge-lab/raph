@@ -3,6 +3,9 @@ import type { DataPath } from '@/domain/entities/DataPath'
 import type { RaphApp } from '@/domain/core/RaphApp'
 import { Raph } from '@/domain/core/Raph'
 
+/**
+ * Описывает reactive signal как RaphNode с value и зависимостями.
+ */
 export class RaphSignal<T> extends RaphNode {
   readonly path: DataPath
   readonly compute?: () => T

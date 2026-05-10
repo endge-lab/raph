@@ -78,6 +78,9 @@ export enum SchedulerType {
   AnimationFrame = 'animationFrame',
 }
 
+/**
+ * Описывает тип RaphPriorityStrategy.
+ */
 export type RaphPriorityStrategy = 'depth-weight-desc' | 'legacy-depth-weight-asc'
 
 /**
@@ -85,6 +88,9 @@ export type RaphPriorityStrategy = 'depth-weight-desc' | 'legacy-depth-weight-as
  */
 export type RaphScheduler = (cb: VoidFunction) => void
 
+/**
+ * Описывает контракт RaphFrameContext.
+ */
 export interface RaphFrameContext {
   now: number
   delta: number
@@ -92,6 +98,9 @@ export interface RaphFrameContext {
   frame: number
 }
 
+/**
+ * Описывает контракт RaphLoopLease.
+ */
 export interface RaphLoopLease {
   readonly owner: string
   release(): void
@@ -112,14 +121,29 @@ export type PhaseDirty = {
   inHeap: Set<number>
 }
 
+/**
+ * Описывает тип RaphNodeType.
+ */
 export type RaphNodeType = Branded<string, 'RaphNodeType'>
 
+/**
+ * Описывает тип MatchParams.
+ */
 export type MatchParams = Record<string, unknown>
 
+/**
+ * Описывает тип Undefinable.
+ */
 export type Undefinable<T> = T | undefined
 
+/**
+ * Описывает тип RaphPropertyName.
+ */
 export type RaphPropertyName = string
 
+/**
+ * Описывает тип RaphProperties.
+ */
 export type RaphProperties = Record<RaphPropertyName, unknown> & {
   weight?: number
 }

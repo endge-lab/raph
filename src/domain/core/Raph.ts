@@ -40,6 +40,9 @@ import { RaphSignal } from '@/domain/reactivity/RaphSignal'
 import { RaphWatch } from '@/domain/reactivity/RaphWatch'
 import { EventBus } from '@/utils/EventBus'
 
+/**
+ * Предоставляет статические операции для настройки Raph graph, phases и dirty processing.
+ */
 export class Raph {
   static MAX_UPS = 144
   static WEIGHT_LIMIT = 100
@@ -110,6 +113,9 @@ export class Raph {
     this._syncPhases()
   }
 
+  /**
+   * Выполняет внутреннюю операцию configure local.
+   */
   static configureLocal<
     P extends RaphProperties,
     A extends object,
@@ -199,6 +205,9 @@ export class Raph {
     return { app, props, phases }
   }
 
+  /**
+   * Выполняет внутреннюю операцию configure.
+   */
   static configure<
     P extends RaphProperties,
     A extends object,
@@ -210,6 +219,9 @@ export class Raph {
     return this.configureLocal(appCtor, nodeCtor)
   }
 
+  /**
+   * Выполняет внутреннюю операцию process dirty nodes.
+   */
   static processDirtyNodes<P extends RaphProperties>(options: {
     payload: RaphLocalPhaseContext<P>
     ignoreCompute?: boolean
@@ -400,6 +412,9 @@ export class Raph {
     callback: ControlFlowCallback,
     opts?: ControlFlowSubscribeOptions,
   ): () => void
+  /**
+   * Выполняет внутреннюю операцию subscribe.
+   */
   static subscribe(node: RaphNode, opts: {
     mask: DataPathDef | DataPathDef[]
     callback: ControlFlowCallback
@@ -407,6 +422,9 @@ export class Raph {
     wildcardDynamic?: boolean
     weight?: number
   }): () => void
+  /**
+   * Выполняет внутреннюю операцию subscribe.
+   */
   static subscribe(
     node: RaphNode,
     maskOrMasksOrOpts:
@@ -491,6 +509,9 @@ export class Raph {
     return Raph.app.data
   }
 
+  /**
+   * Выполняет внутреннюю операцию make descriptor computed local.
+   */
   static MakeDescriptorComputedLocal<Props extends RaphProperties, K extends keyof Props>(
     name: K,
     phase: string,
@@ -505,6 +526,9 @@ export class Raph {
     }
   }
 
+  /**
+   * Выполняет внутреннюю операцию make descriptor computed inherited boolean.
+   */
   static MakeDescriptorComputedInheritedBoolean<Props extends RaphProperties, K extends keyof Props>(
     name: K,
     phase: string,
@@ -520,6 +544,9 @@ export class Raph {
     }
   }
 
+  /**
+   * Выполняет внутреннюю операцию create local property.
+   */
   private static _createLocalProperty<P extends RaphProperties, K extends keyof P>(
     descriptor: RaphLocalPropertyDescriptor<P, K>,
   ): RaphLocalPropertyRuntime<P, K> {

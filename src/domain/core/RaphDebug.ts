@@ -1,8 +1,14 @@
 import type { RaphNode } from '@/domain/core/RaphNode'
 import { Raph } from '@/domain/core/Raph'
 
+/**
+ * Описывает тип EventOff.
+ */
 type EventOff = () => void
 
+/**
+ * Описывает тип NodeInfo.
+ */
 type NodeInfo = {
   id: string
   type?: string
@@ -11,6 +17,9 @@ type NodeInfo = {
   children: Set<string>
 }
 
+/**
+ * Описывает тип NodeTree.
+ */
 export type NodeTree = {
   id: string
   type?: string
@@ -18,6 +27,9 @@ export type NodeTree = {
   routes: string[]
 }
 
+/**
+ * Описывает тип NodeFlatDump.
+ */
 export type NodeFlatDump = {
   id: string
   type?: string
@@ -26,6 +38,9 @@ export type NodeFlatDump = {
   routes: string[]
 }
 
+/**
+ * Собирает debug-метрики Raph phases и dirty processing.
+ */
 export class RaphDebug {
   private enabled = false
   private off: EventOff[] = []

@@ -6,6 +6,9 @@ import type { RaphApp } from '@/domain/core/RaphApp'
 import type { DataPathDef } from '@/domain/types/base.types'
 import type { PhaseExecutorContext } from '@/domain/types/phase.types'
 
+/**
+ * Описывает reactive watcher для наблюдения за computed value.
+ */
 export class RaphWatch extends RaphNode {
   private readonly _cb: WatchCallback
 

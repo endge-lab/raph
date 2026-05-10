@@ -1,5 +1,8 @@
 import type { RaphNode } from '@/domain/core/RaphNode'
 
+/**
+ * Описывает тип GraphNode.
+ */
 type GraphNode = {
   id: string
 }

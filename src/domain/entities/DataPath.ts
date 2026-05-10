@@ -22,6 +22,9 @@ export class DataPath {
   static _cacheToString = new WeakMap<DataPath, string>()
   static _cacheSegments = new Map<string, DataPathSegment[]>()
 
+  /**
+   * Создает instance и подготавливает внутреннее состояние.
+   */
   private constructor(segs: DataPathSegment[]) {
     this._segs = segs
 

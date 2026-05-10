@@ -38,6 +38,9 @@ export class DefaultDataAdapter implements DataAdapter {
   /** WeakMap: array -> dirty flag (true => нужно перестроить индексы при следующем обращении) */
   private _indexDirty: WeakMap<any[], boolean> = new WeakMap()
 
+  /**
+   * Создает instance и подготавливает внутреннее состояние.
+   */
   constructor(initial: DataObject = {}, opts?: DefaultAdapterOptions) {
     this._root = initial
     this._opts = {
@@ -628,6 +631,9 @@ export class DefaultDataAdapter implements DataAdapter {
 
   // ====================== Вспомогательное ======================
 
+  /**
+   * Выполняет внутреннюю операцию is plain object.
+   */
   private _isPlainObject(x: unknown): x is Record<string, unknown> {
     return typeof x === 'object' && x !== null && !Array.isArray(x)
   }

@@ -1,10 +1,16 @@
 // Мин-куча для чисел с минимальными аллокациями (дружественна к сборщику мусора).
+/**
+ * Реализует минимальную heap-структуру для priority-based очередей.
+ */
 export class MinHeap {
   //
   private _a: number[]
   private _size: number
 
   //
+  /**
+   * Создает instance и подготавливает внутреннее состояние.
+   */
   constructor(initialCapacity = 0) {
     // Вместимость сохраняется и используется повторно между кадрами
     this._a = initialCapacity > 0 ? new Array(initialCapacity) : []

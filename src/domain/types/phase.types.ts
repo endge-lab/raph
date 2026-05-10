@@ -18,6 +18,9 @@ export type Traversal =
   | 'all' // все ноды в графе, начиная с _root
 
 // Формат записи resolved
+/**
+ * Описывает тип ResolvedEntry.
+ */
 export type ResolvedEntry = {
   segment: string // имя контейнера, например "attrs" или "legs"
   keyField: string // pk/fk имя, например "legId"
@@ -26,6 +29,9 @@ export type ResolvedEntry = {
 }
 
 //
+/**
+ * Описывает тип PhaseEvent.
+ */
 export type PhaseEvent = {
   // исходный путь события
   original: string
@@ -55,6 +61,9 @@ export type PhaseEachExecutor = (
   ctx: PhaseExecutorContext,
 ) => unknown | Promise<unknown>
 
+/**
+ * Описывает тип PhaseAllExecutor.
+ */
 export type PhaseAllExecutor = (
   ctxs: PhaseExecutorContext[],
 ) => unknown | Promise<unknown>

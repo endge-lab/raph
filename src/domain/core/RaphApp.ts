@@ -39,6 +39,9 @@ import { RaphPropagation } from '@/domain/local/types'
 import { SchedulerType } from '@/domain/types/base.types'
 import { SegKind } from '@/domain/types/path.types'
 
+/**
+ * Управляет Raph graph, scheduler, phases и lifecycle обработки dirty nodes.
+ */
 export class RaphApp<Props extends RaphProperties = RaphProperties> {
   //
   // Константы
@@ -128,6 +131,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
 
   //
   //
+  /**
+   * Создает instance и подготавливает внутреннее состояние.
+   */
   constructor() {
     this._root = new RaphNode<Props>(this, { id: '__root__', type: '__root__' })
   }
@@ -223,6 +229,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     this.registerNode(node)
   }
 
+  /**
+   * Регистрирует node.
+   */
   registerNode(node: RaphNode<any>): void {
     node._attachApp(this)
     this._graph.addNode(node)
@@ -245,6 +254,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     Raph.events.emit('nodes:changed', { graph: this._graph })
   }
 
+  /**
+   * Снимает регистрацию node.
+   */
   unregisterNode(node: RaphNode<any>): void {
     this.removeNode(node)
   }
@@ -266,6 +278,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     Raph.events.emit('nodes:changed', { graph: this._graph })
   }
 
+  /**
+   * Выполняет внутреннюю операцию init.
+   */
   init(): void {
     if (this._ready) {
       console.warn('[RaphApp] Already initialized, skipping.')
@@ -281,20 +296,32 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     this._ready = true
   }
 
+  /**
+   * Очищает внутреннее состояние.
+   */
   clear(): void {
     this.reset()
     this._destroyed = true
   }
 
+  /**
+   * Выполняет внутреннюю операцию traverse all.
+   */
   traverseAll(cb: (node: RaphNode<Props>) => void): void {
     this._root.traverseAll(cb)
   }
 
+  /**
+   * Добавляет local phase.
+   */
   addLocalPhase(phase: RaphLocalPhaseRuntime<Props>): void {
     this._localPhases.set(phase.name, phase)
     this.addPhase(this._toRuntimeLocalPhase(phase))
   }
 
+  /**
+   * Добавляет local property.
+   */
   addLocalProperty<K extends keyof Props>(property: RaphLocalPropertyRuntime<Props, K>): void {
     this._localProperties.set(property.name as keyof Props & string, property)
 
@@ -307,10 +334,16 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     this._syncLocalPhaseTraversal(phase)
   }
 
+  /**
+   * Возвращает local property.
+   */
   getLocalProperty<K extends keyof Props>(key: K): RaphLocalPropertyRuntime<Props, K> | undefined {
     return this._localProperties.get(key as keyof Props & string) as RaphLocalPropertyRuntime<Props, K> | undefined
   }
 
+  /**
+   * Выполняет внутреннюю операцию dirty local node defaults.
+   */
   dirtyLocalNodeDefaults(node: RaphNode<any>, invalidate = false): void {
     for (const property of this._localProperties.values()) {
       this.dirty(property.phase as PhaseName, node, { invalidate })
@@ -334,6 +367,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
   }
   // внутри класса RaphApp
 
+  /**
+   * Выполняет внутреннюю операцию build resolved.
+   */
   private _buildResolved(
     path: DataPathDef,
     vars?: Record<string, any>,
@@ -668,6 +704,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     if (invalidate) { this.invalidate() }
   }
 
+  /**
+   * Выполняет внутреннюю операцию schedule run throttled.
+   */
   private _scheduleRunThrottled(): void {
     if (this._destroyed) { return }
 
@@ -894,6 +933,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     this._ensureLoop()
   }
 
+  /**
+   * Выполняет внутреннюю операцию acquire loop.
+   */
   acquireLoop(owner: string): RaphLoopLease {
     const token = {}
     let released = false
@@ -911,6 +953,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     }
   }
 
+  /**
+   * Выполняет внутреннюю операцию ensure loop.
+   */
   private _ensureLoop(): void {
     if (this.__isLoopActive) { return }
     this.__isLoopActive = true
@@ -939,6 +984,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     this._stopLoopIfIdle()
   }
 
+  /**
+   * Выполняет внутреннюю операцию stop loop if idle.
+   */
   private _stopLoopIfIdle(): void {
     if (this.__manualLoopActive || this.__loopLeases.size > 0) {
       return
@@ -1114,6 +1162,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
   // PRIVATE
   //
 
+  /**
+   * Выполняет внутреннюю операцию get phase dirty.
+   */
   private _getPhaseDirty(phase: PhaseName): PhaseDirty {
     let q = this._dirty.get(phase)
     if (!q) {
@@ -1128,10 +1179,16 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     return q
   }
 
+  /**
+   * Выполняет внутреннюю операцию priority of.
+   */
   priorityOf(node: RaphNode<any>): number {
     return this._priority(node)
   }
 
+  /**
+   * Выполняет внутреннюю операцию priority.
+   */
   private _priority(node: RaphNode<any>): number {
     // depth растёт - индекс растёт - обрабатываем раньше те, у кого depth меньше.
     // default: внутри одного depth больший weight должен пойти раньше.
@@ -1143,10 +1200,16 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     return depth * RaphApp._PRIORITY_SCALE - node.weight
   }
 
+  /**
+   * Выполняет внутреннюю операцию ordered all nodes.
+   */
   private _orderedAllNodes(): RaphNode<any>[] {
     return this._graph.topoOrder()
   }
 
+  /**
+   * Выполняет внутреннюю операцию expand runtime contexts.
+   */
   private _expandRuntimeContexts(
     phase: RaphPhase,
     ctxs: PhaseExecutorContext[],
@@ -1204,6 +1267,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     return ctxs
   }
 
+  /**
+   * Выполняет внутреннюю операцию to runtime local phase.
+   */
   private _toRuntimeLocalPhase(localPhase: RaphLocalPhaseRuntime<Props>): RaphPhase {
     const runtimePhase: RaphPhase = {
       name: localPhase.name as PhaseName,
@@ -1223,6 +1289,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     return runtimePhase
   }
 
+  /**
+   * Выполняет внутреннюю операцию sync local phase traversal.
+   */
   private _syncLocalPhaseTraversal(localPhase: RaphLocalPhaseRuntime<Props>): void {
     const runtimePhase = this._phasesMap.get(localPhase.name as PhaseName)
       ?? this._phasesArray.find(phase => phase.name === localPhase.name)
@@ -1233,6 +1302,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     }
   }
 
+  /**
+   * Выполняет внутреннюю операцию local traversal.
+   */
   private _localTraversal(localPhase: RaphLocalPhaseRuntime<Props>): RaphPhase['traversal'] {
     if (localPhase.mode === 'all') {
       return 'all'
@@ -1271,6 +1343,9 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     return this.__isLoopActive
   }
 
+  /**
+   * Возвращает frame.
+   */
   get frame(): RaphFrameContext {
     return this.__frameContext
   }
@@ -1327,10 +1402,16 @@ export class RaphApp<Props extends RaphProperties = RaphProperties> {
     return this._phasesMap.get(name)
   }
 
+  /**
+   * Возвращает root.
+   */
   get root(): RaphNode<Props> {
     return this._root
   }
 
+  /**
+   * Возвращает ups.
+   */
   get UPS(): number {
     return this.__ups
   }

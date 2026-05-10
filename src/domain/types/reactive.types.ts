@@ -1,9 +1,15 @@
 //
 import type { PhaseEvent } from '@/domain/types/phase.types'
 
+/**
+ * Описывает тип EffectCleanup.
+ */
 export type EffectCleanup = void | (() => void)
 
 //
+/**
+ * Описывает контракт RaphEffectOptions.
+ */
 export interface RaphEffectOptions {
   //
   id: string
@@ -16,4 +22,7 @@ export interface RaphEffectOptions {
 }
 
 //
+/**
+ * Описывает тип WatchCallback.
+ */
 export type WatchCallback = (payload: { events: PhaseEvent[] }) => void

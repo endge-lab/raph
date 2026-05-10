@@ -19,11 +19,17 @@
 import type { ParamValue } from '@/domain/types/path.types'
 import { keyParam } from '@/utils/path'
 
+/**
+ * Описывает тип RouterNodeWithVarName.
+ */
 type RouterNodeWithVarName = {
   node: RouterNode<any>
   varName: string
 }
 
+/**
+ * Описывает node route tree с параметрами и children.
+ */
 export class RouterNode<P> {
   //
   // точные переходы по ключам и индексам

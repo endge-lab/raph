@@ -7,6 +7,9 @@ import type {
 import type { RaphProperties } from '@/domain/types/base.types'
 import { RaphPropagation } from '@/domain/local/types'
 
+/**
+ * Описывает тип PropertyOptions.
+ */
 type PropertyOptions = {
   phase: string
   default?: any
@@ -15,6 +18,9 @@ type PropertyOptions = {
   compute?: (self: any) => any
 }
 
+/**
+ * Описывает тип PhaseOptions.
+ */
 type PhaseOptions = {
   name?: string
   always?: boolean
@@ -22,6 +28,9 @@ type PhaseOptions = {
   mode?: RaphLocalPhaseMode
 }
 
+/**
+ * Описывает тип NodeHandlerOptions.
+ */
 type NodeHandlerOptions = {
   phase: string
 }
@@ -30,6 +39,9 @@ const propertyMetadata = new WeakMap<Function, Map<string | symbol, PropertyOpti
 const phaseMetadata = new WeakMap<Function, Map<string | symbol, PhaseOptions>>()
 const nodeHandlerMetadata = new WeakMap<Function, Map<string, string>>()
 
+/**
+ * Выполняет публичную операцию raph local property.
+ */
 export function RaphLocalProperty(options: PropertyOptions): PropertyDecorator {
   return (target, propertyKey) => {
     const ctor = target.constructor
@@ -39,6 +51,9 @@ export function RaphLocalProperty(options: PropertyOptions): PropertyDecorator {
   }
 }
 
+/**
+ * Выполняет публичную операцию raph local phase.
+ */
 export function RaphLocalPhase(options: PhaseOptions = {}): MethodDecorator {
   return (target, propertyKey) => {
     const ctor = target.constructor
@@ -52,6 +67,9 @@ export function RaphLocalPhase(options: PhaseOptions = {}): MethodDecorator {
   }
 }
 
+/**
+ * Выполняет публичную операцию raph local after.
+ */
 export function RaphLocalAfter(options: NodeHandlerOptions): MethodDecorator {
   return (target, propertyKey) => {
     const ctor = target.constructor
@@ -61,6 +79,9 @@ export function RaphLocalAfter(options: NodeHandlerOptions): MethodDecorator {
   }
 }
 
+/**
+ * Выполняет публичную операцию extract raph local properties.
+ */
 export function extractRaphLocalProperties<P extends RaphProperties>(
   instance: any,
 ): RaphLocalPropertyDescriptor<P, keyof P>[] {
@@ -101,6 +122,9 @@ export function extractRaphLocalProperties<P extends RaphProperties>(
   return result
 }
 
+/**
+ * Выполняет публичную операцию extract raph local phases.
+ */
 export function extractRaphLocalPhases<P extends RaphProperties>(
   instance: any,
 ): Array<RaphLocalPhaseDescriptor<P> & { process: RaphLocalPhaseRunner<P> }> {
@@ -126,6 +150,9 @@ export function extractRaphLocalPhases<P extends RaphProperties>(
   return result
 }
 
+/**
+ * Выполняет публичную операцию extract raph local after handlers.
+ */
 export function extractRaphLocalAfterHandlers(
   instance: any,
 ): { phase: string, methodName: string }[] {

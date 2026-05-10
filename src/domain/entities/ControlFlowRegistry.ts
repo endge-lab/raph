@@ -44,6 +44,9 @@ export class ControlFlowRegistry {
    */
   private _subscriptionCounter = 0
 
+  /**
+   * Создает instance и подготавливает внутреннее состояние.
+   */
   constructor(router: RaphRouter<ControlFlowSubscriptionId>) {
     this._router = router
   }

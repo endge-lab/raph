@@ -5,6 +5,9 @@ import type { DataPathSegment } from '@/domain/types/path.types'
 import { SegKind } from '@/domain/types/path.types'
 import { keyIndex, keyLiteralStr, keyParam } from '@/utils/path'
 
+/**
+ * Строит и выполняет маршрутизацию по RouterNode tree.
+ */
 export class RaphRouter<P = string> {
   private _root = new RouterNode<P>()
 
@@ -23,11 +26,17 @@ export class RaphRouter<P = string> {
   // -------------------------
   // Helpers: caches / keys
   // -------------------------
+  /**
+   * Выполняет внутреннюю операцию to key.
+   */
   private _toKey(dp: DataPathDef): string {
     if (typeof dp === 'string') return dp
     return DataPath.from(dp).toStringPath()
   }
 
+  /**
+   * Выполняет внутреннюю операцию get segs.
+   */
   private _getSegs(input: DataPathDef): readonly DataPathSegment[] {
     const key = this._toKey(input)
     const hit = this._segCache.get(key)
@@ -38,30 +47,45 @@ export class RaphRouter<P = string> {
     return segs
   }
 
+  /**
+   * Выполняет внутреннюю операцию cache match read.
+   */
   private _cacheMatchRead(pathKey: string): Set<P> | null {
     const c = this._matchCache.get(pathKey)
     if (!c || c.v !== this._version) return null
     return c.res
   }
 
+  /**
+   * Выполняет внутреннюю операцию cache match write.
+   */
   private _cacheMatchWrite(pathKey: string, res: Set<P>): void {
     if (this._matchCache.size > RaphRouter.MAX_MATCH_CACHE)
       this._matchCache.clear()
     this._matchCache.set(pathKey, { v: this._version, res })
   }
 
+  /**
+   * Выполняет внутреннюю операцию cache prefix read.
+   */
   private _cachePrefixRead(pathKey: string): Set<P> | null {
     const c = this._prefixCache.get(pathKey)
     if (!c || c.v !== this._version) return null
     return c.res
   }
 
+  /**
+   * Выполняет внутреннюю операцию cache prefix write.
+   */
   private _cachePrefixWrite(pathKey: string, res: Set<P>): void {
     if (this._prefixCache.size > RaphRouter.MAX_PREFIX_CACHE)
       this._prefixCache.clear()
     this._prefixCache.set(pathKey, { v: this._version, res })
   }
 
+  /**
+   * Выполняет внутреннюю операцию bump version.
+   */
   private _bumpVersion(): void {
     this._version++
     // ленивая инвалидция: записи с другой версией считаются просроченными

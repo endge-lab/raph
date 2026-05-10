@@ -6,6 +6,9 @@ import type {
 } from '@/domain/types/phase.types'
 import type { DepGraph } from '@/domain/entities/DepGraph'
 
+/**
+ * Описывает контракт RaphEventPayloads.
+ */
 export interface RaphEventPayloads {
   //
   'node:tracked': { node: RaphNode; path: string }

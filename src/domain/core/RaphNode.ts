@@ -2,6 +2,9 @@ import type { RaphApp } from '@/domain/core/RaphApp'
 import type { RaphProperties } from '@/domain/types/base.types'
 import type { PhaseName } from '@/domain/types/phase.types'
 
+/**
+ * Описывает тип RaphNodeOptions.
+ */
 type RaphNodeOptions = {
   id?: string
   weight?: number
@@ -9,15 +12,24 @@ type RaphNodeOptions = {
   type?: string
 }
 
+/**
+ * Описывает тип RaphAddChildOptions.
+ */
 type RaphAddChildOptions = {
   invalidate?: boolean
 }
 
+/**
+ * Описывает тип RaphLocalApi.
+ */
 type RaphLocalApi<P extends RaphProperties> = {
   get: <K extends keyof P>(key: K) => P[K]
   set: <K extends keyof P>(key: K, value: P[K]) => void
 }
 
+/**
+ * Описывает базовый узел Raph graph с properties, parent-child связями и dirty state.
+ */
 export class RaphNode<P extends RaphProperties = RaphProperties> {
   //
   // Системные
@@ -53,6 +65,9 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
 
   //
   //
+  /**
+   * Создает instance и подготавливает внутреннее состояние.
+   */
   constructor(
     app: RaphApp<any>,
     opts?: RaphNodeOptions,
@@ -126,6 +141,9 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     this._meta[key] = value
   }
 
+  /**
+   * Выполняет внутреннюю операцию options.
+   */
   options(opts: Partial<P> & RaphNodeOptions): this {
     const { id: _id, meta, type, weight, ...rest } = opts
 
@@ -150,10 +168,16 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     return this
   }
 
+  /**
+   * Выполняет внутреннюю операцию get.
+   */
   get<K extends keyof P>(key: K): P[K] {
     return this._app.getLocalProperty(key)?.get(this) ?? this.getLocal(key)
   }
 
+  /**
+   * Выполняет внутреннюю операцию set.
+   */
   set<K extends keyof P>(key: K, value: P[K]): void {
     const property = this._app.getLocalProperty(key)
     if (property) {
@@ -164,14 +188,23 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     this.setLocal(key, value)
   }
 
+  /**
+   * Возвращает local.
+   */
   getLocal<K extends keyof P>(key: K): P[K] {
     return this._localValues[String(key)] as P[K]
   }
 
+  /**
+   * Обновляет local.
+   */
   setLocal<K extends keyof P>(key: K, value: P[K]): void {
     this._localValues[String(key)] = value
   }
 
+  /**
+   * Выполняет внутреннюю операцию dirty.
+   */
   dirty(phase: PhaseName | string | Array<PhaseName | string>): void {
     if (Array.isArray(phase)) {
       for (const p of phase) {
@@ -183,6 +216,9 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     this._app.dirty(phase as PhaseName, this)
   }
 
+  /**
+   * Выполняет внутреннюю операцию traverse all.
+   */
   traverseAll(cb: (node: RaphNode<any>) => void): void {
     cb(this)
     for (const child of this._children) {
@@ -190,6 +226,9 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     }
   }
 
+  /**
+   * Выполняет внутреннюю операцию dispose.
+   */
   dispose(): void {
     for (const child of [...this._children]) {
       child.dispose()
@@ -202,6 +241,9 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     this._app.unregisterNode(this)
   }
 
+  /**
+   * Выполняет внутреннюю операцию attach app.
+   */
   _attachApp(app: RaphApp<any>): void {
     this._app = app
     for (const child of this._children) {
@@ -209,14 +251,23 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     }
   }
 
+  /**
+   * Проверяет наличие dirty phase.
+   */
   hasDirtyPhase(bit: number): boolean {
     return Boolean(this.__dirtyPhasesMask & bit)
   }
 
+  /**
+   * Помечает dirty phase.
+   */
   markDirtyPhase(bit: number): void {
     this.__dirtyPhasesMask |= bit
   }
 
+  /**
+   * Очищает dirty phase.
+   */
   clearDirtyPhase(bit: number): void {
     this.__dirtyPhasesMask &= ~bit
   }
@@ -232,6 +283,9 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     return this._app as RaphApp<P>
   }
 
+  /**
+   * Возвращает raph.
+   */
   get raph(): RaphApp<P> {
     return this._app as RaphApp<P>
   }
@@ -250,6 +304,9 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     return this._weight
   }
 
+  /**
+   * Возвращает computed weight.
+   */
   get computedWeight(): number {
     return this._app.priorityOf(this)
   }
@@ -268,14 +325,23 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     return this._type
   }
 
+  /**
+   * Возвращает parent.
+   */
   get parent(): RaphNode<P> | null {
     return this._parent as RaphNode<P> | null
   }
 
+  /**
+   * Возвращает children.
+   */
   get children(): RaphNode<P>[] {
     return this._children as RaphNode<P>[]
   }
 
+  /**
+   * Возвращает local.
+   */
   get local(): RaphLocalApi<P> {
     return {
       get: key => this.getLocal(key),

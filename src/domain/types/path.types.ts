@@ -21,9 +21,15 @@ export const enum SegKind {
 }
 
 //
+/**
+ * Описывает тип ParamValue.
+ */
 export type ParamValue = string | number
 
 //
+/**
+ * Описывает контракт DataPathSegment.
+ */
 export interface DataPathSegment {
   //
   kind: SegKind
