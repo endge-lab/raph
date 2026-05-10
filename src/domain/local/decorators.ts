@@ -3,9 +3,9 @@ import type {
   RaphLocalPhaseMode,
   RaphLocalPhaseRunner,
   RaphLocalPropertyDescriptor,
-} from '@/domain/local/types'
+} from '@/domain/local/local.types'
 import type { RaphProperties } from '@/domain/types/base.types'
-import { RaphPropagation } from '@/domain/local/types'
+import { RaphPropagation } from '@/domain/local/local.types'
 
 /**
  * Описывает тип PropertyOptions.

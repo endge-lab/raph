@@ -4,7 +4,7 @@ import type {
   RaphLocalNodeCallback,
   RaphLocalPhaseMode,
   RaphLocalPhaseRunner,
-} from '@/domain/local/types'
+} from '@/domain/local/local.types'
 import { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
 
 /**

@@ -23,7 +23,7 @@ export {
   RaphLocalProperty,
   RaphProperty,
 } from '@/domain/local/decorators'
-export { RaphPropagation } from '@/domain/local/types'
+export { RaphPropagation } from '@/domain/local/local.types'
 export type {
   RaphLocalConfiguration,
   RaphLocalNodeCallback,
@@ -35,7 +35,7 @@ export type {
   RaphLocalPhaseRunner,
   RaphLocalPropertyCompute,
   RaphLocalPropertyDescriptor,
-} from '@/domain/local/types'
+} from '@/domain/local/local.types'
 export * from '@/domain/types/base.types'
 export * from '@/domain/types/control-flow.types'
 export * from '@/domain/types/path.types'

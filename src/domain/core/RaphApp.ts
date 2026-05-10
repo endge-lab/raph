@@ -35,7 +35,7 @@ import { DepGraph } from '@/domain/entities/DepGraph'
 import { MinHeap } from '@/domain/entities/MinHeap'
 import { RaphLocalPhaseRuntime } from '@/domain/local/RaphLocalPhase'
 import { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
-import { RaphPropagation } from '@/domain/local/types'
+import { RaphPropagation } from '@/domain/local/local.types'
 import { SchedulerType } from '@/domain/types/base.types'
 import { SegKind } from '@/domain/types/path.types'
 

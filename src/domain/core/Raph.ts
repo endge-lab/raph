@@ -28,13 +28,13 @@ import {
 } from '@/domain/local/decorators'
 import { RaphLocalPhaseRuntime } from '@/domain/local/RaphLocalPhase'
 import { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
-import { RaphPropagation } from '@/domain/local/types'
+import { RaphPropagation } from '@/domain/local/local.types'
 import type {
   RaphLocalConfiguration,
   RaphLocalPhase,
   RaphLocalPhaseContext,
   RaphLocalPropertyDescriptor,
-} from '@/domain/local/types'
+} from '@/domain/local/local.types'
 import { RaphEffect } from '@/domain/reactivity/RaphEffect'
 import { RaphSignal } from '@/domain/reactivity/RaphSignal'
 import { RaphWatch } from '@/domain/reactivity/RaphWatch'
