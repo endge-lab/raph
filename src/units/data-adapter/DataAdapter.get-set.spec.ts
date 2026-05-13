@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { DefaultDataAdapter } from '@/domain/entities/DataAdapter'
+import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
 
 describe('DefaultDataAdapter - простые корректностные тесты get/set с именованным индексом', () => {
   it('set по Param: com[id=<id>].x затем get возвращает то же значение (indexEnabled=false)', () => {

@@ -1,6 +1,6 @@
 import { RaphRuntime } from '@/domain/core/RaphRuntime'
 import { RaphRouter } from '@/domain/core/RaphRouter'
-import { DefaultDataAdapter } from '@/domain/entities/DataAdapter'
+import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
 import { DataPath } from '@/domain/entities/DataPath'
 import type {
   DataAdapter,

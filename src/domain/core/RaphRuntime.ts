@@ -31,15 +31,15 @@ import type {
   RaphObserveDataOptions,
   RaphRuntimeOptions,
 } from '@/domain/types/runtime.types'
-import { RAPH_DEBUG, RAPH_EVENTS, RAPH_MAX_UPS } from '@/domain/core/RaphShared'
+import { RAPH_DEBUG, RAPH_EVENTS, RAPH_MAX_UPS } from '@/domain/core/raph-shared'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 import { ControlFlowQueue } from '@/domain/entities/ControlFlowQueue'
 import { ControlFlowRegistry } from '@/domain/entities/ControlFlowRegistry'
 import { DataPath } from '@/domain/entities/DataPath'
 import { DepGraph } from '@/domain/entities/DepGraph'
 import { MinHeap } from '@/domain/entities/MinHeap'
-import type { RaphLocalPhaseRuntime } from '@/domain/local/RaphLocalPhase'
-import type { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
+import type { RaphLocalPhaseRuntime } from '@/domain/local/raph-local-phase'
+import type { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
 import { RaphPropagation } from '@/domain/local/local.types'
 import { SchedulerType } from '@/domain/types/base.types'
 import { SegKind } from '@/domain/types/path.types'

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
-import { RaphLocalPhaseRuntime } from '@/domain/local/RaphLocalPhase'
-import { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
+import { RaphLocalPhaseRuntime } from '@/domain/local/raph-local-phase'
+import { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
 import { RaphPropagation } from '@/domain/local/local.types'
 import { SchedulerType, type DataAdapter, type DataObject } from '@/domain/types/base.types'
 

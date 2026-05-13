@@ -28,7 +28,7 @@ import {
   RAPH_MAX_DEPTH,
   RAPH_MAX_UPS,
   RAPH_WEIGHT_LIMIT,
-} from '@/domain/core/RaphShared'
+} from '@/domain/core/raph-shared'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { DataPath } from '@/domain/entities/DataPath'
 import {
@@ -36,8 +36,8 @@ import {
   extractRaphLocalPhases,
   extractRaphLocalProperties,
 } from '@/domain/local/decorators'
-import { RaphLocalPhaseRuntime } from '@/domain/local/RaphLocalPhase'
-import { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
+import { RaphLocalPhaseRuntime } from '@/domain/local/raph-local-phase'
+import { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
 import { RaphPropagation } from '@/domain/local/local.types'
 import type {
   RaphLocalConfiguration,

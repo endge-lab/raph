@@ -5,7 +5,7 @@ import type {
   RaphLocalPhaseMode,
   RaphLocalPhaseRunner,
 } from '@/domain/local/local.types'
-import type { RaphLocalPropertyRuntime } from '@/domain/local/RaphLocalProperty'
+import type { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
 
 /**
  * Хранит runtime-описание local phase и правила ее выполнения.

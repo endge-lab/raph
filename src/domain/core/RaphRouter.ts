@@ -1,5 +1,5 @@
 import { DataPath } from '@/domain/entities/DataPath'
-import { RouterNode } from '@/domain/core/RaphRouterNode'
+import { RouterNode } from '@/domain/core/raph-router-node'
 import type { DataPathDef, MatchParams } from '@/domain/types/base.types'
 import type { DataPathSegment } from '@/domain/types/path.types'
 import { SegKind } from '@/domain/types/path.types'
