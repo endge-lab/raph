@@ -19,13 +19,22 @@ interface LocalProps extends RaphProperties {
   renderToken: number
 }
 
+/**
+ * Описывает Nova-node LocalNode и его runtime-поведение.
+ */
 class LocalNode extends RaphNode<LocalProps> {
   readonly afterCalls: Array<string> = []
 
+  /**
+   * Создает экземпляр LocalNode и подготавливает базовое состояние.
+   */
   constructor(app = new RaphApp<LocalProps>(), id = 'node') {
     super(app, { id })
   }
 
+  /**
+   * Возвращает active для LocalNode.
+   */
   @RaphProperty({
     phase: 'update',
     default: true,
@@ -34,18 +43,30 @@ class LocalNode extends RaphNode<LocalProps> {
   get active(): boolean {
     return this.get('active')
   }
+  /**
+   * Обновляет active для LocalNode.
+   */
   set active(value: boolean) {
     this.set('active', value)
   }
 
+  /**
+   * Возвращает width для LocalNode.
+   */
   @RaphProperty({ phase: 'layout', default: 0 })
   get width(): number {
     return this.get('width')
   }
+  /**
+   * Обновляет width для LocalNode.
+   */
   set width(value: number) {
     this.set('width', value)
   }
 
+  /**
+   * Возвращает double Width для LocalNode.
+   */
   @RaphProperty({
     phase: 'layout',
     default: 0,
@@ -56,40 +77,64 @@ class LocalNode extends RaphNode<LocalProps> {
     return this.get('doubleWidth')
   }
 
+  /**
+   * Возвращает render Token для LocalNode.
+   */
   @RaphProperty({ phase: 'render', default: 0 })
   get renderToken(): number {
     return this.get('renderToken')
   }
+  /**
+   * Обновляет render Token для LocalNode.
+   */
   set renderToken(value: number) {
     this.set('renderToken', value)
   }
 
+  /**
+   * Выполняет действие afterLayout в рамках ответственности LocalNode.
+   */
   @RaphAfter({ phase: 'layout' })
   afterLayout(): void {
     this.afterCalls.push(`${this.id}:${this.doubleWidth}`)
   }
 }
 
+/**
+ * Описывает ответственность LocalRuntime в архитектуре проекта.
+ */
 class LocalRuntime {
   readonly phases: Array<string> = []
 
+  /**
+   * Выполняет действие before в рамках ответственности LocalRuntime.
+   */
   @RaphLocalPhase({ name: 'before', priority: -1, always: true })
   before(): void {
     this.phases.push('before')
   }
 
+  /**
+   * Обновляет runtime-состояние LocalRuntime.
+   */
   @RaphLocalPhase({ name: 'update', priority: 0 })
   update(payload: RaphLocalPhaseContext<LocalProps>): void {
     this.phases.push(`update:${payload.dirty.map(node => node.id).join(',')}`)
     Raph.processDirtyNodes({ payload })
   }
 
+  /**
+   * Выполняет действие layout в рамках ответственности LocalRuntime.
+   */
   @RaphLocalPhase({ name: 'layout', priority: 1 })
   layout(payload: RaphLocalPhaseContext<LocalProps>): void {
     this.phases.push(`layout:${payload.dirty.map(node => node.id).join(',')}`)
     Raph.processDirtyNodes({ payload })
   }
 
+  /**
+   * Выполняет отрисовку LocalRuntime.
+   */
   @RaphLocalPhase({ name: 'render', priority: 2, mode: 'all' })
   render(payload: RaphLocalPhaseContext<LocalProps>): void {
     this.phases.push(`render:${payload.dirty.map(node => node.id).join(',')}`)

@@ -17,11 +17,20 @@ interface BenchProps extends RaphProperties {
   renderToken: number
 }
 
+/**
+ * Описывает Nova-node BenchNode и его runtime-поведение.
+ */
 class BenchNode extends RaphNode<BenchProps> {
+  /**
+   * Создает экземпляр BenchNode и подготавливает базовое состояние.
+   */
   constructor(app = new RaphApp<BenchProps>(), id = 'node') {
     super(app, { id })
   }
 
+  /**
+   * Возвращает active для BenchNode.
+   */
   @RaphProperty({
     phase: 'update',
     default: true,
@@ -30,33 +39,57 @@ class BenchNode extends RaphNode<BenchProps> {
   get active(): boolean {
     return this.get('active')
   }
+  /**
+   * Обновляет active для BenchNode.
+   */
   set active(value: boolean) {
     this.set('active', value)
   }
 
+  /**
+   * Возвращает value для BenchNode.
+   */
   @RaphProperty({ phase: 'update', default: 0 })
   get value(): number {
     return this.get('value')
   }
+  /**
+   * Обновляет value для BenchNode.
+   */
   set value(value: number) {
     this.set('value', value)
   }
 
+  /**
+   * Возвращает render Token для BenchNode.
+   */
   @RaphProperty({ phase: 'render', default: 0 })
   get renderToken(): number {
     return this.get('renderToken')
   }
+  /**
+   * Обновляет render Token для BenchNode.
+   */
   set renderToken(value: number) {
     this.set('renderToken', value)
   }
 }
 
+/**
+ * Описывает ответственность BenchRuntime в архитектуре проекта.
+ */
 class BenchRuntime {
+  /**
+   * Обновляет runtime-состояние BenchRuntime.
+   */
   @RaphLocalPhase({ name: 'update', priority: 0 })
   update(payload: RaphLocalPhaseContext<BenchProps>): void {
     Raph.processDirtyNodes({ payload })
   }
 
+  /**
+   * Выполняет отрисовку BenchRuntime.
+   */
   @RaphLocalPhase({ name: 'render', priority: 1, mode: 'all' })
   render(payload: RaphLocalPhaseContext<BenchProps>): void {
     Raph.processDirtyNodes({ payload, ignoreCompute: true })
