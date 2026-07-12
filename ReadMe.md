@@ -2,6 +2,8 @@
 
 Reactive application pipeline, graph scheduler, and path router for complex state flows.
 
+Raph also supports synchronous materialized dependencies between store branches through `Raph.derive()`. See [`src/docs/5_Derived.md`](src/docs/5_Derived.md) for strategies, transactions, and lifecycle rules.
+
 `@endge/raph` is a low-level runtime for applications where updates are driven by:
 
 - a dependency graph of nodes

@@ -10,7 +10,10 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/units/**/*.{spec,test}.ts'],
-    exclude: ['src/units/benchmarks/**/*'],
+    exclude: [
+      'src/units/benchmarks/**/*',
+      'src/units/derived/**/*.memory.spec.ts',
+    ],
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],

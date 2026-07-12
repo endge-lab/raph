@@ -31,6 +31,8 @@ import type {
   RaphObserveDataOptions,
   RaphRuntimeOptions,
 } from '@/domain/types/runtime.types'
+import type { RaphDerivedManagerSnapshot, RaphDerivedOptions } from '@/domain/types/derived.types'
+import type { RaphDerivedHandle } from '@/domain/derived/RaphDerivedHandle'
 import { RAPH_DEBUG, RAPH_EVENTS, RAPH_MAX_UPS } from '@/domain/core/raph-shared'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 import { ControlFlowQueue } from '@/domain/entities/ControlFlowQueue'
@@ -171,6 +173,23 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     }
     //
     this._minUpdateInterval = 1000 / this._maxUps
+  }
+
+  /** Создает системную materialized dependency в текущем runtime graph. */
+  derive<TSource = unknown, TTarget = unknown>(
+    options: RaphDerivedOptions<TSource, TTarget>,
+  ): RaphDerivedHandle {
+    return this._kernel.registerDerived(this, options)
+  }
+
+  /** Выполняет batch mutations через transaction shared kernel. */
+  transaction(fn: () => void): void {
+    this._kernel.transaction(fn)
+  }
+
+  /** Возвращает snapshot shared derived registry. */
+  getDerivedSnapshot(): RaphDerivedManagerSnapshot {
+    return this._kernel.getDerivedSnapshot()
   }
 
   /**
@@ -1142,6 +1161,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     this._root.children.length = 0
 
     this._nodeRouter.removeAll()
+    this._kernel.disposeRuntimeDerived(this)
     this._kernel.removeDataObserversByRuntime(this)
     this._controlFlowRegistry.clear()
     this._controlFlowQueue.clear()

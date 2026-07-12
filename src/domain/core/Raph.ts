@@ -16,6 +16,8 @@ import type {
   RaphPhase,
 } from '@/domain/types/phase.types'
 import type { RaphRuntimeOptions } from '@/domain/types/runtime.types'
+import type { RaphDerivedManagerSnapshot, RaphDerivedOptions } from '@/domain/types/derived.types'
+import type { RaphDerivedHandle } from '@/domain/derived/RaphDerivedHandle'
 import type { WatchCallback } from '@/domain/types/reactive.types'
 import type { RaphDebug } from '@/domain/core/RaphDebug'
 import type { EventBus } from '@/utils/EventBus'
@@ -244,6 +246,23 @@ export class Raph {
     options: RaphRuntimeOptions = {},
   ): RaphRuntime<P> {
     return kernel.createRuntime<P>(options)
+  }
+
+  /** Создает системную materialized dependency в default runtime. */
+  static derive<TSource = unknown, TTarget = unknown>(
+    options: RaphDerivedOptions<TSource, TTarget>,
+  ): RaphDerivedHandle {
+    return this.app.derive(options)
+  }
+
+  /** Выполняет batch mutations через transaction default kernel. */
+  static transaction(fn: () => void): void {
+    this.app.transaction(fn)
+  }
+
+  /** Возвращает snapshot derived registry default kernel. */
+  static getDerivedSnapshot(): RaphDerivedManagerSnapshot {
+    return this.app.getDerivedSnapshot()
   }
 
   /**
