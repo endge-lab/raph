@@ -104,7 +104,9 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
     }
 
     if (node._parent && node._parent !== this) {
-      node._parent._children = node._parent._children.filter(child => child !== node)
+      const previousParent = node._parent
+      previousParent._children = previousParent._children.filter(child => child !== node)
+      node._app.removeDependency(previousParent, node)
     }
 
     node._parent = this
