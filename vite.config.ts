@@ -24,7 +24,7 @@ export default defineConfig({
     rollupTypes: false,
     tsconfigPath: './tsconfig.app.json',
     exclude: [
-      'src/units/**/*',
+      'src/test/units/**/*',
       'src/**/*.spec.ts',
       'src/**/*.test.ts',
     ],

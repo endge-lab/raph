@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createDerivedFixture } from './derived.fixtures'
+import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
 describe('Raph derived memory cleanup', () => {
   it('releases deterministic registry resources after repeated create/dispose', () => {

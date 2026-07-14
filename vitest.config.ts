@@ -9,10 +9,10 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['src/units/**/*.{spec,test}.ts'],
+    include: ['src/test/units/**/*.{spec,test}.ts'],
     exclude: [
-      'src/units/benchmarks/**/*',
-      'src/units/derived/**/*.memory.spec.ts',
+      'src/test/units/benchmarks/**/*',
+      'src/test/units/derived/**/*.memory.spec.ts',
     ],
     coverage: {
       provider: 'v8',
@@ -20,7 +20,7 @@ export default defineConfig({
       exclude: [
         'src/main.ts',
         'src/docs/**',
-        'src/units/**',
+        'src/test/units/**',
         'src/**/*.spec.ts',
         'src/**/*.test.ts',
       ],
@@ -32,7 +32,7 @@ export default defineConfig({
       },
     },
     benchmark: {
-      include: ['src/units/benchmarks/**/*.{spec,test,bench}.ts'],
+      include: ['src/test/units/benchmarks/**/*.{spec,test,bench}.ts'],
     },
   },
 })

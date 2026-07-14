@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { RaphDerivedCycleError, RaphDerivedTargetWriteError } from '@/domain/types/derived.types'
-import { createDerivedFixture } from './derived.fixtures'
+import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
 describe('Raph derived graph', () => {
   it('stabilizes chains and fan-out before returning from source mutation', () => {

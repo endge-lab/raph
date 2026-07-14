@@ -26,11 +26,11 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:derived": "vitest run src/units/derived --exclude **/*.memory.spec.ts",
+    "test:derived": "vitest run src/test/units/derived --exclude **/*.memory.spec.ts",
     "test:derived:memory": "node --expose-gc ./node_modules/vitest/vitest.mjs run --config vitest.memory.config.ts",
     "bench": "vitest bench --run",
-    "bench:derived": "vitest bench --run src/units/benchmarks/bench.derived-*.bench.ts",
-    "bench:derived:stress": "RAPH_DERIVED_STRESS=1 vitest bench --run src/units/benchmarks/bench.derived-*.bench.ts",
+    "bench:derived": "vitest bench --run src/test/units/benchmarks/bench.derived-*.bench.ts",
+    "bench:derived:stress": "RAPH_DERIVED_STRESS=1 vitest bench --run src/test/units/benchmarks/bench.derived-*.bench.ts",
     "publish": "npm publish --access public"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { RaphDerivedDisposedError } from '@/domain/types/derived.types'
-import { createDerivedFixture } from './derived.fixtures'
+import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
 describe('Raph derived lifecycle', () => {
   it('pauses without retaining mutations and resumes through full recompute', () => {

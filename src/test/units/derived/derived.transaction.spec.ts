@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 import { RaphNode } from '@/domain/core/RaphNode'
-import { createDerivedFixture } from './derived.fixtures'
+import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
 describe('Raph derived transactions', () => {
   it('coalesces nested transactions and delivers source/target after stabilization', () => {

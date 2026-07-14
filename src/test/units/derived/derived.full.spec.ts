@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { full } from '@/domain/derived/strategies/full'
-import { createDerivedFixture } from './derived.fixtures'
+import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
 describe('Raph derived full strategy', () => {
   it('recomputes primitive, object and nested mutations synchronously', () => {

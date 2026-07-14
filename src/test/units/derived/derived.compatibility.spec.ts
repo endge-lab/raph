@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 import { RaphNode } from '@/domain/core/RaphNode'
-import { createDerivedFixture } from './derived.fixtures'
+import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
 describe('Raph derived compatibility fast path', () => {
   it('preserves CRUD and transaction delivery when no derives are registered', () => {

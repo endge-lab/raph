@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { collectionByKey } from '@/domain/derived/strategies/collection-by-key'
 import { RaphDerivedStrategyError } from '@/domain/types/derived.types'
-import { createDerivedFixture, projectRows } from './derived.fixtures'
+import { createDerivedFixture, projectRows } from '../../../units/derived/derived.fixtures.ts'
 
 describe('Raph derived collectionByKey strategy', () => {
   it('batches updates by key and processes merge/add/delete incrementally', () => {

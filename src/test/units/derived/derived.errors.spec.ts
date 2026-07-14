@@ -9,7 +9,7 @@ import {
   RaphDerivedReentrancyError,
   RaphDerivedStrategyError,
 } from '@/domain/types/derived.types'
-import { createDerivedFixture } from './derived.fixtures'
+import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
 describe('Raph derived errors', () => {
   it('keeps last-good target, exposes error and retries on next mutation', () => {
