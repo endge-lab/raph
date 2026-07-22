@@ -1,7 +1,7 @@
 {
   "name": "@endge/raph",
   "private": false,
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Reactive application pipeline & router (Raph) - core library",
   "license": "Apache-2.0",
   "type": "module",
@@ -30,8 +30,7 @@
     "test:derived:memory": "node --expose-gc ./node_modules/vitest/vitest.mjs run --config vitest.memory.config.ts",
     "bench": "vitest bench --run",
     "bench:derived": "vitest bench --run src/test/units/benchmarks/bench.derived-*.bench.ts",
-    "bench:derived:stress": "RAPH_DERIVED_STRESS=1 vitest bench --run src/test/units/benchmarks/bench.derived-*.bench.ts",
-    "publish": "npm publish --access public"
+    "bench:derived:stress": "RAPH_DERIVED_STRESS=1 vitest bench --run src/test/units/benchmarks/bench.derived-*.bench.ts"
   },
   "devDependencies": {
     "typescript": "^5.5.4",
