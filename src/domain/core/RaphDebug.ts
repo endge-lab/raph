@@ -7,6 +7,10 @@ import type { EventBus } from '@/utils/EventBus'
  */
 type EventOff = () => void
 
+export interface RaphDebugLease {
+  release(): void
+}
+
 /**
  * Описывает настройки RaphDebug.
  */
@@ -52,6 +56,8 @@ export type NodeFlatDump = {
  */
 export class RaphDebug {
   private enabled = false
+  private manuallyEnabled = false
+  private leases = new Set<symbol>()
   private off: Array<EventOff> = []
   private getApp?: () => RaphRuntime<any>
   private events?: EventBus<any>
@@ -73,9 +79,24 @@ export class RaphDebug {
    * Подключить или отключить debug-слежение за графом и маршрутами.
    */
   enable(value: boolean): void {
-    if (value === this.enabled) return
-    if (value) this.attach()
-    else this.detach()
+    this.manuallyEnabled = value
+    this.syncEnabled()
+  }
+
+  /** Keep debug active for the lifetime of an explicit inspection session. */
+  acquire(): RaphDebugLease {
+    const token = Symbol('raph-debug-lease')
+    this.leases.add(token)
+    this.syncEnabled()
+    let released = false
+    return {
+      release: () => {
+        if (released) return
+        released = true
+        this.leases.delete(token)
+        this.syncEnabled()
+      },
+    }
   }
 
   /** Жёсткая очистка состояния (не трогает флаги enable/disable) */
@@ -181,6 +202,16 @@ export class RaphDebug {
       }),
     )
 
+    this.off.push(
+      events.on('node:untracked', (p: { node: RaphNode; path?: string }) => {
+        const info = this.nodes.get(p.node.id)
+        if (!info) return
+        if (p.path) info.routes.delete(p.path)
+        else info.routes.clear()
+        events.emit('debug:nodes', {})
+      }),
+    )
+
     // 3) При каждом батче уведомлений считаем метрику и пушим в bus
     this.off.push(
       events.on(
@@ -218,6 +249,17 @@ export class RaphDebug {
     this.off = []
   }
 
+  private syncEnabled(): void {
+    const next = this.manuallyEnabled || this.leases.size > 0
+    if (next === this.enabled) return
+    if (next) {
+      this.attach()
+      return
+    }
+    this.detach()
+    this.clear()
+  }
+
   /**
    * Получить или создать агрегированную debug-информацию по ноде.
    */
@@ -239,7 +281,7 @@ export class RaphDebug {
     return info
   }
 
-  /** Пересборка только parent/child из графа; подписки не трогаем. */
+  /** Пересборка живой иерархии и маршрутов из runtime graph/router. */
   private rebuildHierarchyFromGraph(): void {
     const app = this.getApp?.()
     if (!app) return
@@ -247,12 +289,14 @@ export class RaphDebug {
     for (const info of this.nodes.values()) {
       info.parents.clear()
       info.children.clear()
+      info.routes.clear()
     }
 
     const seen = new Set<string>()
     const dfs = (n: RaphNode) => {
       if (!seen.add(n.id)) return
       const cur = this.ensureInfo(n)
+      for (const route of app.getTrackedMasks(n)) cur.routes.add(route)
       for (const ch of app.graph.childrenOf(n)) {
         const child = this.ensureInfo(ch)
         cur.children.add(ch.id)
@@ -268,9 +312,9 @@ export class RaphDebug {
       if (n) dfs(n)
     }
 
-    for (const [id, info] of Array.from(this.nodes.entries())) {
+    for (const [id] of Array.from(this.nodes.entries())) {
       if (app.getNode(id)) continue
-      if (info.routes.size === 0) this.nodes.delete(id)
+      this.nodes.delete(id)
     }
   }
 }

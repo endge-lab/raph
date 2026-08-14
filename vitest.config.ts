@@ -12,7 +12,7 @@ export default defineConfig({
     include: ['src/test/units/**/*.{spec,test}.ts'],
     exclude: [
       'src/test/units/benchmarks/**/*',
-      'src/test/units/derived/**/*.memory.spec.ts',
+      'src/test/units/**/*.memory.spec.ts',
     ],
     coverage: {
       provider: 'v8',

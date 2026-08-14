@@ -1251,10 +1251,18 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     if (!mask) {
       // Снимаем все зависимости
       this._nodeRouter.removePayload(node)
+      RAPH_EVENTS.emit('node:untracked', { node })
       return
     }
 
-    this._nodeRouter.remove(mask, node)
+    const path = DataPath.from(mask).toStringPath()
+    this._nodeRouter.remove(path, node)
+    RAPH_EVENTS.emit('node:untracked', { node, path })
+  }
+
+  /** Read-only snapshot used by live debug projections. */
+  getTrackedMasks(node: RaphNode<any>): ReadonlySet<string> {
+    return this._nodeRouter.masksFor(node)
   }
 
   //

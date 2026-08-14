@@ -7,7 +7,11 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['src/test/units/derived/**/*.memory.spec.ts'],
+    include: [
+      'src/test/units/derived/**/*.memory.spec.ts',
+      'src/test/units/router/**/*.memory.spec.ts',
+      'src/test/units/runtime/**/*.memory.spec.ts',
+    ],
     pool: 'threads',
     testTimeout: 30_000,
   },

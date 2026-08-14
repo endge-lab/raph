@@ -10,6 +10,8 @@ import { keyIndex, keyLiteralStr, keyParam } from '@/utils/path'
  */
 export class RaphRouter<P = string> {
   private _root = new RouterNode<P>()
+  private _payloadMasks = new Map<P, Set<string>>()
+  private _branchSizes = new WeakMap<object, number>()
 
   // --- Versioning for caches ---
   private _version = 0
@@ -42,7 +44,7 @@ export class RaphRouter<P = string> {
     const hit = this._segCache.get(key)
     if (hit) return hit
     const segs = DataPath.from(key).segments()
-    if (this._segCache.size > RaphRouter.MAX_SEG_CACHE) this._segCache.clear()
+    if (this._segCache.size >= RaphRouter.MAX_SEG_CACHE) this._segCache.clear()
     this._segCache.set(key, segs)
     return segs
   }
@@ -88,10 +90,96 @@ export class RaphRouter<P = string> {
    */
   private _bumpVersion(): void {
     this._version++
-    // ленивая инвалидция: записи с другой версией считаются просроченными
-    if (this._version % 1024 === 0) {
-      this._matchCache.clear()
-      this._prefixCache.clear()
+    // Cached Sets hold payloads strongly. Drop them immediately when the trie
+    // changes so an untracked runtime node can be collected without waiting
+    // for another 1024 mutations.
+    this._matchCache.clear()
+    this._prefixCache.clear()
+  }
+
+  private _canonicalMask(mask: DataPathDef): string {
+    return DataPath.from(mask).toStringPath()
+  }
+
+  private _rememberMask(payload: P, mask: string): void {
+    let masks = this._payloadMasks.get(payload)
+    if (!masks) {
+      masks = new Set<string>()
+      this._payloadMasks.set(payload, masks)
+    }
+    masks.add(mask)
+  }
+
+  private _forgetMask(payload: P, mask: string): void {
+    const masks = this._payloadMasks.get(payload)
+    if (!masks) return
+    masks.delete(mask)
+    if (masks.size === 0) this._payloadMasks.delete(payload)
+  }
+
+  private _isEmpty(node: RouterNode<P>): boolean {
+    return !node.end
+      && !node.deep
+      && !node.exact
+      && !node.wc
+      && !node.param
+      && !node.paramAny
+  }
+
+  private _rememberBranch(container: object, existed: boolean): void {
+    if (!existed)
+      this._branchSizes.set(container, (this._branchSizes.get(container) ?? 0) + 1)
+  }
+
+  private _forgetBranch(container: object): boolean {
+    const remaining = Math.max(0, (this._branchSizes.get(container) ?? 1) - 1)
+    if (remaining === 0) {
+      this._branchSizes.delete(container)
+      return true
+    }
+    this._branchSizes.set(container, remaining)
+    return false
+  }
+
+  private _prune(
+    stack: Array<{
+      node: RouterNode<P>
+      via?: {
+        typ: 'exact' | 'wc' | 'param' | 'paramAny'
+        key?: string
+        pk?: string
+        pvKey?: string
+      }
+    }>,
+  ): void {
+    for (let i = stack.length - 1; i > 0; i--) {
+      const current = stack[i]
+      if (!this._isEmpty(current.node)) break
+      const parent = stack[i - 1].node
+      const via = current.via!
+
+      if (via.typ === 'exact' && parent.exact) {
+        const container = parent.exact
+        delete parent.exact[via.key!]
+        if (this._forgetBranch(container)) parent.exact = null
+      } else if (via.typ === 'wc') {
+        parent.wc = null
+      } else if (via.typ === 'param' && parent.param) {
+        const bucket = parent.param[via.pk!]
+        if (bucket) {
+          const bucketIsEmpty = this._forgetBranch(bucket)
+          delete bucket[via.pvKey!]
+          if (bucketIsEmpty) {
+            const params = parent.param
+            delete params[via.pk!]
+            if (this._forgetBranch(params)) parent.param = null
+          }
+        }
+      } else if (via.typ === 'paramAny' && parent.paramAny) {
+        const container = parent.paramAny
+        delete parent.paramAny[via.pk!]
+        if (this._forgetBranch(container)) parent.paramAny = null
+      }
     }
   }
 
@@ -101,7 +189,8 @@ export class RaphRouter<P = string> {
 
   /** Зарегистрировать маршрут (маску) с полезной нагрузкой */
   add(mask: DataPathDef, payload: P): void {
-    const segs = this._getSegs(mask)
+    const canonicalMask = this._canonicalMask(mask)
+    const segs = this._getSegs(canonicalMask)
     let node = this._root
 
     for (let i = 0; i < segs.length; i++) {
@@ -111,16 +200,29 @@ export class RaphRouter<P = string> {
       if (s.kind === SegKind.Wildcard && last) {
         // глубокий wildcard - привязываем payload к текущему узлу
         node.pushDeep(payload)
+        this._rememberMask(payload, canonicalMask)
         this._bumpVersion()
         return
       }
 
       switch (s.kind) {
         case SegKind.Key:
-          node = node.addExact(keyLiteralStr(s.key!))
+          {
+            const parent = node
+            const key = keyLiteralStr(s.key!)
+            const existed = parent.exact?.[key] != null
+            node = parent.addExact(key)
+            this._rememberBranch(parent.exact!, existed)
+          }
           break
         case SegKind.Index:
-          node = node.addExact(keyIndex(s.index!))
+          {
+            const parent = node
+            const key = keyIndex(s.index!)
+            const existed = parent.exact?.[key] != null
+            node = parent.addExact(key)
+            this._rememberBranch(parent.exact!, existed)
+          }
           break
         case SegKind.Wildcard:
           node = node.addWildcard()
@@ -129,65 +231,52 @@ export class RaphRouter<P = string> {
           // если s.pval - строка и начинается с '$' => placeholder (маска захвата)
           if (typeof s.pval === 'string' && s.pval.startsWith('$')) {
             // varName - без '$' или с '$' - как вам удобнее; я сохраню без $
+            const parent = node
+            const pk = s.pkey!
             const varName = s.pval.slice(1)
-            node = node.addParamAny(s.pkey!, varName)
+            const existed = parent.paramAny?.[pk] != null
+            node = parent.addParamAny(pk, varName)
+            this._rememberBranch(parent.paramAny!, existed)
           } else {
-            node = node.addParam(s.pkey!, s.pval!)
+            const parent = node
+            const pk = s.pkey!
+            const pvKey = keyParam(pk, s.pval!)
+            const existingBucket = parent.param?.[pk]
+            const existed = existingBucket?.[pvKey] != null
+            node = parent.addParam(pk, s.pval!)
+            this._rememberBranch(parent.param!, existingBucket != null)
+            this._rememberBranch(parent.param![pk]!, existed)
           }
           break
       }
     }
 
     node.pushEnd(payload)
+    this._rememberMask(payload, canonicalMask)
     this._bumpVersion()
   }
 
   /** Снять payload из всех узлов роутера (и deep, и end). */
   removePayload(payload: P): void {
-    const stack: Array<RouterNode<P>> = [this._root]
-    while (stack.length) {
-      const n = stack.pop()!
+    const masks = this._payloadMasks.get(payload)
+    if (!masks) return
+    for (const mask of [...masks]) this.remove(mask, payload)
+  }
 
-      if (n.end) {
-        n.end.delete(payload)
-        if (n.end.size === 0) n.end = null
-      }
-      if (n.deep) {
-        n.deep.delete(payload)
-        if (n.deep.size === 0) n.deep = null
-      }
-
-      if (n.exact) {
-        for (const k in n.exact) {
-          const child = n.exact[k]
-          if (child) stack.push(child)
-        }
-      }
-      if (n.wc) stack.push(n.wc)
-      if (n.param) {
-        for (const pk in n.param) {
-          const bucket = n.param[pk]
-          if (bucket) {
-            for (const pv in bucket) {
-              const child = bucket[pv]
-              if (child) stack.push(child)
-            }
-          }
-        }
-      }
-    }
-
-    this._bumpVersion()
+  /** Возвращает snapshot живых canonical masks, принадлежащих payload. */
+  masksFor(payload: P): ReadonlySet<string> {
+    return new Set(this._payloadMasks.get(payload) ?? [])
   }
 
   /** Удалить маршрут. Если payload опущен - снимаем все payload'ы по маске. */
   remove(mask: DataPathDef, payload?: P): void {
-    const segs = this._getSegs(mask)
+    const canonicalMask = this._canonicalMask(mask)
+    const segs = this._getSegs(canonicalMask)
 
     const stack: Array<{
       node: RouterNode<P>
       via?: {
-        typ: 'exact' | 'wc' | 'param'
+        typ: 'exact' | 'wc' | 'param' | 'paramAny'
         key?: string
         pk?: string
         pvKey?: string
@@ -202,10 +291,17 @@ export class RaphRouter<P = string> {
 
       if (s.kind === SegKind.Wildcard && last) {
         if (node.deep) {
-          if (payload) node.deep.delete(payload)
-          else node.deep.clear()
+          const removed = payload === undefined ? [...node.deep] : [payload]
+          const changed = payload === undefined
+            ? node.deep.size > 0
+            : node.deep.delete(payload)
+          if (payload === undefined) node.deep.clear()
           if (node.deep.size === 0) node.deep = null
-          this._bumpVersion()
+          if (changed) {
+            for (const item of removed) this._forgetMask(item, canonicalMask)
+            this._prune(stack)
+            this._bumpVersion()
+          }
         }
         return
       }
@@ -229,25 +325,41 @@ export class RaphRouter<P = string> {
         node = next
       } else {
         const pk = s.pkey!
-        const pvKey = keyParam(pk, s.pval!)
-        const next = node.param?.[pk]?.[pvKey]
-        if (!next) return
-        stack.push({ node: next, via: { typ: 'param', pk, pvKey } })
-        node = next
+        if (typeof s.pval === 'string' && s.pval.startsWith('$')) {
+          const next = node.paramAny?.[pk]?.node
+          if (!next) return
+          stack.push({ node: next, via: { typ: 'paramAny', pk } })
+          node = next
+        } else {
+          const pvKey = keyParam(pk, s.pval!)
+          const next = node.param?.[pk]?.[pvKey]
+          if (!next) return
+          stack.push({ node: next, via: { typ: 'param', pk, pvKey } })
+          node = next
+        }
       }
     }
 
     if (node.end) {
-      if (payload) node.end.delete(payload)
-      else node.end.clear()
+      const removed = payload === undefined ? [...node.end] : [payload]
+      const changed = payload === undefined
+        ? node.end.size > 0
+        : node.end.delete(payload)
+      if (payload === undefined) node.end.clear()
       if (node.end.size === 0) node.end = null
-      this._bumpVersion()
+      if (changed) {
+        for (const item of removed) this._forgetMask(item, canonicalMask)
+        this._prune(stack)
+        this._bumpVersion()
+      }
     }
   }
 
   /** Удалить все маршруты и сбросить кэши */
   removeAll(): void {
     this._root = new RouterNode<P>()
+    this._payloadMasks.clear()
+    this._branchSizes = new WeakMap<object, number>()
     this.resetCaches()
   }
 

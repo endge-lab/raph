@@ -16,6 +16,7 @@ import { SegKind } from '@/domain/types/path.types'
  */
 export class DataPath {
   private readonly _segs: Array<DataPathSegment>
+  private static readonly MAX_STRING_CACHE = 20_000
 
   // Глобальные кэши
   static _cacheFromString = new Map<string, DataPath>()
@@ -71,7 +72,13 @@ export class DataPath {
     const segsFromCache = DataPath._cacheSegments.get(path)
     const segs = segsFromCache ?? DataPath._parseSegments(path)
 
-    if (!segsFromCache) DataPath._cacheSegments.set(path, segs)
+    if (!segsFromCache) {
+      if (DataPath._cacheFromString.size >= DataPath.MAX_STRING_CACHE) {
+        DataPath._cacheFromString.clear()
+        DataPath._cacheSegments.clear()
+      }
+      DataPath._cacheSegments.set(path, segs)
+    }
 
     const dp = new DataPath(segs)
     DataPath._cacheFromString.set(path, dp)

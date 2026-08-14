@@ -1,4 +1,5 @@
 export * from '@/domain/core/Raph'
+export * from '@/domain/core/RaphDebug'
 export * from '@/domain/core/RaphApp'
 export * from '@/domain/core/RaphKernel'
 export * from '@/domain/core/RaphNode'

@@ -12,6 +12,7 @@ import type { DepGraph } from '@/domain/entities/DepGraph'
 export interface RaphEventPayloads {
   //
   'node:tracked': { node: RaphNode; path: string }
+  'node:untracked': { node: RaphNode; path?: string }
   'node:notified': { node: RaphNode; event: PhaseEvent }
 
   //
