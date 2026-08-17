@@ -312,7 +312,19 @@ export class DataPath {
           const quoted =
             (rawVal.startsWith('"') && rawVal.endsWith('"')) ||
             (rawVal.startsWith("'") && rawVal.endsWith("'"))
-          if (quoted) rawVal = rawVal.slice(1, -1)
+          if (quoted) {
+            if (rawVal.startsWith('"')) {
+              try {
+                rawVal = JSON.parse(rawVal)
+              }
+              catch {
+                rawVal = rawVal.slice(1, -1)
+              }
+            }
+            else {
+              rawVal = rawVal.slice(1, -1).replace(/\\(['\\])/g, '$1')
+            }
+          }
 
           if (!quoted && rawVal.startsWith('$')) {
             segs.push({ kind: SegKind.Param, pkey, pval: rawVal })

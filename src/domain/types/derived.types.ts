@@ -16,7 +16,15 @@ export interface RaphDerivedCollectionByKeyStrategy {
   readonly key: string
 }
 
-export type RaphDerivedStrategy = RaphDerivedFullStrategy | RaphDerivedCollectionByKeyStrategy
+export interface RaphDerivedFilterByKeyStrategy {
+  readonly kind: 'filter-by-key'
+  readonly key: string
+}
+
+export type RaphDerivedStrategy
+  = | RaphDerivedFullStrategy
+    | RaphDerivedCollectionByKeyStrategy
+    | RaphDerivedFilterByKeyStrategy
 
 export interface RaphDerivedOptions<TSource = unknown, TTarget = unknown> {
   id?: string

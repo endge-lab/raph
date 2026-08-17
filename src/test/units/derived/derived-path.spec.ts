@@ -45,6 +45,8 @@ describe('Raph derived path semantics', () => {
     expect(collectionMutationImpact(source, 'id', record('rows[id=1].value'))).toEqual({ kind: 'key', key: 1 })
     expect(keyedPath(source, 'id', 1)).toBe('rows[id=1]')
     expect(keyedPath(source, 'id', 'a')).toBe('rows[id="a"]')
+    const escaped = keyedPath(source, 'id', 'SU "101"')
+    expect(DataPath.from(escaped).segments()[1].pval).toBe('SU "101"')
   })
 
   it('rejects an empty collection key', () => {

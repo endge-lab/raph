@@ -52,6 +52,13 @@ describe('DataPath.fromString / segments()', () => {
 
     const s2 = DataPath.from('n[name=\'bar\'].v')
     expect(s2.segments()[1].pval).toBe('bar')
+
+    const escaped = DataPath.from('n[name="SU \\"101\\""]')
+    expect(escaped.segments()[1].pval).toBe('SU "101"')
+    expect(escaped.toStringPath()).toBe('n[name="SU \\"101\\""]')
+
+    const invalidEscape = DataPath.from('n[name="bad\\q"]')
+    expect(invalidEscape.segments()[1].pval).toBe('bad\\q')
   })
 
   it('разбирает дот-сегменты и параметры с дефисом в ключе', () => {

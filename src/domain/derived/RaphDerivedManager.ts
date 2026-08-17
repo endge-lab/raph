@@ -366,12 +366,15 @@ export class RaphDerivedManager {
   private _executeFull(registration: DerivedRegistration, invalidate: boolean): RaphDerivedMutationRecord[] {
     const source = this._adapter.get(registration.from)
     const output = this._callCompute(registration, source, 'full')
-    if (registration.strategy.kind === 'collection-by-key')
+    if (registration.strategy.kind !== 'full')
       this._validateCollectionResult(registration, source, output)
-    this._adapter.set(registration.to, output)
-    if (registration.strategy.kind === 'collection-by-key') {
+    const materialized = registration.strategy.kind === 'filter-by-key'
+      ? cloneMaterializedValue(output)
+      : output
+    this._adapter.set(registration.to, materialized)
+    if (registration.strategy.kind !== 'full') {
       registration.sourceIndex = collectionIndex(source as unknown[], registration.strategy.key, 'source')
-      registration.targetIndex = collectionIndex(output as unknown[], registration.strategy.key, 'output')
+      registration.targetIndex = collectionIndex(materialized as unknown[], registration.strategy.key, 'output')
     }
     registration.node.countTargetWrites(1)
     return [this._record('derived', registration.to, registration.to, { invalidate }, registration.id)]
@@ -382,6 +385,9 @@ export class RaphDerivedManager {
     keys: Set<RaphDerivedKey>,
     invalidate: boolean,
   ): RaphDerivedMutationRecord[] {
+    if (registration.strategy.kind === 'filter-by-key')
+      return this._executeIncrementalFilter(registration, keys, invalidate)
+
     const strategy = registration.strategy as Extract<RaphDerivedStrategy, { kind: 'collection-by-key' }>
     const keyField = strategy.key
     const source = this._adapter.get(registration.from)
@@ -454,6 +460,79 @@ export class RaphDerivedManager {
     return records
   }
 
+  /** Пересчитывает только затронутые строки row-local фильтра и обновляет membership по ключу. */
+  private _executeIncrementalFilter(
+    registration: DerivedRegistration,
+    keys: Set<RaphDerivedKey>,
+    invalidate: boolean,
+  ): RaphDerivedMutationRecord[] {
+    const strategy = registration.strategy as Extract<RaphDerivedStrategy, { kind: 'filter-by-key' }>
+    const keyField = strategy.key
+    const source = this._adapter.get(registration.from)
+    const target = this._adapter.get(registration.to)
+    if (!Array.isArray(source) || !Array.isArray(target))
+      throw new RaphDerivedStrategyError('[RaphDerived] filterByKey requires array source and target.')
+
+    if (!registration.sourceIndex || indexesAreStale(source, keyField, registration.sourceIndex, keys))
+      registration.sourceIndex = collectionIndex(source, keyField, 'source')
+    const targetIndex = registration.targetIndex!
+    const existing: Array<{ key: RaphDerivedKey, index: number, item: unknown }> = []
+    for (const key of keys) {
+      const index = registration.sourceIndex.get(key)
+      if (index !== undefined)
+        existing.push({ key, index, item: source[index] })
+    }
+    existing.sort((left, right) => left.index - right.index)
+
+    const input = existing.map(entry => entry.item)
+    const output = input.length ? this._callCompute(registration, input, 'incremental') : []
+    this._validateIncrementalResult(registration, existing.map(entry => entry.key), output)
+
+    const result = output as unknown[]
+    const accepted = new Map<RaphDerivedKey, unknown>()
+    const outputKeys = collectionKeys(result, keyField, 'output')
+    for (let index = 0; index < outputKeys.length; index++) {
+      const key = outputKeys[index]
+      if (key !== undefined)
+        accepted.set(key, cloneMaterializedValue(result[index]))
+    }
+
+    const affected = new Set(keys)
+    const changed = [...affected].filter(key => targetIndex.has(key) || accepted.has(key))
+    const structural = changed.some(key => targetIndex.has(key) !== accepted.has(key))
+    if (structural) {
+      const oldItems = new Map<RaphDerivedKey, unknown>()
+      for (const [key, index] of targetIndex)
+        oldItems.set(key, target[index])
+
+      const nextTarget: unknown[] = []
+      for (const key of collectionKeys(source, keyField, 'source')) {
+        if (key === undefined)
+          continue
+        if (affected.has(key)) {
+          if (accepted.has(key))
+            nextTarget.push(accepted.get(key))
+          continue
+        }
+        if (oldItems.has(key))
+          nextTarget.push(oldItems.get(key))
+      }
+      this._adapter.set(registration.to, nextTarget)
+      registration.targetIndex = collectionIndex(nextTarget, keyField, 'target')
+    }
+    else {
+      for (const [key, item] of accepted)
+        this._adapter.set(keyedPath(registration.to, keyField, key), item)
+    }
+
+    const records = changed.map((key) => {
+      const path = keyedPath(registration.to, keyField, key)
+      return this._record('derived', path, path, { invalidate }, registration.id)
+    })
+    registration.node.countTargetWrites(records.length)
+    return records
+  }
+
   private _callCompute(
     registration: DerivedRegistration,
     source: unknown,
@@ -479,14 +558,32 @@ export class RaphDerivedManager {
   ): void {
     if (!Array.isArray(source) || !Array.isArray(output))
       throw new RaphDerivedStrategyError('[RaphDerived] collectionByKey requires array source and output.')
-    if (source.length !== output.length)
+    if (registration.strategy.kind === 'collection-by-key' && source.length !== output.length)
       throw new RaphDerivedStrategyError('[RaphDerived] collectionByKey must preserve collection cardinality.')
-    const key = (registration.strategy as Extract<RaphDerivedStrategy, { kind: 'collection-by-key' }>).key
+    const key = registration.strategy.kind === 'full' ? '' : registration.strategy.key
     const sourceKeys = collectionKeys(source, key, 'source')
     const outputKeys = collectionKeys(output, key, 'output')
-    for (let index = 0; index < sourceKeys.length; index++) {
-      if (sourceKeys[index] !== outputKeys[index])
-        throw new RaphDerivedStrategyError('[RaphDerived] collectionByKey must preserve key order.')
+    if (registration.strategy.kind === 'collection-by-key') {
+      for (let index = 0; index < sourceKeys.length; index++) {
+        if (sourceKeys[index] !== outputKeys[index])
+          throw new RaphDerivedStrategyError('[RaphDerived] collectionByKey must preserve key order.')
+      }
+      return
+    }
+
+    const sourcePositions = new Map<RaphDerivedKey, number>()
+    sourceKeys.forEach((sourceKey, index) => {
+      if (sourceKey !== undefined)
+        sourcePositions.set(sourceKey, index)
+    })
+    let previousPosition = -1
+    for (const outputKey of outputKeys) {
+      if (outputKey === undefined)
+        continue
+      const position = sourcePositions.get(outputKey)
+      if (position === undefined || position <= previousPosition)
+        throw new RaphDerivedStrategyError('[RaphDerived] filterByKey output must be an ordered subset of source.')
+      previousPosition = position
     }
   }
 
@@ -497,13 +594,27 @@ export class RaphDerivedManager {
   ): void {
     if (!Array.isArray(output))
       throw new RaphDerivedStrategyError('[RaphDerived] Incremental collection compute must return an array.')
-    if (inputKeys.length !== output.length)
+    if (registration.strategy.kind === 'collection-by-key' && inputKeys.length !== output.length)
       throw new RaphDerivedStrategyError('[RaphDerived] Incremental collection compute must preserve cardinality.')
-    const key = (registration.strategy as Extract<RaphDerivedStrategy, { kind: 'collection-by-key' }>).key
+    const key = registration.strategy.kind === 'full' ? '' : registration.strategy.key
     const outputKeys = collectionKeys(output, key, 'output')
-    for (let index = 0; index < inputKeys.length; index++) {
-      if (inputKeys[index] !== outputKeys[index])
-        throw new RaphDerivedStrategyError('[RaphDerived] Incremental collection compute must preserve key order.')
+    if (registration.strategy.kind === 'collection-by-key') {
+      for (let index = 0; index < inputKeys.length; index++) {
+        if (inputKeys[index] !== outputKeys[index])
+          throw new RaphDerivedStrategyError('[RaphDerived] Incremental collection compute must preserve key order.')
+      }
+      return
+    }
+
+    const inputPositions = new Map(inputKeys.map((keyValue, index) => [keyValue, index]))
+    let previousPosition = -1
+    for (const outputKey of outputKeys) {
+      if (outputKey === undefined)
+        continue
+      const position = inputPositions.get(outputKey)
+      if (position === undefined || position <= previousPosition)
+        throw new RaphDerivedStrategyError('[RaphDerived] Incremental filter output must be an ordered subset of input.')
+      previousPosition = position
     }
   }
 
@@ -631,4 +742,38 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 function isThenable(value: unknown): value is PromiseLike<unknown> {
   return Boolean(value && (typeof value === 'object' || typeof value === 'function') && typeof (value as any).then === 'function')
+}
+
+/** Отделяет materialized filter target от source даже при identity predicate `rows.filter(...)`. */
+function cloneMaterializedValue<T>(value: T): T {
+  try {
+    return structuredClone(value)
+  }
+  catch {
+    return cloneFallback(value, new WeakMap<object, unknown>())
+  }
+}
+
+function cloneFallback<T>(value: T, seen: WeakMap<object, unknown>): T {
+  if (value === null || typeof value !== 'object')
+    return value
+  const cached = seen.get(value)
+  if (cached !== undefined)
+    return cached as T
+  if (value instanceof Date)
+    return new Date(value.getTime()) as T
+  if (Array.isArray(value)) {
+    const result: unknown[] = []
+    seen.set(value, result)
+    for (let index = 0; index < value.length; index++) {
+      if (index in value)
+        result[index] = cloneFallback(value[index], seen)
+    }
+    return result as T
+  }
+  const result = Object.create(Object.getPrototypeOf(value)) as Record<PropertyKey, unknown>
+  seen.set(value, result)
+  for (const key of Reflect.ownKeys(value))
+    result[key] = cloneFallback((value as Record<PropertyKey, unknown>)[key], seen)
+  return result as T
 }
