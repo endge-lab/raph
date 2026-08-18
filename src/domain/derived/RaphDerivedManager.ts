@@ -366,15 +366,22 @@ export class RaphDerivedManager {
   private _executeFull(registration: DerivedRegistration, invalidate: boolean): RaphDerivedMutationRecord[] {
     const source = this._adapter.get(registration.from)
     const output = this._callCompute(registration, source, 'full')
-    if (registration.strategy.kind !== 'full')
+    const unmaterializedCollection = registration.strategy.kind !== 'full'
+      && source === undefined
+      && (output === undefined || (Array.isArray(output) && output.length === 0))
+    if (registration.strategy.kind !== 'full' && !unmaterializedCollection)
       this._validateCollectionResult(registration, source, output)
     const materialized = registration.strategy.kind === 'filter-by-key'
       ? cloneMaterializedValue(output)
       : output
     this._adapter.set(registration.to, materialized)
     if (registration.strategy.kind !== 'full') {
-      registration.sourceIndex = collectionIndex(source as unknown[], registration.strategy.key, 'source')
-      registration.targetIndex = collectionIndex(materialized as unknown[], registration.strategy.key, 'output')
+      registration.sourceIndex = unmaterializedCollection
+        ? new Map()
+        : collectionIndex(source as unknown[], registration.strategy.key, 'source')
+      registration.targetIndex = unmaterializedCollection
+        ? new Map()
+        : collectionIndex(materialized as unknown[], registration.strategy.key, 'output')
     }
     registration.node.countTargetWrites(1)
     return [this._record('derived', registration.to, registration.to, { invalidate }, registration.id)]
@@ -556,8 +563,11 @@ export class RaphDerivedManager {
     source: unknown,
     output: unknown,
   ): void {
-    if (!Array.isArray(source) || !Array.isArray(output))
-      throw new RaphDerivedStrategyError('[RaphDerived] collectionByKey requires array source and output.')
+    if (!Array.isArray(source) || !Array.isArray(output)) {
+      throw new RaphDerivedStrategyError(
+        `[RaphDerived] collectionByKey "${registration.publicId}" requires array source and output.`,
+      )
+    }
     if (registration.strategy.kind === 'collection-by-key' && source.length !== output.length)
       throw new RaphDerivedStrategyError('[RaphDerived] collectionByKey must preserve collection cardinality.')
     const key = registration.strategy.kind === 'full' ? '' : registration.strategy.key

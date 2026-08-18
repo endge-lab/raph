@@ -4,6 +4,28 @@ import { RaphDerivedStrategyError } from '@/domain/types/derived.types'
 import { createDerivedFixture, projectRows } from '../../../units/derived/derived.fixtures.ts'
 
 describe('Raph derived collectionByKey strategy', () => {
+  it.each([
+    { name: 'undefined output', emptyOutput: undefined },
+    { name: 'empty array output', emptyOutput: [] },
+  ])('waits for an initially unavailable collection with $name', ({ emptyOutput }) => {
+    const { kernel, runtime } = createDerivedFixture()
+    const compute = vi.fn((rows: any[] | undefined) => rows
+      ? rows.map(row => ({ id: row.id, label: row.name }))
+      : emptyOutput)
+    const handle = runtime.derive({
+      from: 'source.rows', to: 'target.rows', strategy: collectionByKey('id'), compute,
+    })
+
+    expect(kernel.get('target.rows')).toEqual(emptyOutput)
+    expect(handle.snapshot()).toMatchObject({ status: 'active', fullComputeCount: 1 })
+
+    kernel.set('source.rows', [{ id: 1, name: 'A' }])
+
+    expect(kernel.get('target.rows')).toEqual([{ id: 1, label: 'A' }])
+    expect(handle.snapshot()).toMatchObject({ status: 'active', fullComputeCount: 2 })
+    runtime.destroy()
+  })
+
   it('batches updates by key and processes merge/add/delete incrementally', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [
