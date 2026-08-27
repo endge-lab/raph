@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { filterByKey } from '@/domain/derived/strategies/filter-by-key'
 import { keyedPath } from '@/domain/derived/derived-path'
+import { filterByKey } from '@/domain/derived/strategies/filter-by-key'
 import { DataPath } from '@/domain/entities/DataPath'
 import { RaphDerivedStrategyError } from '@/domain/types/derived.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('Raph derived filterByKey strategy', () => {
+describe('raph derived filterByKey strategy', () => {
   it('normalizes, freezes and validates the strategy descriptor', () => {
     const strategy = filterByKey('  flightId  ')
     expect(strategy).toEqual({ kind: 'filter-by-key', key: 'flightId' })
@@ -96,7 +96,9 @@ describe('Raph derived filterByKey strategy', () => {
     source.self = source
     kernel.set('source.rows', [source])
     runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: filterByKey('id'),
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: filterByKey('id'),
       compute: (rows: any[]) => rows.filter(row => row.visible),
     })
 
@@ -161,7 +163,9 @@ describe('Raph derived filterByKey strategy', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, visible: true }])
     const handle = runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: filterByKey('id'),
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: filterByKey('id'),
       compute: (rows: Array<{ id: number, visible: boolean }>) => rows.filter(row => row.visible),
     })
     const initialWrites = handle.snapshot().targetWriteCount
@@ -202,7 +206,10 @@ describe('Raph derived filterByKey strategy', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, visible: true }])
     const handle = runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: filterByKey('id'), immediate: false,
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: filterByKey('id'),
+      immediate: false,
       compute: (rows: Array<{ id: number, visible: boolean }>) => rows.filter(row => row.visible),
     })
 
@@ -217,7 +224,9 @@ describe('Raph derived filterByKey strategy', () => {
     kernel.set('source.rows', [{ id: 1, text: 'SU101' }, { id: 2, text: 'S7202' }])
     let search = 'su'
     const handle = runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: filterByKey('id'),
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: filterByKey('id'),
       compute: (rows: Array<{ id: number, text: string }>) => rows.filter(row => row.text.toLowerCase().includes(search)),
     })
     expect(kernel.get('target.rows')).toEqual([{ id: 1, text: 'SU101' }])
@@ -233,7 +242,9 @@ describe('Raph derived filterByKey strategy', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 'SU "101"', visible: true, value: 1 }])
     runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: filterByKey('id'),
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: filterByKey('id'),
       compute: (rows: Array<{ id: string, visible: boolean, value: number }>) => rows.filter(row => row.visible),
     })
 
@@ -268,7 +279,10 @@ describe('Raph derived filterByKey strategy', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', source)
     expect(() => runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: filterByKey('id'), compute: compute as any,
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: filterByKey('id'),
+      compute: compute as any,
     })).toThrow(RaphDerivedStrategyError)
     expect(kernel.get('target.rows')).toBeUndefined()
     expect(kernel.getDerivedSnapshot().registrations).toBe(0)
@@ -280,7 +294,9 @@ describe('Raph derived filterByKey strategy', () => {
     kernel.set('source.rows', [{ id: 1, visible: true, value: 1 }, { id: 2, visible: true, value: 2 }])
     let invalid = false
     const handle = runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: filterByKey('id'),
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: filterByKey('id'),
       compute: (rows: Array<{ id: number, visible: boolean, value: number }>) => invalid
         ? [{ ...rows[0]!, id: 999 }]
         : rows.filter(row => row.visible),

@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
 import { DataPath } from '@/domain/entities/DataPath'
 
-describe('DefaultDataAdapter get/set/merge/delete', () => {
+describe('defaultDataAdapter get/set/merge/delete', () => {
   it('должен устанавливать и получать простое значение', () => {
     const adapter = new DefaultDataAdapter({})
     adapter.set('com.x', 123)

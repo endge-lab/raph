@@ -2,15 +2,16 @@ import { describe, expect, it } from 'vitest'
 import { RaphDerivedDisposedError } from '@/domain/types/derived.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('Raph derived lifecycle', () => {
+describe('raph derived lifecycle', () => {
   it('pauses without retaining mutations and resumes through full recompute', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     const handle = runtime.derive({ from: 'source', to: 'target', compute: value => Number(value) * 2 })
     handle.pause()
     kernel.transaction(() => {
-      for (let index = 0; index < 100; index++)
+      for (let index = 0; index < 100; index++) {
         kernel.set('source', index)
+      }
     })
     expect(kernel.get('target')).toBe(2)
     expect(handle.snapshot()).toMatchObject({ status: 'paused', stale: true, computeCount: 1 })
@@ -62,9 +63,13 @@ describe('Raph derived lifecycle', () => {
     kernel.set('source', 1)
     let fail = true
     const handle = runtime.derive({
-      from: 'source', to: 'target', immediate: false,
+      from: 'source',
+      to: 'target',
+      immediate: false,
       compute: (value) => {
-        if (fail) throw new Error('temporary')
+        if (fail) {
+          throw new Error('temporary')
+        }
         return value
       },
     })

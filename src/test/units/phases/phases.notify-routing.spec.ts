@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { RaphNode } from '@/domain/core/RaphNode'
-import { RaphApp } from '@/domain/core/RaphApp'
-import { SchedulerType } from '@/domain/types/base.types'
 import type {
   PhaseExecutorContext,
   PhaseName,
 } from '@/domain/types/phase.types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
+import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
 /**
  *
@@ -32,7 +32,7 @@ function buildTree(raph: RaphApp): any {
   return { a, b, a1, b1, b2 }
 }
 
-describe('RaphApp.notify routing', () => {
+describe('raphApp.notify routing', () => {
   beforeEach(() => {
     vi.useRealTimers()
   })
@@ -169,7 +169,7 @@ describe('RaphApp.notify routing', () => {
       {
         name: 'phase' as PhaseName,
         traversal: 'dirty-only',
-        each: ctx => {
+        each: (ctx) => {
           seen.push(ctx.node.id)
         },
         routes: ['data.*'],
@@ -193,7 +193,7 @@ describe('RaphApp.notify routing', () => {
       {
         name: 'phase' as PhaseName,
         traversal: 'dirty-and-down',
-        each: ctx => {
+        each: (ctx) => {
           seen.push(ctx.node.id)
         },
         routes: ['data.*'],
@@ -219,7 +219,7 @@ describe('RaphApp.notify routing', () => {
       {
         name: 'phase' as PhaseName,
         traversal: 'dirty-and-up',
-        each: ctx => {
+        each: (ctx) => {
           seen.push(ctx.node.id)
         },
         routes: ['data.*'],
@@ -243,7 +243,7 @@ describe('RaphApp.notify routing', () => {
       {
         name: 'phase' as PhaseName,
         traversal: 'all',
-        each: ctx => {
+        each: (ctx) => {
           // root у RaphNode имеет id вида "root-..." (или определён вашей реализацией)
           seen.add(ctx.node.id)
         },

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
 
 /**
@@ -7,7 +7,7 @@ import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
  *  - смешанные массивы/параметры: rows[id=...].items[idx].value
  * Проверяем корректность финального состояния и печатаем время.
  */
-describe('DefaultDataAdapter deep & nested set() bench', () => {
+describe('defaultDataAdapter deep & nested set() bench', () => {
   it('deep key chains and mixed array/param writes', () => {
     const adapter = new DefaultDataAdapter({}, { autoCreate: true })
 

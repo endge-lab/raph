@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { full } from '@/domain/derived/strategies/full'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('Raph derived full strategy', () => {
+describe('raph derived full strategy', () => {
   it('recomputes primitive, object and nested mutations synchronously', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', { value: 2, stale: true })
     const handle = runtime.derive({
-      from: 'source', to: 'target', strategy: full(),
+      from: 'source',
+      to: 'target',
+      strategy: full(),
       compute: (source: any) => ({ result: source?.value ?? 0 }),
     })
     expect(kernel.get('target')).toEqual({ result: 2 })
@@ -26,7 +28,9 @@ describe('Raph derived full strategy', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 2, active: true }, { id: 1, active: false }, { id: 3, active: true }])
     runtime.derive({
-      from: 'source.rows', to: 'target.summary', strategy: full(),
+      from: 'source.rows',
+      to: 'target.summary',
+      strategy: full(),
       compute: (rows: any[]) => ({
         total: rows.length,
         active: rows.filter(row => row.active).sort((a, b) => a.id - b.id).map(row => row.id),
@@ -42,7 +46,9 @@ describe('Raph derived full strategy', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', { mode: 'long' })
     runtime.derive({
-      from: 'source', to: 'target', strategy: full(),
+      from: 'source',
+      to: 'target',
+      strategy: full(),
       compute: (source: any) => source.mode === 'long' ? { current: 1, stale: 2 } : { current: 3 },
     })
     kernel.set('source.mode', 'short')
@@ -55,8 +61,10 @@ describe('Raph derived full strategy', () => {
     kernel.set('scope.source', null)
     let calls = 0
     runtime.derive({
-      from: 'scope.source', to: 'target.value', strategy: full(),
-      compute: (source) => ({ source, calls: ++calls }),
+      from: 'scope.source',
+      to: 'target.value',
+      strategy: full(),
+      compute: source => ({ source, calls: ++calls }),
     })
     expect(kernel.get('target.value')).toEqual({ source: null, calls: 1 })
     kernel.notify('scope.source')

@@ -1,10 +1,10 @@
+import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 import { describe, expect, it } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
-import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 
-describe('RaphRuntime legacy compatibility', () => {
+describe('raphRuntime legacy compatibility', () => {
   it('keeps phase.routes + track() delivery working through RaphApp', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })

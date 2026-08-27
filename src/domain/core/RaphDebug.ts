@@ -8,13 +8,13 @@ import type { EventBus } from '@/utils/EventBus'
 type EventOff = () => void
 
 export interface RaphDebugLease {
-  release(): void
+  release: () => void
 }
 
 /**
  * Описывает настройки RaphDebug.
  */
-type RaphDebugOptions = {
+interface RaphDebugOptions {
   getApp: () => RaphRuntime<any>
   events: EventBus<any>
 }
@@ -22,7 +22,7 @@ type RaphDebugOptions = {
 /**
  * Описывает тип NodeInfo.
  */
-type NodeInfo = {
+interface NodeInfo {
   id: string
   type?: string
   routes: Set<string>
@@ -33,7 +33,7 @@ type NodeInfo = {
 /**
  * Описывает тип NodeTree.
  */
-export type NodeTree = {
+export interface NodeTree {
   id: string
   type?: string
   children: Array<NodeTree>
@@ -43,7 +43,7 @@ export type NodeTree = {
 /**
  * Описывает тип NodeFlatDump.
  */
-export type NodeFlatDump = {
+export interface NodeFlatDump {
   id: string
   type?: string
   parentIds: Array<string>
@@ -91,7 +91,9 @@ export class RaphDebug {
     let released = false
     return {
       release: () => {
-        if (released) return
+        if (released) {
+          return
+        }
         released = true
         this.leases.delete(token)
         this.syncEnabled()
@@ -140,7 +142,9 @@ export class RaphDebug {
    */
   getTree(): Array<NodeTree> {
     const app = this.getApp?.()
-    if (!app) return []
+    if (!app) {
+      return []
+    }
 
     const roots = Array.from(app.graph.roots())
     const seen = new Set<string>()
@@ -164,9 +168,13 @@ export class RaphDebug {
       .map(r => build(r))
 
     for (const id of this.nodes.keys()) {
-      if (seen.has(id)) continue
+      if (seen.has(id)) {
+        continue
+      }
       const n = app.getNode(id)
-      if (n) forest.push(build(n))
+      if (n) {
+        forest.push(build(n))
+      }
     }
 
     return forest
@@ -195,19 +203,25 @@ export class RaphDebug {
 
     // 2) Узел подписался на маску
     this.off.push(
-      events.on('node:tracked', (p: { node: RaphNode; path: string }) => {
+      events.on('node:tracked', (p: { node: RaphNode, path: string }) => {
         const info = this.ensureInfo(p.node)
-        if (typeof p.path === 'string' && p.path) info.routes.add(p.path)
+        if (typeof p.path === 'string' && p.path) {
+          info.routes.add(p.path)
+        }
         events.emit('debug:nodes', {})
       }),
     )
 
     this.off.push(
-      events.on('node:untracked', (p: { node: RaphNode; path?: string }) => {
+      events.on('node:untracked', (p: { node: RaphNode, path?: string }) => {
         const info = this.nodes.get(p.node.id)
-        if (!info) return
-        if (p.path) info.routes.delete(p.path)
-        else info.routes.clear()
+        if (!info) {
+          return
+        }
+        if (p.path) {
+          info.routes.delete(p.path)
+        }
+        else { info.routes.clear() }
         events.emit('debug:nodes', {})
       }),
     )
@@ -217,10 +231,12 @@ export class RaphDebug {
       events.on(
         'nodes:notified',
         (_payload: {
-          ctxs: Array<{ phase: string; node: RaphNode; events?: Array<any> }>
+          ctxs: Array<{ phase: string, node: RaphNode, events?: Array<any> }>
         }) => {
           const currentApp = this.getApp?.()
-          if (!currentApp) return
+          if (!currentApp) {
+            return
+          }
           events.emit('debug:metrics', {
             ups: currentApp.ups,
             eps: currentApp.eps,
@@ -242,7 +258,8 @@ export class RaphDebug {
     for (const f of this.off) {
       try {
         f()
-      } catch {
+      }
+      catch {
         //
       }
     }
@@ -251,7 +268,9 @@ export class RaphDebug {
 
   private syncEnabled(): void {
     const next = this.manuallyEnabled || this.leases.size > 0
-    if (next === this.enabled) return
+    if (next === this.enabled) {
+      return
+    }
     if (next) {
       this.attach()
       return
@@ -275,7 +294,8 @@ export class RaphDebug {
         children: new Set<string>(),
       }
       this.nodes.set(id, info)
-    } else if (!info.type && node.type) {
+    }
+    else if (!info.type && node.type) {
       info.type = node.type
     }
     return info
@@ -284,7 +304,9 @@ export class RaphDebug {
   /** Пересборка живой иерархии и маршрутов из runtime graph/router. */
   private rebuildHierarchyFromGraph(): void {
     const app = this.getApp?.()
-    if (!app) return
+    if (!app) {
+      return
+    }
 
     for (const info of this.nodes.values()) {
       info.parents.clear()
@@ -294,9 +316,13 @@ export class RaphDebug {
 
     const seen = new Set<string>()
     const dfs = (n: RaphNode) => {
-      if (!seen.add(n.id)) return
+      if (!seen.add(n.id)) {
+        return
+      }
       const cur = this.ensureInfo(n)
-      for (const route of app.getTrackedMasks(n)) cur.routes.add(route)
+      for (const route of app.getTrackedMasks(n)) {
+        cur.routes.add(route)
+      }
       for (const ch of app.graph.childrenOf(n)) {
         const child = this.ensureInfo(ch)
         cur.children.add(ch.id)
@@ -305,15 +331,23 @@ export class RaphDebug {
       }
     }
 
-    for (const r of app.graph.roots()) dfs(r)
+    for (const r of app.graph.roots()) {
+      dfs(r)
+    }
     for (const [id] of this.nodes) {
-      if (seen.has(id)) continue
+      if (seen.has(id)) {
+        continue
+      }
       const n = app.getNode(id)
-      if (n) dfs(n)
+      if (n) {
+        dfs(n)
+      }
     }
 
     for (const [id] of Array.from(this.nodes.entries())) {
-      if (app.getNode(id)) continue
+      if (app.getNode(id)) {
+        continue
+      }
       this.nodes.delete(id)
     }
   }

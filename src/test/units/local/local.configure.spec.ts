@@ -1,15 +1,16 @@
+import type { RaphLocalPhaseContext, RaphProperties } from '@/main'
 import { describe, expect, it, vi } from 'vitest'
 import {
   Raph,
   RaphAfter,
   RaphApp,
   RaphLocalPhase,
+
   RaphNode,
   RaphPropagation,
+
   RaphProperty,
   RaphSchedulerType,
-  type RaphLocalPhaseContext,
-  type RaphProperties,
 } from '@/main'
 
 interface LocalProps extends RaphProperties {
@@ -43,6 +44,7 @@ class LocalNode extends RaphNode<LocalProps> {
   get active(): boolean {
     return this.get('active')
   }
+
   /**
    * Обновляет active для LocalNode.
    */
@@ -57,6 +59,7 @@ class LocalNode extends RaphNode<LocalProps> {
   get width(): number {
     return this.get('width')
   }
+
   /**
    * Обновляет width для LocalNode.
    */
@@ -84,6 +87,7 @@ class LocalNode extends RaphNode<LocalProps> {
   get renderToken(): number {
     return this.get('renderToken')
   }
+
   /**
    * Обновляет render Token для LocalNode.
    */
@@ -154,7 +158,7 @@ function createRuntime() {
   return { runtime, ...configured }
 }
 
-describe('Raph local/instant runtime', () => {
+describe('raph local/instant runtime', () => {
   it('sets a local property and runs only the related phase once per node', async () => {
     const { app, runtime } = createRuntime()
     const node = new LocalNode(app, 'n1')

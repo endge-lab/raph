@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { DataPath } from '@/domain/entities/DataPath'
 import {
   canonicalDerivedPath,
   collectionMutationImpact,
@@ -7,9 +6,10 @@ import {
   pathsOverlap,
 } from '@/domain/derived/derived-path'
 import { collectionByKey } from '@/domain/derived/strategies/collection-by-key'
+import { DataPath } from '@/domain/entities/DataPath'
 import { RaphDerivedPathError, RaphDerivedStrategyError } from '@/domain/types/derived.types'
 
-describe('Raph derived path semantics', () => {
+describe('raph derived path semantics', () => {
   it('validates concrete paths and all segment overlap variants', () => {
     expect(() => canonicalDerivedPath('', 'from')).toThrow(RaphDerivedPathError)
     expect(() => canonicalDerivedPath('rows.*', 'from')).toThrow(RaphDerivedPathError)

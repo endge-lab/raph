@@ -7,7 +7,8 @@ describe('derived full benchmarks', () => {
   const rows = Array.from({ length: size }, (_, id) => ({ id, value: id % 100, nested: { active: id % 2 === 0 } }))
   const derived = fixture(rows)
   derived.runtime.derive({
-    from: 'source', to: 'target',
+    from: 'source',
+    to: 'target',
     compute: (source: typeof rows) => source.map(row => ({ id: row.id, score: row.value * 2 })),
   })
   const manual = new RaphKernel()

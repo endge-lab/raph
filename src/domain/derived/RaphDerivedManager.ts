@@ -10,8 +10,6 @@ import type {
   RaphDerivedStrategy,
 } from '@/domain/types/derived.types'
 import { RaphRouter } from '@/domain/core/RaphRouter'
-import { RaphDerivedHandle } from '@/domain/derived/RaphDerivedHandle'
-import { RaphDerivedNode as DerivedNode } from '@/domain/derived/RaphDerivedNode'
 import {
   canonicalDerivedPath,
   collectionMutationImpact,
@@ -19,13 +17,15 @@ import {
   keyedPath,
   pathsOverlap,
 } from '@/domain/derived/derived-path'
+import { RaphDerivedHandle } from '@/domain/derived/RaphDerivedHandle'
+import { RaphDerivedNode as DerivedNode } from '@/domain/derived/RaphDerivedNode'
 import { DataPath } from '@/domain/entities/DataPath'
 import { DepGraph } from '@/domain/entities/DepGraph'
 import {
   RaphDerivedComputeError,
   RaphDerivedCycleError,
-  RaphDerivedError,
   RaphDerivedDisposedError,
+  RaphDerivedError,
   RaphDerivedPathError,
   RaphDerivedReentrancyError,
   RaphDerivedStrategyError,
@@ -84,17 +84,21 @@ export class RaphDerivedManager {
   ): RaphDerivedHandle {
     this._assertRegistryMutable()
     const publicId = String(options.id ?? `derived-${this._counter++}`).trim()
-    if (!publicId)
+    if (!publicId) {
       throw new RaphDerivedPathError('[RaphDerived] id must not be empty.')
-    if (this._publicIds.has(publicId))
+    }
+    if (this._publicIds.has(publicId)) {
       throw new RaphDerivedPathError(`[RaphDerived] Duplicate id: "${publicId}".`)
+    }
 
     const from = canonicalDerivedPath(options.from, 'from')
     const to = canonicalDerivedPath(options.to, 'to')
-    if (pathsOverlap(from, to))
+    if (pathsOverlap(from, to)) {
       throw new RaphDerivedPathError('[RaphDerived] from and to paths must not overlap.')
-    if (this._targetRouter.matchIncludingPrefix(to).size)
+    }
+    if (this._targetRouter.matchIncludingPrefix(to).size) {
       throw new RaphDerivedTargetWriteError(`[RaphDerived] Target already has an active writer: "${to.toStringPath()}".`)
+    }
 
     const strategy = options.strategy ?? Object.freeze({ kind: 'full' as const })
     const internalId = `${runtime.id}:${publicId}`
@@ -109,8 +113,9 @@ export class RaphDerivedManager {
     // Derived-нода всегда является системным ребенком runtime root. Default Raph
     // может еще не быть init()-нут, поэтому root регистрируется лениво вместе с
     // первой derived-нODE, не запуская остальной runtime lifecycle.
-    if (!runtime.graph.hasNode(runtime.root))
+    if (!runtime.graph.hasNode(runtime.root)) {
       runtime.registerNode(runtime.root)
+    }
     runtime.root.addChild(node, { invalidate: false })
     const handle = new RaphDerivedHandle(
       publicId,
@@ -138,8 +143,9 @@ export class RaphDerivedManager {
     try {
       this._registerGraph(registration)
       node.bindDispose(() => this.dispose(internalId))
-      if (options.immediate !== false)
+      if (options.immediate !== false) {
         this.recompute(internalId)
+      }
       return handle
     }
     catch (error) {
@@ -184,8 +190,9 @@ export class RaphDerivedManager {
   public dispose(id: string): void {
     this._assertRegistryMutable()
     const registration = this._registrations.get(id)
-    if (!registration)
+    if (!registration) {
       return
+    }
 
     this._sourceRouter.remove(derivedRoute(registration.from), registration)
     this._targetRouter.remove(derivedRoute(registration.to), registration)
@@ -209,17 +216,20 @@ export class RaphDerivedManager {
 
   /** Стабилизирует все affected derives и возвращает target mutations для обычной доставки. */
   public stabilize(input: RaphDerivedMutationRecord[]): StabilizationResult {
-    if (!input.length || !this._registrations.size)
+    if (!input.length || !this._registrations.size) {
       return { records: input, errors: [] }
-    if (this._stabilizing)
+    }
+    if (this._stabilizing) {
       throw new RaphDerivedReentrancyError('[RaphDerived] Reentrant stabilization is forbidden.')
+    }
 
     this._stabilizing = true
     const records = [...input]
     const errors: Error[] = []
     try {
-      for (const mutation of input)
+      for (const mutation of input) {
         this._ingestMutation(mutation)
+      }
 
       while (this._dirty.size) {
         const registration = this._nextDirtyRegistration()
@@ -255,8 +265,9 @@ export class RaphDerivedManager {
 
   /** Запрещает reentrant compute writes и внешние записи в materialized targets. */
   public assertExternalMutationAllowed(path: DataPathDef): void {
-    if (this._stabilizing)
+    if (this._stabilizing) {
       throw new RaphDerivedReentrancyError('[RaphDerived] Store mutation during compute/stabilization is forbidden.')
+    }
     const canonical = DataPath.from(path)
     const targets = this._targetRouter.matchIncludingPrefix(canonical)
     if (targets.size) {
@@ -269,22 +280,26 @@ export class RaphDerivedManager {
     const handles = [...this._registrations.values()]
       .filter(registration => registration.runtime === runtime)
       .map(registration => registration.handle)
-    for (const handle of handles)
+    for (const handle of handles) {
       handle.dispose()
+    }
   }
 
   public disposeAll(): void {
-    for (const handle of [...this._registrations.values()].map(item => item.handle))
+    for (const handle of [...this._registrations.values()].map(item => item.handle)) {
       handle.dispose()
+    }
   }
 
   public snapshot(): RaphDerivedManagerSnapshot {
     let graphEdges = 0
-    for (const registration of this._graph.topoOrder())
+    for (const registration of this._graph.topoOrder()) {
       graphEdges += this._graph.childrenOf(registration).size
+    }
     let pendingKeys = 0
-    for (const dirty of this._dirty.values())
+    for (const dirty of this._dirty.values()) {
       pendingKeys += dirty.keys.size
+    }
     return {
       registrations: this._registrations.size,
       graphNodes: this._graph.size(),
@@ -322,8 +337,9 @@ export class RaphDerivedManager {
       this._graph.addEdge(parent, registration)
     }
     for (const child of downstream) {
-      if (child === registration)
+      if (child === registration) {
         continue
+      }
       if (!this._graph.addEdge(registration, child)) {
         this._rollbackRegistration(registration)
         throw new RaphDerivedCycleError(`[RaphDerived] Cycle detected near "${registration.publicId}".`)
@@ -357,8 +373,9 @@ export class RaphDerivedManager {
     finally {
       this._stabilizing = false
     }
-    if (!first.length)
+    if (!first.length) {
       return { records: [], errors }
+    }
     const downstream = this.stabilize(first)
     return { records: downstream.records, errors: [...errors, ...downstream.errors] }
   }
@@ -369,8 +386,9 @@ export class RaphDerivedManager {
     const unmaterializedCollection = registration.strategy.kind !== 'full'
       && source === undefined
       && (output === undefined || (Array.isArray(output) && output.length === 0))
-    if (registration.strategy.kind !== 'full' && !unmaterializedCollection)
+    if (registration.strategy.kind !== 'full' && !unmaterializedCollection) {
       this._validateCollectionResult(registration, source, output)
+    }
     const materialized = registration.strategy.kind === 'filter-by-key'
       ? cloneMaterializedValue(output)
       : output
@@ -392,18 +410,21 @@ export class RaphDerivedManager {
     keys: Set<RaphDerivedKey>,
     invalidate: boolean,
   ): RaphDerivedMutationRecord[] {
-    if (registration.strategy.kind === 'filter-by-key')
+    if (registration.strategy.kind === 'filter-by-key') {
       return this._executeIncrementalFilter(registration, keys, invalidate)
+    }
 
     const strategy = registration.strategy as Extract<RaphDerivedStrategy, { kind: 'collection-by-key' }>
     const keyField = strategy.key
     const source = this._adapter.get(registration.from)
     const target = this._adapter.get(registration.to)
-    if (!Array.isArray(source) || !Array.isArray(target))
+    if (!Array.isArray(source) || !Array.isArray(target)) {
       throw new RaphDerivedStrategyError('[RaphDerived] collectionByKey requires array source and target.')
+    }
 
-    if (!registration.sourceIndex || indexesAreStale(source, keyField, registration.sourceIndex, keys))
+    if (!registration.sourceIndex || indexesAreStale(source, keyField, registration.sourceIndex, keys)) {
       registration.sourceIndex = collectionIndex(source, keyField, 'source')
+    }
     const targetIndex = registration.targetIndex!
     const existing: Array<{ key: RaphDerivedKey, index: number, item: unknown }> = []
     const deleted: RaphDerivedKey[] = []
@@ -427,22 +448,26 @@ export class RaphDerivedManager {
 
     if (structural) {
       const replacements = new Map<RaphDerivedKey, unknown>()
-      for (let index = 0; index < existing.length; index++)
+      for (let index = 0; index < existing.length; index++) {
         replacements.set(existing[index].key, result[index])
+      }
       const oldItems = new Map<RaphDerivedKey, unknown>()
-      for (const [key, index] of targetIndex)
+      for (const [key, index] of targetIndex) {
         oldItems.set(key, target[index])
+      }
 
       const sourceKeys = collectionKeys(source, keyField, 'source')
       const nextTarget = new Array<unknown>(sourceKeys.length)
       for (let position = 0; position < sourceKeys.length; position++) {
         const key = sourceKeys[position]
         // DefaultDataAdapter может удалять array item через unset, сохраняя hole.
-        if (key === undefined)
+        if (key === undefined) {
           continue
+        }
         const item = replacements.has(key) ? replacements.get(key) : oldItems.get(key)
-        if (item === undefined)
+        if (item === undefined) {
           throw new RaphDerivedStrategyError(`[RaphDerived] Missing materialized target item for key "${String(key)}".`)
+        }
         nextTarget[position] = item
       }
       this._adapter.set(registration.to, nextTarget)
@@ -477,17 +502,20 @@ export class RaphDerivedManager {
     const keyField = strategy.key
     const source = this._adapter.get(registration.from)
     const target = this._adapter.get(registration.to)
-    if (!Array.isArray(source) || !Array.isArray(target))
+    if (!Array.isArray(source) || !Array.isArray(target)) {
       throw new RaphDerivedStrategyError('[RaphDerived] filterByKey requires array source and target.')
+    }
 
-    if (!registration.sourceIndex || indexesAreStale(source, keyField, registration.sourceIndex, keys))
+    if (!registration.sourceIndex || indexesAreStale(source, keyField, registration.sourceIndex, keys)) {
       registration.sourceIndex = collectionIndex(source, keyField, 'source')
+    }
     const targetIndex = registration.targetIndex!
     const existing: Array<{ key: RaphDerivedKey, index: number, item: unknown }> = []
     for (const key of keys) {
       const index = registration.sourceIndex.get(key)
-      if (index !== undefined)
+      if (index !== undefined) {
         existing.push({ key, index, item: source[index] })
+      }
     }
     existing.sort((left, right) => left.index - right.index)
 
@@ -500,8 +528,9 @@ export class RaphDerivedManager {
     const outputKeys = collectionKeys(result, keyField, 'output')
     for (let index = 0; index < outputKeys.length; index++) {
       const key = outputKeys[index]
-      if (key !== undefined)
+      if (key !== undefined) {
         accepted.set(key, cloneMaterializedValue(result[index]))
+      }
     }
 
     const affected = new Set(keys)
@@ -509,27 +538,32 @@ export class RaphDerivedManager {
     const structural = changed.some(key => targetIndex.has(key) !== accepted.has(key))
     if (structural) {
       const oldItems = new Map<RaphDerivedKey, unknown>()
-      for (const [key, index] of targetIndex)
+      for (const [key, index] of targetIndex) {
         oldItems.set(key, target[index])
+      }
 
       const nextTarget: unknown[] = []
       for (const key of collectionKeys(source, keyField, 'source')) {
-        if (key === undefined)
-          continue
-        if (affected.has(key)) {
-          if (accepted.has(key))
-            nextTarget.push(accepted.get(key))
+        if (key === undefined) {
           continue
         }
-        if (oldItems.has(key))
+        if (affected.has(key)) {
+          if (accepted.has(key)) {
+            nextTarget.push(accepted.get(key))
+          }
+          continue
+        }
+        if (oldItems.has(key)) {
           nextTarget.push(oldItems.get(key))
+        }
       }
       this._adapter.set(registration.to, nextTarget)
       registration.targetIndex = collectionIndex(nextTarget, keyField, 'target')
     }
     else {
-      for (const [key, item] of accepted)
+      for (const [key, item] of accepted) {
         this._adapter.set(keyedPath(registration.to, keyField, key), item)
+      }
     }
 
     const records = changed.map((key) => {
@@ -553,8 +587,9 @@ export class RaphDerivedManager {
     catch (cause) {
       throw new RaphDerivedComputeError(registration.publicId, cause)
     }
-    if (isThenable(output))
+    if (isThenable(output)) {
       throw new RaphDerivedStrategyError('[RaphDerived] Async compute is not supported.')
+    }
     return output
   }
 
@@ -568,31 +603,36 @@ export class RaphDerivedManager {
         `[RaphDerived] collectionByKey "${registration.publicId}" requires array source and output.`,
       )
     }
-    if (registration.strategy.kind === 'collection-by-key' && source.length !== output.length)
+    if (registration.strategy.kind === 'collection-by-key' && source.length !== output.length) {
       throw new RaphDerivedStrategyError('[RaphDerived] collectionByKey must preserve collection cardinality.')
+    }
     const key = registration.strategy.kind === 'full' ? '' : registration.strategy.key
     const sourceKeys = collectionKeys(source, key, 'source')
     const outputKeys = collectionKeys(output, key, 'output')
     if (registration.strategy.kind === 'collection-by-key') {
       for (let index = 0; index < sourceKeys.length; index++) {
-        if (sourceKeys[index] !== outputKeys[index])
+        if (sourceKeys[index] !== outputKeys[index]) {
           throw new RaphDerivedStrategyError('[RaphDerived] collectionByKey must preserve key order.')
+        }
       }
       return
     }
 
     const sourcePositions = new Map<RaphDerivedKey, number>()
     sourceKeys.forEach((sourceKey, index) => {
-      if (sourceKey !== undefined)
+      if (sourceKey !== undefined) {
         sourcePositions.set(sourceKey, index)
+      }
     })
     let previousPosition = -1
     for (const outputKey of outputKeys) {
-      if (outputKey === undefined)
+      if (outputKey === undefined) {
         continue
+      }
       const position = sourcePositions.get(outputKey)
-      if (position === undefined || position <= previousPosition)
+      if (position === undefined || position <= previousPosition) {
         throw new RaphDerivedStrategyError('[RaphDerived] filterByKey output must be an ordered subset of source.')
+      }
       previousPosition = position
     }
   }
@@ -602,16 +642,19 @@ export class RaphDerivedManager {
     inputKeys: RaphDerivedKey[],
     output: unknown,
   ): void {
-    if (!Array.isArray(output))
+    if (!Array.isArray(output)) {
       throw new RaphDerivedStrategyError('[RaphDerived] Incremental collection compute must return an array.')
-    if (registration.strategy.kind === 'collection-by-key' && inputKeys.length !== output.length)
+    }
+    if (registration.strategy.kind === 'collection-by-key' && inputKeys.length !== output.length) {
       throw new RaphDerivedStrategyError('[RaphDerived] Incremental collection compute must preserve cardinality.')
+    }
     const key = registration.strategy.kind === 'full' ? '' : registration.strategy.key
     const outputKeys = collectionKeys(output, key, 'output')
     if (registration.strategy.kind === 'collection-by-key') {
       for (let index = 0; index < inputKeys.length; index++) {
-        if (inputKeys[index] !== outputKeys[index])
+        if (inputKeys[index] !== outputKeys[index]) {
           throw new RaphDerivedStrategyError('[RaphDerived] Incremental collection compute must preserve key order.')
+        }
       }
       return
     }
@@ -619,11 +662,13 @@ export class RaphDerivedManager {
     const inputPositions = new Map(inputKeys.map((keyValue, index) => [keyValue, index]))
     let previousPosition = -1
     for (const outputKey of outputKeys) {
-      if (outputKey === undefined)
+      if (outputKey === undefined) {
         continue
+      }
       const position = inputPositions.get(outputKey)
-      if (position === undefined || position <= previousPosition)
+      if (position === undefined || position <= previousPosition) {
         throw new RaphDerivedStrategyError('[RaphDerived] Incremental filter output must be an ordered subset of input.')
+      }
       previousPosition = position
     }
   }
@@ -686,14 +731,16 @@ export class RaphDerivedManager {
 
   private _requireRegistration(id: string): DerivedRegistration {
     const registration = this._registrations.get(id)
-    if (!registration)
+    if (!registration) {
       throw new RaphDerivedDisposedError(`[RaphDerived] Registration "${id}" is disposed.`)
+    }
     return registration
   }
 
   private _assertRegistryMutable(): void {
-    if (this._stabilizing)
+    if (this._stabilizing) {
       throw new RaphDerivedReentrancyError('[RaphDerived] Registry mutation during stabilization is forbidden.')
+    }
   }
 }
 
@@ -706,13 +753,16 @@ function collectionKeys(collection: unknown[], key: string, label: string): Arra
       continue
     }
     const item = collection[index]
-    if (!isPlainObject(item))
+    if (!isPlainObject(item)) {
       throw new RaphDerivedStrategyError(`[RaphDerived] ${label} collection items must be objects.`)
+    }
     const value = item[key]
-    if (typeof value !== 'string' && typeof value !== 'number')
+    if (typeof value !== 'string' && typeof value !== 'number') {
       throw new RaphDerivedStrategyError(`[RaphDerived] ${label} item key "${key}" must be a string or number.`)
-    if (seen.has(value))
+    }
+    if (seen.has(value)) {
       throw new RaphDerivedStrategyError(`[RaphDerived] Duplicate ${label} key: "${String(value)}".`)
+    }
     seen.add(value)
     keys.push(value)
   }
@@ -723,8 +773,9 @@ function collectionIndex(collection: unknown[], key: string, label: string): Map
   const keys = collectionKeys(collection, key, label)
   const index = new Map<RaphDerivedKey, number>()
   for (let position = 0; position < keys.length; position++) {
-    if (keys[position] !== undefined)
+    if (keys[position] !== undefined) {
       index.set(keys[position]!, position)
+    }
   }
   return index
 }
@@ -737,11 +788,13 @@ function indexesAreStale(
 ): boolean {
   for (const key of affectedKeys) {
     const position = index.get(key)
-    if (position === undefined)
+    if (position === undefined) {
       return true
+    }
     const item = collection[position]
-    if (!isPlainObject(item) || item[keyField] !== key)
+    if (!isPlainObject(item) || item[keyField] !== key) {
       return true
+    }
   }
   return false
 }
@@ -765,25 +818,30 @@ function cloneMaterializedValue<T>(value: T): T {
 }
 
 function cloneFallback<T>(value: T, seen: WeakMap<object, unknown>): T {
-  if (value === null || typeof value !== 'object')
+  if (value === null || typeof value !== 'object') {
     return value
+  }
   const cached = seen.get(value)
-  if (cached !== undefined)
+  if (cached !== undefined) {
     return cached as T
-  if (value instanceof Date)
+  }
+  if (value instanceof Date) {
     return new Date(value.getTime()) as T
+  }
   if (Array.isArray(value)) {
     const result: unknown[] = []
     seen.set(value, result)
     for (let index = 0; index < value.length; index++) {
-      if (index in value)
+      if (index in value) {
         result[index] = cloneFallback(value[index], seen)
+      }
     }
     return result as T
   }
   const result = Object.create(Object.getPrototypeOf(value)) as Record<PropertyKey, unknown>
   seen.set(value, result)
-  for (const key of Reflect.ownKeys(value))
+  for (const key of Reflect.ownKeys(value)) {
     result[key] = cloneFallback((value as Record<PropertyKey, unknown>)[key], seen)
+  }
   return result as T
 }

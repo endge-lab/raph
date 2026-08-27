@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { RaphDerivedCycleError, RaphDerivedTargetWriteError } from '@/domain/types/derived.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('Raph derived graph', () => {
+describe('raph derived graph', () => {
   it('stabilizes chains and fan-out before returning from source mutation', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('a', 1)
@@ -32,7 +32,11 @@ describe('Raph derived graph', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 2)
     const middle = runtime.derive({
-      id: 'middle', from: 'source', to: 'middle', disposeTarget: 'delete', compute: value => Number(value) * 2,
+      id: 'middle',
+      from: 'source',
+      to: 'middle',
+      disposeTarget: 'delete',
+      compute: value => Number(value) * 2,
     })
     runtime.derive({ id: 'downstream', from: 'middle', to: 'result', compute: value => value ?? 'empty' })
     expect(kernel.get('result')).toBe(4)

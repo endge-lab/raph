@@ -1,7 +1,7 @@
-import { RaphKernel } from '@/domain/core/RaphKernel'
-import { RaphRuntime } from '@/domain/core/RaphRuntime'
 import type { RaphProperties } from '@/domain/types/base.types'
 import type { RaphRuntimeOptions } from '@/domain/types/runtime.types'
+import { RaphKernel } from '@/domain/core/RaphKernel'
+import { RaphRuntime } from '@/domain/core/RaphRuntime'
 
 /**
  * Backward-compatible Raph application facade.

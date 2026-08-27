@@ -79,11 +79,11 @@ export interface RaphDerivedHandleContract {
   readonly node: RaphDerivedNode
   readonly status: RaphDerivedStatus
   readonly lastError: Error | null
-  pause(): void
-  resume(): void
-  recompute(): void
-  dispose(): void
-  snapshot(): RaphDerivedHandleSnapshot
+  pause: () => void
+  resume: () => void
+  recompute: () => void
+  dispose: () => void
+  snapshot: () => RaphDerivedHandleSnapshot
 }
 
 export class RaphDerivedError extends Error {

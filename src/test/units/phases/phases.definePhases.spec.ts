@@ -1,12 +1,12 @@
-import { describe, it, expect, vi } from 'vitest'
 import type {
   PhaseExecutorContext,
   PhaseName,
   RaphPhase,
 } from '@/domain/types/phase.types'
+import { describe, expect, it, vi } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 
-describe('RaphApp.definePhases', () => {
+describe('raphApp.definePhases', () => {
   it('сохраняет фазы в массиве с сохранением порядка', () => {
     const raph = new RaphApp()
 

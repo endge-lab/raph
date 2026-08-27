@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 
 /**
@@ -17,7 +17,7 @@ const KB = 1024
 // Простой детерминированный псевдо‑рандом для воспроизводимости
 function mulberry32(seed: number) {
   return function () {
-    let t = (seed += 0x6d2b79f5)
+    let t = (seed += 0x6D2B79F5)
     t = Math.imul(t ^ (t >>> 15), t | 1)
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
@@ -38,7 +38,7 @@ function logBench(title: string, data: Record<string, number | string>) {
   console.info(`[bench][${title}] ${parts.join(', ')}`)
 }
 
-describe('RaphRouter – бенчмарки', () => {
+describe('raphRouter – бенчмарки', () => {
   let router: RaphRouter
 
   beforeEach(() => {
@@ -48,7 +48,9 @@ describe('RaphRouter – бенчмарки', () => {
   it('add() производительность: точные ключи (N=50k)', () => {
     const N = 50_000
     const patterns: Array<string> = []
-    for (let i = 0; i < N; i++) patterns.push(`com.k${i}.v`)
+    for (let i = 0; i < N; i++) {
+      patterns.push(`com.k${i}.v`)
+    }
 
     const t0 = now()
     for (let i = 0; i < N; i++) {
@@ -67,9 +69,13 @@ describe('RaphRouter – бенчмарки', () => {
   it('add() производительность: mid‑wildcard (N=20k) и tail‑greedy (N=20k)', () => {
     const N = 20_000
     const t0 = now()
-    for (let i = 0; i < N; i++) router.add(`a.${i % 50}.*.c`, 'W')
+    for (let i = 0; i < N; i++) {
+      router.add(`a.${i % 50}.*.c`, 'W')
+    }
     const t1 = now()
-    for (let i = 0; i < N; i++) router.add(`topic${i % 100}.*`, 'G')
+    for (let i = 0; i < N; i++) {
+      router.add(`topic${i % 100}.*`, 'G')
+    }
     const t2 = now()
 
     logBench('add:wildcards', {
@@ -99,7 +105,9 @@ describe('RaphRouter – бенчмарки', () => {
   it('match() производительность: точные совпадения (N=200k) – холодный и тёплый кэш', () => {
     // Подготовка маршрутов с точными путями
     const N = 100_000
-    for (let i = 0; i < N; i++) router.add(`com.k${i}.v`, 'E')
+    for (let i = 0; i < N; i++) {
+      router.add(`com.k${i}.v`, 'E')
+    }
 
     const Q = 200_000
     const t0 = now()
@@ -157,7 +165,9 @@ describe('RaphRouter – бенчмарки', () => {
   it('match() производительность: tail‑greedy (N=100k) – холодный и тёплый кэш', () => {
     router = new RaphRouter()
     const N = 100_000
-    for (let i = 0; i < N; i++) router.add(`topic${i % 257}.*`, 'G')
+    for (let i = 0; i < N; i++) {
+      router.add(`topic${i % 257}.*`, 'G')
+    }
 
     const Q = 200_000
     const t0 = now()
@@ -200,19 +210,26 @@ describe('RaphRouter – бенчмарки', () => {
         const gid = i % 131
         // целевой путь имеет конкретный id - должен совпасть с rows[*]
         return `rows[id=${i % 499}][type="${type}"][gid=${gid}].name`
-      } else {
+      }
+      else {
         return `rows[id=${i % 499}][type="x${i % 11}"][gid=${(i + 3) % 131}].name`
       }
     }
 
     const queries = new Array(Q)
-    for (let i = 0; i < Q; i++) queries[i] = makeQuery(i)
+    for (let i = 0; i < Q; i++) {
+      queries[i] = makeQuery(i)
+    }
 
     const t0 = now()
-    for (let i = 0; i < Q; i++) router.match(queries[i])
+    for (let i = 0; i < Q; i++) {
+      router.match(queries[i])
+    }
     const t1 = now()
 
-    for (let i = 0; i < Q; i++) router.match(queries[i])
+    for (let i = 0; i < Q; i++) {
+      router.match(queries[i])
+    }
     const t2 = now()
 
     logBench('match:параметры', {
@@ -236,11 +253,14 @@ describe('RaphRouter – бенчмарки', () => {
       const r = rnd()
       if (r < 0.25) {
         router.add(`com.k${i}.v`, 'E')
-      } else if (r < 0.5) {
+      }
+      else if (r < 0.5) {
         router.add(`a.${i % 97}.*.c`, 'W')
-      } else if (r < 0.75) {
+      }
+      else if (r < 0.75) {
         router.add(`topic${i % 151}.*`, 'G')
-      } else {
+      }
+      else {
         router.add(`rows[*][gid=${i % 89}].name`, 'P')
       }
     }
@@ -250,19 +270,29 @@ describe('RaphRouter – бенчмарки', () => {
     const queries: Array<string> = []
     for (let i = 0; i < Q; i++) {
       const r = rnd()
-      if (r < 0.25) queries.push(`com.k${i % addN}.v`)
-      else if (r < 0.5) queries.push(`a.${i % 97}.x.c`)
-      else if (r < 0.75) queries.push(`topic${i % 151}.foo.bar`)
-      else queries.push(`rows[id=${i % 200}][gid=${i % 89}].name`)
+      if (r < 0.25) {
+        queries.push(`com.k${i % addN}.v`)
+      }
+      else if (r < 0.5) {
+        queries.push(`a.${i % 97}.x.c`)
+      }
+      else if (r < 0.75) {
+        queries.push(`topic${i % 151}.foo.bar`)
+      }
+      else { queries.push(`rows[id=${i % 200}][gid=${i % 89}].name`) }
     }
 
     // Холодный
     const tMatch0 = now()
-    for (let i = 0; i < Q; i++) router.match(queries[i])
+    for (let i = 0; i < Q; i++) {
+      router.match(queries[i])
+    }
     const tMatch1 = now()
 
     // Тёплый
-    for (let i = 0; i < Q; i++) router.match(queries[i])
+    for (let i = 0; i < Q; i++) {
+      router.match(queries[i])
+    }
     const tMatch2 = now()
 
     // Удаление ~10% маршрутов, затем повторный match
@@ -277,11 +307,13 @@ describe('RaphRouter – бенчмарки', () => {
     }
     const tRem1 = now()
 
-    for (let i = 0; i < Q; i++) router.match(queries[i])
+    for (let i = 0; i < Q; i++) {
+      router.match(queries[i])
+    }
     const tMatch3 = now()
 
     logBench('смешанная', {
-      addN: addN,
+      addN,
       addMs: fmt(tAdd1 - tAdd0),
       matchColdMs: fmt(tMatch1 - tMatch0),
       matchColdPerOpUs: fmt(((tMatch1 - tMatch0) * 1000) / Q),
@@ -300,15 +332,21 @@ describe('RaphRouter – бенчмарки', () => {
     router = new RaphRouter()
     const N = 100_000
     for (let i = 0; i < N; i++) {
-      if ((i & 3) === 0) router.add(`a.${i % 97}.*.c`, 'W')
-      else if ((i & 3) === 1) router.add(`topic${i % 151}.*`, 'G')
-      else if ((i & 3) === 2) router.add(`rows[*][gid=${i % 89}].name`, 'P')
-      else router.add(`com.k${i}.v`, 'E')
+      if ((i & 3) === 0) {
+        router.add(`a.${i % 97}.*.c`, 'W')
+      }
+      else if ((i & 3) === 1) {
+        router.add(`topic${i % 151}.*`, 'G')
+      }
+      else if ((i & 3) === 2) {
+        router.add(`rows[*][gid=${i % 89}].name`, 'P')
+      }
+      else { router.add(`com.k${i}.v`, 'E') }
     }
 
     // @ts-expect-error: process может быть undefined в browser-like env
-    const mem =
-      typeof process !== 'undefined' && process.memoryUsage
+    const mem
+      = typeof process !== 'undefined' && process.memoryUsage
         ? process.memoryUsage()
         : null
     const rssMb = mem ? (mem.rss / KB / KB).toFixed(1) : 'n/a'

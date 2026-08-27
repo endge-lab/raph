@@ -1,13 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { RaphApp } from '@/domain/core/RaphApp'
-import { SchedulerType } from '@/domain/types/base.types'
 import type {
   PhaseExecutorContext,
   PhaseName,
 } from '@/domain/types/phase.types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
-describe('RaphApp notify CRUD', () => {
+describe('raphApp notify CRUD', () => {
   let raph: RaphApp
   let executorSpy: ReturnType<typeof vi.fn>
 

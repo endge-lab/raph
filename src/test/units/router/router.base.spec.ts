@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 
-describe('Router', () => {
+describe('router', () => {
   let router: RaphRouter
 
   beforeEach(() => {
@@ -10,7 +10,9 @@ describe('Router', () => {
 
   function expectSetEqual<T>(set: Set<T>, arr: Array<T>): void {
     expect(set.size).toBe(arr.length)
-    for (const v of arr) expect(set.has(v)).toBe(true)
+    for (const v of arr) {
+      expect(set.has(v)).toBe(true)
+    }
   }
 
   // Точные ключи без wildcard

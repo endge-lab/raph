@@ -1,10 +1,10 @@
+import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 import { describe, expect, it, vi } from 'vitest'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
-import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 
-describe('RaphKernel transaction', () => {
+describe('raphKernel transaction', () => {
   it('coalesces invalidation and batches events per runtime', () => {
     const kernel = new RaphKernel()
     const runtime = kernel.createRuntime({ id: 'runtime', scheduler: SchedulerType.Sync })

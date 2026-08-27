@@ -1,13 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { RaphApp } from '@/domain/core/RaphApp'
-import { SchedulerType } from '@/domain/types/base.types'
 import type {
   PhaseExecutorContext,
   PhaseName,
 } from '@/domain/types/phase.types'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
-describe('RaphApp.scheduler-raf', () => {
+describe('raphApp.scheduler-raf', () => {
   let rafSpy: ReturnType<typeof vi.fn>
   let cafSpy: ReturnType<typeof vi.fn>
   let realRAF: typeof globalThis.requestAnimationFrame | undefined
@@ -47,7 +47,7 @@ describe('RaphApp.scheduler-raf', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.AnimationFrame })
 
-    const calls: Array<{ phase: string; node: string }> = []
+    const calls: Array<{ phase: string, node: string }> = []
 
     raph.definePhases([
       {

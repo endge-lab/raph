@@ -1,11 +1,11 @@
-//
-import { RaphNode } from '@/domain/core/RaphNode'
+import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import type {
   EffectCleanup,
   RaphEffectOptions,
 } from '@/domain/types/reactive.types'
-import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import { Raph } from '@/domain/core/Raph'
+//
+import { RaphNode } from '@/domain/core/RaphNode'
 
 /**
  * Описывает reactive effect, который выполняется при изменении dependencies.
@@ -35,7 +35,9 @@ export class RaphEffect extends RaphNode {
    * Выполнить эффект, пересобрав зависимости.
    */
   run(): void {
-    if (this._stopped) return
+    if (this._stopped) {
+      return
+    }
 
     // Снимаем прошлые подписки на пути
     this.app.untrack(this)
@@ -44,7 +46,8 @@ export class RaphEffect extends RaphNode {
     if (this._cleanup) {
       try {
         this._cleanup()
-      } catch {
+      }
+      catch {
         // ToDo: ignore?
       }
       this._cleanup = undefined
@@ -55,23 +58,29 @@ export class RaphEffect extends RaphNode {
     let ret: EffectCleanup
     try {
       ret = this._fn()
-    } finally {
+    }
+    finally {
       Raph.popContext()
     }
 
     // Сохраняем cleanup, если вернули функцию
-    if (typeof ret === 'function') this._cleanup = ret
+    if (typeof ret === 'function') {
+      this._cleanup = ret
+    }
   }
 
   /**
    * Остановить эффект: снять подписки, вызвать cleanup и удалить из графа.
    */
   stop(): void {
-    if (this._stopped) return
+    if (this._stopped) {
+      return
+    }
     this._stopped = true
     try {
       this._cleanup?.()
-    } catch {
+    }
+    catch {
       // ToDo: ignore?
     }
     this._cleanup = undefined

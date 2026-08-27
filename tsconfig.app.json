@@ -1,21 +1,21 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "target": "esnext",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "rootDir": "./src",
     "module": "esnext",
     "paths": {
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    /* Linting */
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedSideEffectImports": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"]
 }

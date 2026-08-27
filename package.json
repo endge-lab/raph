@@ -1,13 +1,11 @@
 {
   "name": "@endge/raph",
+  "type": "module",
+  "version": "3.0.14",
   "private": false,
-  "version": "3.0.13",
   "description": "Reactive application pipeline & router (Raph) - core library",
   "license": "Apache-2.0",
-  "type": "module",
-  "main": "./dist/raph.js",
-  "module": "./dist/raph.js",
-  "types": "./dist/main.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/main.d.ts",
@@ -15,10 +13,12 @@
       "require": "./dist/raph.cjs"
     }
   },
+  "main": "./dist/raph.js",
+  "module": "./dist/raph.js",
+  "types": "./dist/main.d.ts",
   "files": [
     "dist"
   ],
-  "sideEffects": false,
   "scripts": {
     "clean": "rimraf dist tsconfig.tsbuildinfo",
     "dev": "vite build --watch",

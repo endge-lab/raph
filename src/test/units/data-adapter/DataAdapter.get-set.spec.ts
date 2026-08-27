@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
 
-describe('DefaultDataAdapter - простые корректностные тесты get/set с именованным индексом', () => {
+describe('defaultDataAdapter - простые корректностные тесты get/set с именованным индексом', () => {
   it('set по Param: com[id=<id>].x затем get возвращает то же значение (indexEnabled=false)', () => {
     const SIZE = 1000
     const com = Array.from({ length: SIZE }, (_, i) => ({ id: i, x: 0 }))

@@ -1,14 +1,15 @@
+import type { RaphLocalPhaseContext, RaphProperties } from '@/main'
 import { bench, describe } from 'vitest'
 import {
   Raph,
   RaphApp,
   RaphLocalPhase,
+
   RaphNode,
   RaphPropagation,
+
   RaphProperty,
   RaphSchedulerType,
-  type RaphLocalPhaseContext,
-  type RaphProperties,
 } from '@/main'
 
 interface BenchProps extends RaphProperties {
@@ -39,6 +40,7 @@ class BenchNode extends RaphNode<BenchProps> {
   get active(): boolean {
     return this.get('active')
   }
+
   /**
    * Обновляет active для BenchNode.
    */
@@ -53,6 +55,7 @@ class BenchNode extends RaphNode<BenchProps> {
   get value(): number {
     return this.get('value')
   }
+
   /**
    * Обновляет value для BenchNode.
    */
@@ -67,6 +70,7 @@ class BenchNode extends RaphNode<BenchProps> {
   get renderToken(): number {
     return this.get('renderToken')
   }
+
   /**
    * Обновляет render Token для BenchNode.
    */
@@ -128,7 +132,7 @@ function createBenchTree(size: number) {
   return { app, nodes, root }
 }
 
-describe('Raph local/instant benchmarks', () => {
+describe('raph local/instant benchmarks', () => {
   const benchOptions = {
     iterations: 5,
     warmupIterations: 1,

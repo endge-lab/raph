@@ -10,7 +10,7 @@ import { RaphPropagation } from '@/domain/local/local.types'
 /**
  * Описывает тип PropertyOptions.
  */
-type PropertyOptions = {
+interface PropertyOptions {
   phase: string
   default?: any
   propagation?: RaphPropagation
@@ -21,7 +21,7 @@ type PropertyOptions = {
 /**
  * Описывает тип PhaseOptions.
  */
-type PhaseOptions = {
+interface PhaseOptions {
   name?: string
   always?: boolean
   priority?: number
@@ -31,7 +31,7 @@ type PhaseOptions = {
 /**
  * Описывает тип NodeHandlerOptions.
  */
-type NodeHandlerOptions = {
+interface NodeHandlerOptions {
   phase: string
 }
 
@@ -101,8 +101,8 @@ export function extractRaphLocalProperties<P extends RaphProperties>(
     if (!compute) {
       if (propagation === RaphPropagation.Down) {
         compute = (self: any) =>
-          (self.get(name) ?? defaultValue ?? true) &&
-          (self.parent?.get(name) ?? true)
+          (self.get(name) ?? defaultValue ?? true)
+          && (self.parent?.get(name) ?? true)
       }
       else {
         compute = (self: any) => self.get(name) ?? defaultValue

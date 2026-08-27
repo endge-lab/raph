@@ -1,9 +1,9 @@
-import { describe, expect, it, vi } from 'vitest'
 import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
+import { describe, expect, it, vi } from 'vitest'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('Raph derived transactions', () => {
+describe('raph derived transactions', () => {
   it('coalesces nested transactions and delivers source/target after stabilization', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', { value: 1 })
@@ -35,9 +35,12 @@ describe('Raph derived transactions', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     runtime.derive({
-      from: 'source', to: 'target',
+      from: 'source',
+      to: 'target',
       compute: (value) => {
-        if (value === 2) throw new Error('compute failed')
+        if (value === 2) {
+          throw new Error('compute failed')
+        }
         return value
       },
     })

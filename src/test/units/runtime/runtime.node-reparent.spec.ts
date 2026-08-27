@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { RaphKernel, RaphNode, RaphSchedulerType } from '@/main'
 
-describe('RaphNode reparent', () => {
+describe('raphNode reparent', () => {
   it('removes the previous graph edge when a node changes parent', () => {
     const runtime = new RaphKernel().createRuntime({
       id: 'node-reparent',

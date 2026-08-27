@@ -1,8 +1,8 @@
+import type { RaphEventPayloads } from '@/domain/types/events.types'
 import { afterEach, describe, expect, it } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphDebug } from '@/domain/core/RaphDebug'
 import { RaphNode } from '@/domain/core/RaphNode'
-import type { RaphEventPayloads } from '@/domain/types/events.types'
 import { EventBus } from '@/utils/EventBus'
 
 function createDebugHarness() {
@@ -13,11 +13,13 @@ function createDebugHarness() {
   return { app, debug, events }
 }
 
-describe('Raph debug leases', () => {
+describe('raph debug leases', () => {
   const cleanups: Array<() => void> = []
 
   afterEach(() => {
-    for (const cleanup of cleanups.splice(0)) cleanup()
+    for (const cleanup of cleanups.splice(0)) {
+      cleanup()
+    }
   })
 
   it('keeps debug active until the last nested lease is released', () => {

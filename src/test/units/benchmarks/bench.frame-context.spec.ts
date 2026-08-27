@@ -1,10 +1,10 @@
+import type { PhaseName } from '@/domain/types/phase.types'
 import { describe, expect, it } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
-import type { PhaseName } from '@/domain/types/phase.types'
 
-describe('RaphApp frame context overhead', () => {
+describe('raphApp frame context overhead', () => {
   it('runs 10k sync frames with frame context under a small local budget', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })

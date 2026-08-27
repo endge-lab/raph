@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
 
-type Perf = { opsPerSec: number; ms: number }
+interface Perf { opsPerSec: number, ms: number }
 
 function hr(n: number) {
   return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(n)
@@ -9,14 +9,16 @@ function hr(n: number) {
 
 function measure(fn: () => void, iter: number): Perf {
   const t0 = performance.now()
-  for (let i = 0; i < iter; i++) fn()
+  for (let i = 0; i < iter; i++) {
+    fn()
+  }
   const t1 = performance.now()
   const ms = t1 - t0
   const opsPerSec = iter / (ms / 1000)
   return { opsPerSec, ms }
 }
 
-describe('DefaultDataAdapter - perf & correctness (indexed vs non-indexed)', () => {
+describe('defaultDataAdapter - perf & correctness (indexed vs non-indexed)', () => {
   // три размера массива
   const SIZES = [10_000, 100_000, 500_000] as const
   // количество операций под каждый размер (чтобы не упираться в таймаут)
@@ -33,7 +35,7 @@ describe('DefaultDataAdapter - perf & correctness (indexed vs non-indexed)', () 
       const base = Array.from({ length: SIZE }, (_, i) => ({ id: i, x: 0 }))
 
       it(
-        'GET: correctness + indexed is faster',
+        'gET: correctness + indexed is faster',
         () => {
           const iter = ITERS[SIZE]
           // два адаптера с одинаковыми данными
@@ -59,7 +61,9 @@ describe('DefaultDataAdapter - perf & correctness (indexed vs non-indexed)', () 
 
           // создадим «таблицу» id для предсказуемого доступа
           const ids = new Uint32Array(iter)
-          for (let i = 0; i < iter; i++) ids[i] = i % SIZE
+          for (let i = 0; i < iter; i++) {
+            ids[i] = i % SIZE
+          }
 
           // измеряем без индексов
           let p = 0
@@ -88,7 +92,7 @@ describe('DefaultDataAdapter - perf & correctness (indexed vs non-indexed)', () 
       )
 
       it(
-        'SET: correctness + indexed not slower (should be faster)',
+        'sET: correctness + indexed not slower (should be faster)',
         () => {
           const iter = ITERS[SIZE]
           const aNoIdx = new DefaultDataAdapter(
@@ -105,7 +109,9 @@ describe('DefaultDataAdapter - perf & correctness (indexed vs non-indexed)', () 
 
           // подготовим данные set
           const ids = new Uint32Array(iter)
-          for (let i = 0; i < iter; i++) ids[i] = i % SIZE
+          for (let i = 0; i < iter; i++) {
+            ids[i] = i % SIZE
+          }
 
           // измеряем SET без индексов (меняем только поле x - индексы по id не требуют апдейта)
           let p = 0

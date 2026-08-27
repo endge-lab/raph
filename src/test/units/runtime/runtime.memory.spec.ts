@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 
-describe('Raph runtime memory cleanup', () => {
+describe('raph runtime memory cleanup', () => {
   it('releases a removed node and its observer callback', async () => {
     const refs = createAndRemoveNode()
     await collectGarbage()
@@ -39,9 +39,13 @@ function createAndRemoveNode(): {
 async function collectGarbage(): Promise<void> {
   const gc = (globalThis as { gc?: () => void }).gc
   for (let pass = 0; pass < 20; pass++) {
-    if (typeof gc === 'function') gc()
+    if (typeof gc === 'function') {
+      gc()
+    }
     const pressure = new Array(10_000).fill(pass)
-    if (pressure.length === 0) throw new Error('unreachable')
+    if (pressure.length === 0) {
+      throw new Error('unreachable')
+    }
     await new Promise(resolve => setTimeout(resolve, 0))
   }
 }

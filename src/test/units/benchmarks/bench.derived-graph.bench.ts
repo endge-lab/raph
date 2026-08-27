@@ -27,7 +27,9 @@ describe('derived graph benchmarks', () => {
     kernel.set('source', 1)
     for (let index = 0; index < 100; index++) {
       runtime.derive({
-        id: `fan-${index}`, from: 'source', to: `targets.t${index}`,
+        id: `fan-${index}`,
+        from: 'source',
+        to: `targets.t${index}`,
         compute: value => Number(value) + index,
       })
     }

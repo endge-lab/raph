@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest'
-import { SchedulerType } from '@/domain/types/base.types'
-import { RaphApp } from '@/domain/core/RaphApp'
 import type { PhaseName } from '@/domain/types/phase.types'
+import { describe, expect, it } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
-describe('Dep Graph', () => {
+describe('dep Graph', () => {
   it('выполняет в порядке по depth, а внутри уровня - по weight (больше раньше)', () => {
     const app = new RaphApp()
     app.options({ scheduler: SchedulerType.Sync })
@@ -38,10 +38,11 @@ describe('Dep Graph', () => {
     app.addDependency(A, E)
 
     // Пометим все узлы грязными разом (порядок добавления не должен влиять)
-    for (const n of [E, C, A, D, B])
-      {app.dirty('P' as PhaseName, n, {
+    for (const n of [E, C, A, D, B]) {
+      app.dirty('P' as PhaseName, n, {
         invalidate: false,
-      })}
+      })
+    }
     app.run()
 
     // Ожидаем:

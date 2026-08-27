@@ -1,9 +1,9 @@
-import type { StableKey, StableMaskKey } from '@/domain/types/path.types'
-import type { DataPath } from '@/domain/entities/DataPath'
 import type { RaphNode } from '@/domain/core/RaphNode'
-import type { PhaseEvent } from '@/domain/types/phase.types'
+import type { DataPath } from '@/domain/entities/DataPath'
 import type { MinHeap } from '@/domain/entities/MinHeap'
 import type { Branded } from '@/domain/types/brand.types'
+import type { StableKey, StableMaskKey } from '@/domain/types/path.types'
+import type { PhaseEvent } from '@/domain/types/phase.types'
 
 /**
  * Настройки RaphApp
@@ -19,34 +19,34 @@ export interface RaphOptions {
 /**
  * Описание вариантов описания пути
  */
-export type DataPathDef =
-  | StableKey
-  | StableMaskKey
-  | string
-  | DataPath
-  | Record<string, any>
+export type DataPathDef
+  = | StableKey
+    | StableMaskKey
+    | string
+    | DataPath
+    | Record<string, any>
 
 /**
  * Интерфейс адаптера данных для RaphApp
  */
 export interface DataAdapter {
-  root(): DataObject
-  get(
+  root: () => DataObject
+  get: (
     path: DataPathDef,
     opts?: { vars?: Record<string, any> },
-  ): Undefinable<unknown>
-  set(
-    path: DataPathDef,
-    value: unknown,
-    opts?: { vars?: Record<string, any> },
-  ): void
-  delete(path: DataPathDef, opts?: { vars?: Record<string, any> }): void
-  merge(
+  ) => Undefinable<unknown>
+  set: (
     path: DataPathDef,
     value: unknown,
     opts?: { vars?: Record<string, any> },
-  ): void
-  indexOf(path: DataPathDef, opts?: { vars?: Record<string, any> }): number
+  ) => void
+  delete: (path: DataPathDef, opts?: { vars?: Record<string, any> }) => void
+  merge: (
+    path: DataPathDef,
+    value: unknown,
+    opts?: { vars?: Record<string, any> },
+  ) => void
+  indexOf: (path: DataPathDef, opts?: { vars?: Record<string, any> }) => number
 }
 
 /**
@@ -103,13 +103,13 @@ export interface RaphFrameContext {
  */
 export interface RaphLoopLease {
   readonly owner: string
-  release(): void
+  release: () => void
 }
 
 /**
  * Данные фазы для обработки грязных узлов
  */
-export type PhaseDirty = {
+export interface PhaseDirty {
   // key = computedWeight -> список нод
   buckets: Map<number, Array<RaphNode<any>>>
   events: Map<string, Array<PhaseEvent>>

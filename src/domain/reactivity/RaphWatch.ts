@@ -1,10 +1,10 @@
-//
-//
-import { RaphNode } from '@/domain/core/RaphNode'
-import type { WatchCallback } from '@/domain/types/reactive.types'
 import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import type { DataPathDef } from '@/domain/types/base.types'
 import type { PhaseExecutorContext } from '@/domain/types/phase.types'
+import type { WatchCallback } from '@/domain/types/reactive.types'
+//
+//
+import { RaphNode } from '@/domain/core/RaphNode'
 
 /**
  * Описывает reactive watcher для наблюдения за computed value.
@@ -34,7 +34,9 @@ export class RaphWatch extends RaphNode {
     if (!Array.isArray(masks)) {
       masks = [masks]
     }
-    for (const m of masks) app.track(this, m)
+    for (const m of masks) {
+      app.track(this, m)
+    }
   }
 
   /**

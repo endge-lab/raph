@@ -1,16 +1,17 @@
+import type { DataAdapter, DataObject } from '@/domain/types/base.types'
 import { describe, expect, it } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
+import { RaphPropagation } from '@/domain/local/local.types'
 import { RaphLocalPhaseRuntime } from '@/domain/local/raph-local-phase'
 import { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
-import { RaphPropagation } from '@/domain/local/local.types'
-import { SchedulerType, type DataAdapter, type DataObject } from '@/domain/types/base.types'
+import { SchedulerType } from '@/domain/types/base.types'
 
-type Props = {
+interface Props {
   value: number
 }
 
-describe('RaphRuntime local instant properties', () => {
+describe('raphRuntime local instant properties', () => {
   it('updates local properties without using DataPath adapter operations', () => {
     const calls = {
       get: 0,

@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
-import { DepGraph } from '@/domain/entities/DepGraph'
 import { RaphNode } from '@/domain/core/RaphNode'
+import { DepGraph } from '@/domain/entities/DepGraph'
 
 /**
  * создаёт линейную цепочку A0 -> A1 -> ... -> A{n-1}
@@ -59,7 +59,7 @@ function buildRegularTree(branching: number, levels: number) {
   return { app, g, all, byLevel, total: all.length }
 }
 
-function time<T>(fn: () => T): { ms: number; res: T } {
+function time<T>(fn: () => T): { ms: number, res: T } {
   const t0 = performance.now()
   const res = fn()
   const t1 = performance.now()
@@ -73,7 +73,7 @@ function time<T>(fn: () => T): { ms: number; res: T } {
  *  - скорость expandByTraversal (down/up)
  *  - отсутствие циклов (добавление циклического ребра запрещено)
  */
-describe('DepGraph bench & correctness', () => {
+describe('depGraph bench & correctness', () => {
   it('builds a large DAG, keeps depths sane, expands fast enough', () => {
     const app = new RaphApp()
 
@@ -93,7 +93,9 @@ describe('DepGraph bench & correctness', () => {
       level: number,
       prefix: string,
     ): any {
-      if (level >= LEVELS) return
+      if (level >= LEVELS) {
+        return
+      }
       for (let i = 0; i < BRANCH; i++) {
         const id = `${prefix}_${level}_${i}`
         const weight = ((level * 37 + i * 19) % 127) + 1
@@ -101,7 +103,9 @@ describe('DepGraph bench & correctness', () => {
         app.addNode(n)
         nodes.push(n)
         ids.push(id)
-        if (parent) app.addDependency(parent, n)
+        if (parent) {
+          app.addDependency(parent, n)
+        }
         makeTree(n, level + 1, id)
       }
     }
@@ -119,7 +123,7 @@ describe('DepGraph bench & correctness', () => {
 
     // 3) Корректность глубины: у первых BRANCH узлов глубина должна быть 0/1
     //    (часть вершин - корни без родителей)
-    const depth0 = app['__proto__'] // silence TS about private in IDEs
+    const depth0 = app.__proto__ // silence TS about private in IDEs
 
     // Проверим несколько случайных: глубина потомка > глубины родителя
     // (Детальную проверку сделаем проще - через выборку пары parent->child)
@@ -131,7 +135,7 @@ describe('DepGraph bench & correctness', () => {
         const c = nodes[i]
         // depth(p) <= depth(c)
         expect(
-          app['__graph']?.getDepth(p) ?? app['getDepth']?.(p) ?? 0,
+          app.__graph?.getDepth(p) ?? app.getDepth?.(p) ?? 0,
         ).toBeTypeOf('number') // защитная, т.к. getDepth приватный в DepGraph
         // Через публичный API RaphApp нет прямого getDepth – просто sanity:
         expect(p.id).toBeTypeOf('string')
@@ -214,7 +218,9 @@ describe('DepGraph bench & correctness', () => {
       const l = 1
       const rem = LVL - l
       let pow = 1
-      for (let i = 0; i < rem + 1; i++) pow *= BR
+      for (let i = 0; i < rem + 1; i++) {
+        pow *= BR
+      }
       return (pow - 1) / (BR - 1)
     })()
     const expectedDown = byLevel[1].length * subtreeSizePerSeed
@@ -249,7 +255,9 @@ describe('DepGraph bench & correctness', () => {
     const { ms, res } = time(() => g.expandByTraversal(base, 'dirty-only'))
 
     expect(res.size).toBe(base.size)
-    for (const n of base) expect(res.has(n)).toBe(true)
+    for (const n of base) {
+      expect(res.has(n)).toBe(true)
+    }
 
     console.info(`[DepGraph/only] N=${N} only=${ms.toFixed(2)}ms`)
   })

@@ -5,11 +5,13 @@ import { full } from '@/domain/derived/strategies/full'
 import { RaphDerivedPathError, RaphDerivedTargetWriteError } from '@/domain/types/derived.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('Raph derived API', () => {
+describe('raph derived API', () => {
   it('exposes derive and transaction on the default static runtime', () => {
     Raph.set('derivedStatic.source', 2)
     const handle = Raph.derive({
-      id: 'static-double', from: 'derivedStatic.source', to: 'derivedStatic.target',
+      id: 'static-double',
+      from: 'derivedStatic.source',
+      to: 'derivedStatic.target',
       compute: value => Number(value) * 2,
     })
     Raph.transaction(() => Raph.set('derivedStatic.source', 3))
@@ -23,7 +25,10 @@ describe('Raph derived API', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.value', 2)
     const handle = runtime.derive({
-      id: 'double', from: 'source.value', to: 'target.value', strategy: full(),
+      id: 'double',
+      from: 'source.value',
+      to: 'target.value',
+      strategy: full(),
       compute: value => Number(value) * 2,
     })
 
@@ -54,7 +59,11 @@ describe('Raph derived API', () => {
   it('supports immediate=false and rejects invalid paths and duplicate ids', () => {
     const { runtime } = createDerivedFixture()
     const handle = runtime.derive({
-      id: 'later', from: 'source', to: 'target', immediate: false, compute: value => value,
+      id: 'later',
+      from: 'source',
+      to: 'target',
+      immediate: false,
+      compute: value => value,
     })
     expect(handle.snapshot().computeCount).toBe(0)
     expect(() => runtime.derive({ id: 'later', from: 'other', to: 'another', compute: value => value })).toThrow(RaphDerivedPathError)

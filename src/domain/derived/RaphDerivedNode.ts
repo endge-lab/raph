@@ -46,8 +46,9 @@ export class RaphDerivedNode extends RaphNode {
 
   /** Освобождает manager registration и удаляет системную ноду. */
   public override dispose(): void {
-    if (this._disposed)
+    if (this._disposed) {
       return
+    }
     this._disposed = true
     try {
       this._onDispose?.()
@@ -57,8 +58,9 @@ export class RaphDerivedNode extends RaphNode {
       // RaphNode.dispose() сам по себе не вырезает прямой вызов из parent.children.
       // Для system node сначала используем remove(), чтобы root не удерживал
       // disposed handle/node сильной ссылкой.
-      if (this.parent)
+      if (this.parent) {
         this.remove()
+      }
       super.dispose()
     }
   }
@@ -90,10 +92,10 @@ export class RaphDerivedNode extends RaphNode {
 
   public countCompute(mode: 'full' | 'incremental'): void {
     this._computeCount++
-    if (mode === 'full')
+    if (mode === 'full') {
       this._fullComputeCount++
-    else
-      this._incrementalComputeCount++
+    }
+    else { this._incrementalComputeCount++ }
   }
 
   public countTargetWrites(count: number): void {

@@ -1,5 +1,7 @@
-import { RaphNode } from '@/domain/core/RaphNode'
 import type { RaphKernel } from '@/domain/core/RaphKernel'
+import type { RaphDerivedHandle } from '@/domain/derived/RaphDerivedHandle'
+import type { RaphLocalPhaseRuntime } from '@/domain/local/raph-local-phase'
+import type { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
 import type {
   DataAdapter,
   DataObject,
@@ -18,6 +20,7 @@ import type {
   ControlFlowSubscribeOptions,
   ControlFlowSubscriptionId,
 } from '@/domain/types/control-flow.types'
+import type { RaphDerivedManagerSnapshot, RaphDerivedOptions } from '@/domain/types/derived.types'
 import type {
   PhaseEvent,
   PhaseExecutorContext,
@@ -31,17 +34,14 @@ import type {
   RaphObserveDataOptions,
   RaphRuntimeOptions,
 } from '@/domain/types/runtime.types'
-import type { RaphDerivedManagerSnapshot, RaphDerivedOptions } from '@/domain/types/derived.types'
-import type { RaphDerivedHandle } from '@/domain/derived/RaphDerivedHandle'
 import { RAPH_DEBUG, RAPH_EVENTS, RAPH_MAX_UPS } from '@/domain/core/raph-shared'
+import { RaphNode } from '@/domain/core/RaphNode'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 import { ControlFlowQueue } from '@/domain/entities/ControlFlowQueue'
 import { ControlFlowRegistry } from '@/domain/entities/ControlFlowRegistry'
 import { DataPath } from '@/domain/entities/DataPath'
 import { DepGraph } from '@/domain/entities/DepGraph'
 import { MinHeap } from '@/domain/entities/MinHeap'
-import type { RaphLocalPhaseRuntime } from '@/domain/local/raph-local-phase'
-import type { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
 import { RaphPropagation } from '@/domain/local/local.types'
 import { SchedulerType } from '@/domain/types/base.types'
 import { SegKind } from '@/domain/types/path.types'
@@ -118,6 +118,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     elapsed: 0,
     frame: 0,
   }
+
   private __animationFrameId: number | null = null
   private __upsResetTimeout: number | null = null
 
@@ -565,7 +566,9 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
         this.__epsCount = 0
         this.__lastEPSUpdate = now
       }
-      if (this.__epsResetTimeout !== null) { clearTimeout(this.__epsResetTimeout) }
+      if (this.__epsResetTimeout !== null) {
+        clearTimeout(this.__epsResetTimeout)
+      }
       this.__epsResetTimeout = setTimeout(() => {
         this.__eps = 0
         this.__epsResetTimeout = null
@@ -603,7 +606,9 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
       traversal: 'dirty-only' | 'dirty-and-down' | 'dirty-and-up' | 'all',
     ): Set<RaphNode<any>> => {
       let s = expandedCache.get(traversal)
-      if (s) { return s }
+      if (s) {
+        return s
+      }
 
       if (traversal === 'all') {
         s = this._graph.expandByTraversal(null, 'all')
@@ -623,7 +628,9 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     // 4) Для каждой фазы раскладываем соответствующие ноды в бакеты
     for (const phaseName of phaseHits) {
       const phase = this._phasesMap.get(phaseName)
-      if (!phase) { continue }
+      if (!phase) {
+        continue
+      }
 
       if (phase.traversal !== 'all' && matches.size === 0) {
         // нет базовых нод - фаза со специальным обходом не сработает
@@ -637,7 +644,9 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
 
       affectedNodesTotal += expanded.size
 
-      if (expanded.size === 0) { continue }
+      if (expanded.size === 0) {
+        continue
+      }
 
       const queuedNodes
         = phase.traversal === 'all' || phase.traversal === 'dirty-and-down'
@@ -667,7 +676,9 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
         this.__npsCount = 0
         this.__lastNPSUpdate = now
       }
-      if (this.__npsResetTimeout !== null) { clearTimeout(this.__npsResetTimeout) }
+      if (this.__npsResetTimeout !== null) {
+        clearTimeout(this.__npsResetTimeout)
+      }
       this.__npsResetTimeout = setTimeout(() => {
         this.__nps = 0
         this.__npsResetTimeout = null
@@ -800,15 +811,21 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
       else { q.events.set(node.id, [event]) }
     }
 
-    if (bit) { node.markDirtyPhase(bit) }
-    if (invalidate) { this.invalidate() }
+    if (bit) {
+      node.markDirtyPhase(bit)
+    }
+    if (invalidate) {
+      this.invalidate()
+    }
   }
 
   /**
    * Выполняет внутреннюю операцию schedule run throttled.
    */
   private _scheduleRunThrottled(): void {
-    if (this._destroyed) { return }
+    if (this._destroyed) {
+      return
+    }
 
     if (!this.loopEnabled) {
       this.run()
@@ -816,7 +833,9 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     }
 
     // уже ждём слота - коалесцируем
-    if (this.__throttleTimer !== null || this._schedulerPending) { return }
+    if (this.__throttleTimer !== null || this._schedulerPending) {
+      return
+    }
 
     const now = performance.now()
     const elapsed = now - this.__lastRunAt
@@ -830,7 +849,9 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
       this.__throttleTimer = setTimeout(() => {
         this.__throttleTimer = null
         // защитимся от гонок: если кто-то успел поставить _schedulerPending - коалесцируем
-        if (this._schedulerPending) { return }
+        if (this._schedulerPending) {
+          return
+        }
         this._schedulerPending = true
         this._scheduler(() => {
           this._schedulerPending = false
@@ -887,7 +908,9 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     for (const phase of this._phasesArray) {
       const q = this._dirty.get(phase.name)!
       const hasDirty = Boolean(q && q.inHeap.size > 0)
-      if (!hasDirty && !phase.always) { continue }
+      if (!hasDirty && !phase.always) {
+        continue
+      }
 
       const bit = this._phaseBits.get(phase.name) ?? 0
 
@@ -897,7 +920,9 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
 
         if (phase.mode === 'all' && hasDirty) {
           for (const node of this._orderedAllNodes()) {
-            if (bit) { node.clearDirtyPhase(bit) }
+            if (bit) {
+              node.clearDirtyPhase(bit)
+            }
             const events = q.events?.get(node.id) ?? undefined
             ctxs.push({ phase: phase.name, node, frame, events })
           }
@@ -909,11 +934,15 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
         else if (hasDirty) {
           for (const bucketIdx of q.inHeap) {
             const arr = q.buckets.get(bucketIdx)
-            if (!arr || arr.length === 0) { continue }
+            if (!arr || arr.length === 0) {
+              continue
+            }
 
             for (let i = 0; i < arr.length; i++) {
               const node = arr[i]
-              if (bit) { node.clearDirtyPhase(bit) }
+              if (bit) {
+                node.clearDirtyPhase(bit)
+              }
               const events = q.events?.get(node.id) ?? undefined
               ctxs.push({ phase: phase.name, node, frame, events })
             }
@@ -950,11 +979,15 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
           q.inHeap.delete(bucketIdx)
 
           const arr = q.buckets.get(bucketIdx)
-          if (!arr || arr.length === 0) { continue }
+          if (!arr || arr.length === 0) {
+            continue
+          }
 
           for (let i = 0; i < arr.length; i++) {
             const node = arr[i]
-            if (bit) { node.clearDirtyPhase(bit) }
+            if (bit) {
+              node.clearDirtyPhase(bit)
+            }
             const events = q.events?.get(node.id) ?? undefined
             ctxs.push({ phase: phase.name, node, frame, events })
           }
@@ -1042,7 +1075,9 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     return {
       owner,
       release: () => {
-        if (released) return
+        if (released) {
+          return
+        }
         released = true
         this.__loopLeases.delete(token)
         this._stopLoopIfIdle()
@@ -1054,11 +1089,15 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
    * Выполняет внутреннюю операцию ensure loop.
    */
   private _ensureLoop(): void {
-    if (this.__isLoopActive) { return }
+    if (this.__isLoopActive) {
+      return
+    }
     this.__isLoopActive = true
 
     const loop = (_time: number): void => {
-      if (!this.__isLoopActive) { return }
+      if (!this.__isLoopActive) {
+        return
+      }
 
       this.invalidate()
 
@@ -1128,12 +1167,16 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
    * Однако обновления произойдет только, если есть грязные узлы.
    */
   invalidate(): void {
-    if (this._schedulerPending) { return }
+    if (this._schedulerPending) {
+      return
+    }
 
     this._schedulerPending = true
     this._scheduler(() => {
       this._schedulerPending = false
-      if (this._destroyed) { return }
+      if (this._destroyed) {
+        return
+      }
       this._scheduleRunThrottled()
     })
   }
@@ -1300,7 +1343,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
 
     if (traversal === 'dirty-and-down') {
       const result: Array<RaphNode<any>> = []
-      node.traverseAll(child => {
+      node.traverseAll((child) => {
         if (this._graph.hasNode(child)) {
           result.push(child)
         }
@@ -1368,7 +1411,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
       const result: Array<PhaseExecutorContext> = []
 
       for (const ctx of ctxs) {
-        ctx.node.traverseAll(node => {
+        ctx.node.traverseAll((node) => {
           if (seen.has(node.id) || !this._graph.hasNode(node)) {
             return
           }
@@ -1421,7 +1464,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
       routes: [],
       mode: localPhase.mode,
       always: localPhase.always,
-      all: ctxs => {
+      all: (ctxs) => {
         localPhase.run({
           frame: ctxs[0]?.frame ?? this.__frameContext,
           root: this._root,

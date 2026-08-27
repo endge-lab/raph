@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 
 /**
@@ -9,7 +9,7 @@ import { RaphRouter } from '@/domain/core/RaphRouter'
  * Если в роутере есть метод enableCache - включаем его. Если нет -
  * тест всё равно пройдёт функционально, но ускорение может быть меньше.
  */
-describe('RaphRouter - бенчмарк кеша', () => {
+describe('raphRouter - бенчмарк кеша', () => {
   it('ускоряет повторные вызовы match() на одном наборе путей', () => {
     const router = new RaphRouter()
 

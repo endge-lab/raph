@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { MinHeap } from '@/domain/entities/MinHeap'
 
 // Детеминированный RNG (LCG), чтобы бенчи были воспроизводимыми
@@ -9,14 +9,18 @@ function makeLCG(seed = 123456789): any {
 
 const N_SMALL = 5000
 
-describe('MinHeap: функциональные тесты', () => {
+describe('minHeap: функциональные тесты', () => {
   it('push/pop возвращают значения в неубывающем порядке', () => {
     const h = new MinHeap()
     const vals = [7, 1, 5, 2, 9, 3, 3, 0, -1, 10]
-    for (const v of vals) h.push(v)
+    for (const v of vals) {
+      h.push(v)
+    }
 
     const out: Array<number> = []
-    while (!h.empty) out.push(h.pop()!)
+    while (!h.empty) {
+      out.push(h.pop()!)
+    }
     const sorted = [...vals].sort((a, b) => a - b)
 
     expect(out).toEqual(sorted)
@@ -59,7 +63,9 @@ describe('MinHeap: функциональные тесты', () => {
     h.buildFrom(arr)
 
     const out: Array<number> = []
-    while (!h.empty) out.push(h.pop()!)
+    while (!h.empty) {
+      out.push(h.pop()!)
+    }
 
     const sorted = [...arr].sort((a, b) => a - b)
     expect(out).toEqual(sorted)
@@ -79,7 +85,9 @@ describe('MinHeap: функциональные тесты', () => {
   it('clear(preserveCapacity=true) обнуляет size, но сохраняет capacity', () => {
     const h = new MinHeap()
     // поднадуем внутренний буфер
-    for (let i = 0; i < 100; i++) h.push(i)
+    for (let i = 0; i < 100; i++) {
+      h.push(i)
+    }
     const capBefore = (h as any)._a.length
 
     h.clear(true)
@@ -95,7 +103,9 @@ describe('MinHeap: функциональные тесты', () => {
 
   it('clear(preserveCapacity=false) сбрасывает и размер, и capacity', () => {
     const h = new MinHeap()
-    for (let i = 0; i < 50; i++) h.push(i)
+    for (let i = 0; i < 50; i++) {
+      h.push(i)
+    }
     h.clear(false)
     expect(h.size).toBe(0)
     expect((h as any)._a.length).toBe(0)
@@ -108,7 +118,9 @@ describe('MinHeap: функциональные тесты', () => {
     expect(h.size).toBe(0)
 
     // и вставка в пределах capacity проходит без проблем
-    for (let i = 0; i < 128; i++) h.push(128 - i)
+    for (let i = 0; i < 128; i++) {
+      h.push(128 - i)
+    }
     expect(h.size).toBe(128)
   })
 
@@ -116,9 +128,13 @@ describe('MinHeap: функциональные тесты', () => {
     const h = new MinHeap()
     const rng = makeLCG(1337)
     const data = Array.from({ length: N_SMALL }, () => rng() % 10_000 | 0)
-    for (const x of data) h.push(x)
+    for (const x of data) {
+      h.push(x)
+    }
     const out: Array<number> = []
-    while (!h.empty) out.push(h.pop()!)
+    while (!h.empty) {
+      out.push(h.pop()!)
+    }
 
     const sorted = [...data].sort((a, b) => a - b)
     expect(out).toEqual(sorted)

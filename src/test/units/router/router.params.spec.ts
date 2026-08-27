@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 
-describe('RaphRouter.matchWithParams', () => {
+describe('raphRouter.matchWithParams', () => {
   let r: RaphRouter<string>
 
   beforeEach(() => {

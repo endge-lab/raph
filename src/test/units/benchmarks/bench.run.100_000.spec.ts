@@ -1,12 +1,12 @@
-import { describe, it, expect } from 'vitest'
-import { RaphApp } from '@/domain/core/RaphApp'
-import { SchedulerType } from '@/domain/types/base.types'
-import { RaphNode } from '@/domain/core/RaphNode'
 import type {
   PhaseExecutorContext,
   PhaseName,
   RaphPhase,
 } from '@/domain/types/phase.types'
+import { describe, expect, it } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
+import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
 /**
  * Бенчмарк фазы run():
@@ -35,14 +35,17 @@ describe('bench.run() большая графовая структура и мн
       level: number,
       prefix: string,
     ): void => {
-      if (level >= LEVELS) return
+      if (level >= LEVELS) {
+        return
+      }
       for (let i = 0; i < BRANCH; i++) {
         const id = `${prefix}_${level}_${i}`
         const weight = ((level * 53 + i * 17) % 255) + 1
         const n = new RaphNode(raph, { id, weight })
         if (parent) {
           parent.addChild(n)
-        } else {
+        }
+        else {
           raph.addNode(n)
         }
         ids.push(id)
@@ -59,9 +62,15 @@ describe('bench.run() большая графовая структура и мн
     //    - часть - персональные ключи: `com[id="..."].*`
     for (let idx = 0; idx < ids.length; idx++) {
       const node = raph.getNode(ids[idx])!
-      if (idx % 2 === 0) raph.track(node, 'data.*')
-      if (idx % 3 === 0) raph.track(node, 'com.*')
-      if (idx % 5 === 0) raph.track(node, `com[id="${ids[idx]}"].*`)
+      if (idx % 2 === 0) {
+        raph.track(node, 'data.*')
+      }
+      if (idx % 3 === 0) {
+        raph.track(node, 'com.*')
+      }
+      if (idx % 5 === 0) {
+        raph.track(node, `com[id="${ids[idx]}"].*`)
+      }
     }
 
     // 3) Много фаз

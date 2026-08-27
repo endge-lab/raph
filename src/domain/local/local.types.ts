@@ -1,5 +1,5 @@
-import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import type { RaphNode } from '@/domain/core/RaphNode'
+import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import type { RaphFrameContext, RaphProperties } from '@/domain/types/base.types'
 
 /**
@@ -81,7 +81,7 @@ export interface RaphLocalPhase<P extends RaphProperties> {
   properties: Array<{
     name: keyof P
     propagation: RaphPropagation
-    computeOn(node: RaphNode<P>): void
+    computeOn: (node: RaphNode<P>) => void
   }>
   beforeProcess?: RaphLocalNodeCallback<P>
   afterProcess?: RaphLocalNodeCallback<P>

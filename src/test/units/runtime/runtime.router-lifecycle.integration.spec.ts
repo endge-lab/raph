@@ -1,10 +1,10 @@
+import type { PhaseName } from '@/domain/types/phase.types'
 import { describe, expect, it } from 'vitest'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
-import type { PhaseName } from '@/domain/types/phase.types'
 
-describe('Raph runtime/router lifecycle integration', () => {
+describe('raph runtime/router lifecycle integration', () => {
   it('returns router state to baseline after unique-path lifecycle cycles', () => {
     const kernel = new RaphKernel()
     const runtime = kernel.createRuntime({ id: 'cycles', scheduler: SchedulerType.Sync })
@@ -17,17 +17,19 @@ describe('Raph runtime/router lifecycle integration', () => {
         runtime.observeData(node, `pages[cycle=${cycle}].rows[id=${index}].value`, { phase: 'update' })
         return node
       })
-      for (const node of nodes) node.remove()
+      for (const node of nodes) {
+        node.remove()
+      }
     }
 
-    const router = (runtime as unknown as { _nodeRouter: { _payloadMasks: Map<unknown, unknown>; _root: unknown } })._nodeRouter
+    const router = (runtime as unknown as { _nodeRouter: { _payloadMasks: Map<unknown, unknown>, _root: unknown } })._nodeRouter
     expect(router._payloadMasks.size).toBe(0)
     expect(router._root).toMatchObject({ exact: null, wc: null, param: null, paramAny: null })
   })
 
   it.each([SchedulerType.Sync, SchedulerType.Microtask, SchedulerType.RAF])(
     'never notifies a deleted node in %s scheduler',
-    async scheduler => {
+    async (scheduler) => {
       const kernel = new RaphKernel()
       const runtime = kernel.createRuntime({ id: `scheduler-${scheduler}`, scheduler })
       let calls = 0

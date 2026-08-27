@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('RaphKernel shared store', () => {
+describe('raphKernel shared store', () => {
   it('keeps data shared across runtimes and clears it only via kernel.clear()', () => {
     const kernel = new RaphKernel()
     const nova = kernel.createRuntime({ id: 'nova', scheduler: SchedulerType.Sync })

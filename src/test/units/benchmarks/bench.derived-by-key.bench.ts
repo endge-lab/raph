@@ -38,8 +38,9 @@ describe('derived collectionByKey benchmarks', () => {
 
 function mutate(kernel: RaphKernel, updates: number) {
   kernel.transaction(() => {
-    for (let index = 0; index < updates; index++)
+    for (let index = 0; index < updates; index++) {
       kernel.set(`source[id=${index}].value`, index + 1)
+    }
   })
 }
 
@@ -49,13 +50,15 @@ function fixture(size: number, incremental: boolean, cpuHeavy = false) {
   runtime.init()
   kernel.set('source', Array.from({ length: size }, (_, id) => ({ id, value: id })))
   runtime.derive({
-    from: 'source', to: 'target',
+    from: 'source',
+    to: 'target',
     strategy: incremental ? collectionByKey('id') : undefined,
     compute: (rows: Array<{ id: number, value: number }>) => rows.map((row) => {
       let score = row.value * 2
       if (cpuHeavy) {
-        for (let iteration = 0; iteration < 250; iteration++)
+        for (let iteration = 0; iteration < 250; iteration++) {
           score = Math.imul(score ^ iteration, 2654435761) >>> 0
+        }
       }
       return { id: row.id, doubled: score }
     }),

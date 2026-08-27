@@ -3,7 +3,7 @@ import { collectionByKey } from '@/domain/derived/strategies/collection-by-key'
 import { RaphDerivedStrategyError } from '@/domain/types/derived.types'
 import { createDerivedFixture, projectRows } from '../../../units/derived/derived.fixtures.ts'
 
-describe('Raph derived collectionByKey strategy', () => {
+describe('raph derived collectionByKey strategy', () => {
   it.each([
     { name: 'undefined output', emptyOutput: undefined },
     { name: 'empty array output', emptyOutput: [] },
@@ -13,7 +13,10 @@ describe('Raph derived collectionByKey strategy', () => {
       ? rows.map(row => ({ id: row.id, label: row.name }))
       : emptyOutput)
     const handle = runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: collectionByKey('id'), compute,
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: collectionByKey('id'),
+      compute,
     })
 
     expect(kernel.get('target.rows')).toEqual(emptyOutput)
@@ -35,7 +38,10 @@ describe('Raph derived collectionByKey strategy', () => {
     ])
     const compute = vi.fn(projectRows)
     const handle = runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: collectionByKey('id'), compute,
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: collectionByKey('id'),
+      compute,
     })
 
     kernel.transaction(() => {
@@ -81,19 +87,25 @@ describe('Raph derived collectionByKey strategy', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1 }, { id: 2 }])
     expect(() => runtime.derive({
-      from: 'source.rows', to: 'target.bad', strategy: collectionByKey('id'),
+      from: 'source.rows',
+      to: 'target.bad',
+      strategy: collectionByKey('id'),
       compute: (rows: any[]) => rows.slice(0, 1),
     })).toThrow(RaphDerivedStrategyError)
     expect(kernel.get('target.bad')).toBeUndefined()
 
     expect(() => runtime.derive({
-      from: 'source.rows', to: 'target.reordered', strategy: collectionByKey('id'),
+      from: 'source.rows',
+      to: 'target.reordered',
+      strategy: collectionByKey('id'),
       compute: (rows: any[]) => [...rows].reverse(),
     })).toThrow(RaphDerivedStrategyError)
 
     kernel.set('source.duplicates', [{ id: 1 }, { id: 1 }])
     expect(() => runtime.derive({
-      from: 'source.duplicates', to: 'target.duplicates', strategy: collectionByKey('id'),
+      from: 'source.duplicates',
+      to: 'target.duplicates',
+      strategy: collectionByKey('id'),
       compute: (rows: any[]) => rows,
     })).toThrow(RaphDerivedStrategyError)
     runtime.destroy()
@@ -104,9 +116,13 @@ describe('Raph derived collectionByKey strategy', () => {
     kernel.set('source.rows', [{ id: 1, value: 1 }, { id: 2, value: 2 }])
     let fail = false
     runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: collectionByKey('id'),
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: collectionByKey('id'),
       compute: (rows: any[]) => {
-        if (fail) throw new Error('batch failed')
+        if (fail) {
+          throw new Error('batch failed')
+        }
         return rows.map(row => ({ id: row.id, value: row.value * 10 }))
       },
     })
@@ -132,8 +148,11 @@ describe('Raph derived collectionByKey strategy', () => {
     kernel.set('source.rows', [{ id: 1, value: 1 }])
     const compute = vi.fn((rows: any[]) => rows.map(row => ({ id: row.id, value: row.value * 2 })))
     const handle = runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: collectionByKey('id'),
-      immediate: false, compute,
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: collectionByKey('id'),
+      immediate: false,
+      compute,
     })
     kernel.set('source.rows[id=1].value', 2)
     expect(kernel.get('target.rows')).toEqual([{ id: 1, value: 4 }])
@@ -150,7 +169,10 @@ describe('Raph derived collectionByKey strategy', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1 }, { id: 2 }])
     expect(() => runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: collectionByKey('id'), compute: compute as any,
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: collectionByKey('id'),
+      compute: compute as any,
     })).toThrow(RaphDerivedStrategyError)
     expect(kernel.get('target.rows')).toBeUndefined()
     runtime.destroy()
@@ -165,7 +187,9 @@ describe('Raph derived collectionByKey strategy', () => {
     kernel.set('source.rows', [{ id: 1, value: 1 }])
     let invalid = false
     runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: collectionByKey('id'),
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: collectionByKey('id'),
       compute: (rows: any[]) => invalid ? next() : rows.map(row => ({ id: row.id, value: row.value })),
     })
     invalid = true

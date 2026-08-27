@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest'
-import { SchedulerType } from '@/domain/types/base.types'
+import { describe, expect, it } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
-describe('RaphApp.notify (без фаз)', () => {
+describe('raphApp.notify (без фаз)', () => {
   it('не планирует и не выполняет ничего; CRUD всё ещё работает', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })

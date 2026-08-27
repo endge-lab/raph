@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest'
-import { SchedulerType } from '@/domain/types/base.types'
-import { RaphApp } from '@/domain/core/RaphApp'
 import type {
   PhaseExecutorContext,
   PhaseName,
 } from '@/domain/types/phase.types'
+import { describe, expect, it } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
 /**
  * Bench: 1000 последовательных notify/set.

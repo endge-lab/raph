@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest'
 import type { DataPathDef } from '@/domain/types/base.types'
+import { describe, expect, it } from 'vitest'
+import { RaphKernel } from '@/domain/core/RaphKernel'
 import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
 import { DataPath } from '@/domain/entities/DataPath'
-import { RaphKernel } from '@/domain/core/RaphKernel'
 import { SchedulerType } from '@/domain/types/base.types'
 import {
   RaphDerivedComputeError,
@@ -11,14 +11,17 @@ import {
 } from '@/domain/types/derived.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('Raph derived errors', () => {
+describe('raph derived errors', () => {
   it('keeps last-good target, exposes error and retries on next mutation', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     const handle = runtime.derive({
-      from: 'source', to: 'target',
+      from: 'source',
+      to: 'target',
       compute: (value) => {
-        if (value === 2) throw new Error('bad value')
+        if (value === 2) {
+          throw new Error('bad value')
+        }
         return Number(value) * 10
       },
     })
@@ -37,7 +40,9 @@ describe('Raph derived errors', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     expect(() => runtime.derive({
-      from: 'source', to: 'target', compute: async value => value,
+      from: 'source',
+      to: 'target',
+      compute: async value => value,
     })).toThrow(RaphDerivedStrategyError)
     expect(kernel.getDerivedSnapshot().registrations).toBe(0)
     runtime.destroy()
@@ -47,8 +52,9 @@ describe('Raph derived errors', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     expect(() => runtime.derive({
-      from: 'source', to: 'target',
-      compute: value => {
+      from: 'source',
+      to: 'target',
+      compute: (value) => {
         kernel.set('side-effect', value)
         return value
       },
@@ -56,8 +62,9 @@ describe('Raph derived errors', () => {
     expect((() => {
       try {
         runtime.derive({
-          from: 'source', to: 'another-target',
-          compute: value => {
+          from: 'source',
+          to: 'another-target',
+          compute: (value) => {
             kernel.set('side-effect', value)
             return value
           },
@@ -74,16 +81,24 @@ describe('Raph derived errors', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     runtime.derive({
-      id: 'bad-a', from: 'source', to: 'bad.a',
-      compute: () => { throw new Error('a') }, immediate: false,
+      id: 'bad-a',
+      from: 'source',
+      to: 'bad.a',
+      compute: () => { throw new Error('a') },
+      immediate: false,
     })
     runtime.derive({
-      id: 'good', from: 'source', to: 'good',
+      id: 'good',
+      from: 'source',
+      to: 'good',
       compute: value => Number(value) * 2,
     })
     runtime.derive({
-      id: 'bad-b', from: 'source', to: 'bad.b',
-      compute: () => { throw 'b' }, immediate: false,
+      id: 'bad-b',
+      from: 'source',
+      to: 'bad.b',
+      compute: () => { throw 'b' },
+      immediate: false,
     })
     expect(() => kernel.set('source', 3)).toThrow(AggregateError)
     expect(kernel.get('good')).toBe(6)
@@ -96,7 +111,8 @@ describe('Raph derived errors', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     expect(() => runtime.derive({
-      from: 'source', to: 'target',
+      from: 'source',
+      to: 'target',
       compute: (value) => {
         runtime.derive({ from: 'other', to: 'another', immediate: false, compute: item => item })
         return value
@@ -129,7 +145,9 @@ describe('Raph derived errors', () => {
     runtime.init()
     kernel.set('source', 1)
     expect(() => runtime.derive({
-      from: 'source', to: 'target', disposeTarget: 'delete',
+      from: 'source',
+      to: 'target',
+      disposeTarget: 'delete',
       compute: () => { throw new Error('original compute') },
     })).toThrow('original compute')
     expect(kernel.getDerivedSnapshot().registrations).toBe(0)
@@ -141,16 +159,18 @@ class TargetFailingAdapter extends DefaultDataAdapter {
   public failTarget = false
 
   public override set(path: DataPathDef, value: unknown, opts?: { vars?: Record<string, any> }): void {
-    if (this.failTarget && DataPath.from(path).toStringPath().startsWith('target'))
+    if (this.failTarget && DataPath.from(path).toStringPath().startsWith('target')) {
       throw new Error('adapter target commit failed')
+    }
     super.set(path, value, opts)
   }
 }
 
 class DeleteFailingAdapter extends DefaultDataAdapter {
   public override delete(path: DataPathDef): void {
-    if (DataPath.from(path).toStringPath().startsWith('target'))
+    if (DataPath.from(path).toStringPath().startsWith('target')) {
       throw new Error('adapter cleanup failed')
+    }
     super.delete(path)
   }
 }

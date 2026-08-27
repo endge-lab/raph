@@ -1,17 +1,17 @@
-import { describe, it, expect } from 'vitest'
 import type {
   PhaseExecutorContext,
   PhaseName,
 } from '@/domain/types/phase.types'
-import { RaphSignal } from '@/domain/reactivity/RaphSignal'
-import { SchedulerType } from '@/domain/types/base.types'
+import { describe, expect, it } from 'vitest'
 import { Raph } from '@/domain/core/Raph'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { DataPath } from '@/domain/entities/DataPath'
+import { RaphSignal } from '@/domain/reactivity/RaphSignal'
+import { SchedulerType } from '@/domain/types/base.types'
 
 /**
  *  вспомогательный each для "compute"-фазы
- *  */
+ */
 function computeExecutor({ node }: PhaseExecutorContext): void {
   // обновляем только computed-сигналы
   if (node instanceof RaphSignal && typeof node.compute === 'function') {
@@ -19,7 +19,7 @@ function computeExecutor({ node }: PhaseExecutorContext): void {
   }
 }
 
-describe('RaphSignal (DAG)', () => {
+describe('raphSignal (DAG)', () => {
   it('plain signal: get/set работает и шлёт notify', () => {
     Raph.options({ scheduler: SchedulerType.Sync })
 
@@ -31,7 +31,7 @@ describe('RaphSignal (DAG)', () => {
         name: PHASE,
         traversal: 'dirty-only',
         routes: ['__signals.*'],
-        each: ctx => {
+        each: (ctx) => {
           execCalls.push(ctx.node.id)
         },
       },

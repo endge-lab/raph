@@ -9,8 +9,11 @@ describe('derived lifecycle benchmarks', () => {
     runtime.init()
     for (let index = 0; index < 10_000; index++) {
       runtime.derive({
-        id: `lifecycle-${index}`, from: 'source', to: `target.t${index}`,
-        immediate: false, compute: value => value,
+        id: `lifecycle-${index}`,
+        from: 'source',
+        to: `target.t${index}`,
+        immediate: false,
+        compute: value => value,
       }).dispose()
     }
     runtime.destroy()

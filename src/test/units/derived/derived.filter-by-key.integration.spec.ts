@@ -8,7 +8,7 @@ import { filterByKey } from '@/domain/derived/strategies/filter-by-key'
 import { SchedulerType } from '@/domain/types/base.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('Raph derived filterByKey integration', () => {
+describe('raph derived filterByKey integration', () => {
   it('stabilizes a two-stage filtered graph once per transaction', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [
@@ -23,12 +23,18 @@ describe('Raph derived filterByKey integration', () => {
       .filter(row => row.priority)
       .map(row => ({ id: row.id, label: `${row.id}:${row.projected}` })))
     runtime.derive({
-      id: 'visible', from: 'source.rows', to: 'derived.visible',
-      strategy: filterByKey('id'), compute: visibleCompute,
+      id: 'visible',
+      from: 'source.rows',
+      to: 'derived.visible',
+      strategy: filterByKey('id'),
+      compute: visibleCompute,
     })
     runtime.derive({
-      id: 'priority', from: 'derived.visible', to: 'derived.priority',
-      strategy: filterByKey('id'), compute: priorityCompute,
+      id: 'priority',
+      from: 'derived.visible',
+      to: 'derived.priority',
+      strategy: filterByKey('id'),
+      compute: priorityCompute,
     })
 
     kernel.transaction(() => {
@@ -60,7 +66,9 @@ describe('Raph derived filterByKey integration', () => {
       { id: 2, visible: false, value: 2 },
     ])
     runtime.derive({
-      from: 'source.rows', to: 'target.rows', strategy: filterByKey('id'),
+      from: 'source.rows',
+      to: 'target.rows',
+      strategy: filterByKey('id'),
       compute: (rows: Array<{ id: number, visible: boolean, value: number }>) => rows.filter(row => row.visible),
     })
 
@@ -101,11 +109,15 @@ describe('Raph derived filterByKey integration', () => {
     kernel.set('source.rows', [{ id: 1, active: true }, { id: 2, active: false }])
 
     const upstream = sourceRuntime.derive({
-      from: 'source.rows', to: 'shared.active', strategy: filterByKey('id'),
+      from: 'source.rows',
+      to: 'shared.active',
+      strategy: filterByKey('id'),
       compute: (rows: Array<{ id: number, active: boolean }>) => rows.filter(row => row.active),
     })
     const downstream = consumerRuntime.derive({
-      from: 'shared.active', to: 'consumer.rows', strategy: filterByKey('id'),
+      from: 'shared.active',
+      to: 'consumer.rows',
+      strategy: filterByKey('id'),
       compute: (rows: Array<{ id: number, active: boolean }>) => rows.map(row => ({ id: row.id, text: `row-${row.id}` })),
     })
 

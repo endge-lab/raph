@@ -1,10 +1,10 @@
+import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 import { describe, expect, it } from 'vitest'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
-import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 
-describe('RaphKernel runtime isolation', () => {
+describe('raphKernel runtime isolation', () => {
   it('routes business data changes only to subscribed runtime lanes', () => {
     const kernel = new RaphKernel()
     const nova = kernel.createRuntime({ id: 'nova', scheduler: SchedulerType.Sync })

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('Raph derived memory cleanup', () => {
+describe('raph derived memory cleanup', () => {
   it('releases deterministic registry resources after repeated create/dispose', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
@@ -38,20 +38,31 @@ describe('Raph derived memory cleanup', () => {
     const handles = []
     for (let index = 0; index < count; index++) {
       const handle = runtime.derive({
-        id: `fan-${index}`, from: 'source', to: `fan.t${index}`,
-        immediate: false, compute: value => value,
+        id: `fan-${index}`,
+        from: 'source',
+        to: `fan.t${index}`,
+        immediate: false,
+        compute: value => value,
       })
-      if (index % 2 === 0) handle.pause()
+      if (index % 2 === 0) {
+        handle.pause()
+      }
       handles.push(handle)
     }
     expect(() => runtime.derive({
-      id: 'failed', from: 'source', to: 'failed',
+      id: 'failed',
+      from: 'source',
+      to: 'failed',
       compute: () => { throw new Error('expected') },
     })).toThrow()
     handles.forEach(handle => handle.dispose())
     expect(kernel.getDerivedSnapshot()).toMatchObject({
-      registrations: 0, graphNodes: 0, graphEdges: 0,
-      dirtyHandles: 0, pendingKeys: 0, errors: 0,
+      registrations: 0,
+      graphNodes: 0,
+      graphEdges: 0,
+      dirtyHandles: 0,
+      pendingKeys: 0,
+      errors: 0,
     })
     expect(runtime.root.children).toHaveLength(0)
     runtime.destroy()
@@ -100,7 +111,9 @@ function registerDisposableClosure(runtime: ReturnType<typeof createDerivedFixtu
   const captured = { data: new Array(100_000).fill(1) }
   const weak = new WeakRef(captured)
   runtime.derive({
-    from: 'source', to: 'target', immediate: false,
+    from: 'source',
+    to: 'target',
+    immediate: false,
     compute: value => captured.data.length + Number(value),
   }).dispose()
   return weak
@@ -117,8 +130,9 @@ function heapUsed(): number {
 function forceGc(): void {
   const gc = (globalThis as any).gc
   if (typeof gc === 'function') {
-    for (let index = 0; index < 5; index++)
+    for (let index = 0; index < 5; index++) {
       gc()
+    }
   }
 }
 

@@ -35,7 +35,9 @@ export class MinHeap {
    * Очистить кучу, при необходимости сохранив выделенную память.
    */
   clear(preserveCapacity = true): void {
-    if (preserveCapacity) this._size = 0
+    if (preserveCapacity) {
+      this._size = 0
+    }
     else {
       this._a.length = 0
       this._size = 0
@@ -46,7 +48,9 @@ export class MinHeap {
    * Зарезервировать ёмкость под указанное число элементов.
    */
   reserve(capacity: number): void {
-    if (capacity > this._a.length) this._a.length = capacity
+    if (capacity > this._a.length) {
+      this._a.length = capacity
+    }
   }
 
   /**
@@ -61,8 +65,10 @@ export class MinHeap {
    */
   push(x: number): void {
     const i = this._size
-    if (i < this._a.length) this._a[i] = x
-    else this._a.push(x)
+    if (i < this._a.length) {
+      this._a[i] = x
+    }
+    else { this._a.push(x) }
     this._size = i + 1
     this._siftUp(i)
   }
@@ -72,7 +78,9 @@ export class MinHeap {
    */
   pop(): number | undefined {
     const n = this._size
-    if (n === 0) return undefined
+    if (n === 0) {
+      return undefined
+    }
     const a = this._a
     const min = a[0]
     const last = a[n - 1]
@@ -104,12 +112,16 @@ export class MinHeap {
   buildFrom(src: ReadonlyArray<number>): void {
     const n = src.length
     this._a.length = n
-    for (let i = 0; i < n; i++) this._a[i] = src[i]
+    for (let i = 0; i < n; i++) {
+      this._a[i] = src[i]
+    }
     this._size = n
 
     //
     // Построение кучи методом Флойда
-    for (let i = (n >> 1) - 1; i >= 0; i--) this._siftDown(i)
+    for (let i = (n >> 1) - 1; i >= 0; i--) {
+      this._siftDown(i)
+    }
   }
 
   /**
@@ -121,7 +133,9 @@ export class MinHeap {
     while (i > 0) {
       const p = (i - 1) >> 1
       const y = a[p]
-      if (x >= y) break
+      if (x >= y) {
+        break
+      }
       a[i] = y
       i = p
     }
@@ -148,7 +162,9 @@ export class MinHeap {
           y = yr
         }
       }
-      if (x <= y) break
+      if (x <= y) {
+        break
+      }
       a[i] = y
       i = child
     }

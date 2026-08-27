@@ -1,7 +1,7 @@
-import { RaphNode } from '@/domain/core/RaphNode'
-import type { DataPath } from '@/domain/entities/DataPath'
 import type { RaphRuntime } from '@/domain/core/RaphRuntime'
+import type { DataPath } from '@/domain/entities/DataPath'
 import { Raph } from '@/domain/core/Raph'
+import { RaphNode } from '@/domain/core/RaphNode'
 
 /**
  * Описывает reactive signal как RaphNode с value и зависимостями.
@@ -44,7 +44,8 @@ export class RaphSignal<T> extends RaphNode {
       if (current instanceof RaphSignal) {
         // вычисляется другой сигнал - строим ребро dep-this и подписку по пути
         current.addDependency(this)
-      } else {
+      }
+      else {
         // любая другая нода: достаточно подписки по пути
         this.app.track(current, this.path)
       }
@@ -68,14 +69,18 @@ export class RaphSignal<T> extends RaphNode {
    * Пересчёт computed-сигнала. Без notify.
    */
   update(): void {
-    if (!this.compute) return
+    if (!this.compute) {
+      return
+    }
 
     // Снимаем старые зависимости (и из графа, и из роутера путей)
     if (this._deps.size) {
       for (const dep of this._deps) {
         this.app.removeDependency(dep, this)
         const depPath = (dep as any).path
-        if (depPath) this.app.untrack(this, depPath)
+        if (depPath) {
+          this.app.untrack(this, depPath)
+        }
       }
       this._deps.clear()
     }
@@ -85,7 +90,8 @@ export class RaphSignal<T> extends RaphNode {
     let val: T
     try {
       val = this.compute()
-    } finally {
+    }
+    finally {
       Raph.popContext()
     }
 
@@ -97,7 +103,9 @@ export class RaphSignal<T> extends RaphNode {
    * Зарегистрировать зависимость this от dep (dep - this)
    */
   addDependency(dep: RaphNode): void {
-    if (dep === this || this._deps.has(dep)) return
+    if (dep === this || this._deps.has(dep)) {
+      return
+    }
     this._deps.add(dep)
 
     // граф: ребро dep - this
@@ -105,6 +113,8 @@ export class RaphSignal<T> extends RaphNode {
 
     // роутер путей: чтобы notify по dep.path находил this как грязную
     const depPath = (dep as any).path
-    if (depPath) this.app.track(this, depPath)
+    if (depPath) {
+      this.app.track(this, depPath)
+    }
   }
 }

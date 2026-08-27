@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 
 function time<T>(label: string, fn: () => T) {
@@ -15,7 +15,7 @@ function randInt(n: number) {
   return Math.floor(Math.random() * n)
 }
 
-describe('RaphRouter - бенчмарки с параметрическими плейсхолдерами', () => {
+describe('raphRouter - бенчмарки с параметрическими плейсхолдерами', () => {
   it('быстро строит большой роутер с $placeholders', () => {
     const r = new RaphRouter<string>()
 
@@ -64,7 +64,7 @@ describe('RaphRouter - бенчмарки с параметрическими п
           const iid = randInt(64)
           const out = (r as any).matchWithParams(
             `orders[id=${oid}].items[id=${iid}].price`,
-          ) as Array<{ payload: string; params: Record<string, unknown> }>
+          ) as Array<{ payload: string, params: Record<string, unknown> }>
           results.push(out.length)
           // sanity
           if (out.length > 0) {
@@ -73,26 +73,31 @@ describe('RaphRouter - бенчмарки с параметрическими п
             expect(cap.oid).not.toBeUndefined()
             expect(cap.iid).not.toBeUndefined()
           }
-        } else if (kind === 1) {
+        }
+        else if (kind === 1) {
           const oid = randInt(10_000)
           const out = (r as any).matchWithParams(
             `orders[id=${oid}].total`,
-          ) as Array<{ payload: string; params: Record<string, unknown> }>
+          ) as Array<{ payload: string, params: Record<string, unknown> }>
           results.push(out.length)
-          if (out.length > 0) expect(out[0].params.oid).toBe(oid)
-        } else if (kind === 2) {
+          if (out.length > 0) {
+            expect(out[0].params.oid).toBe(oid)
+          }
+        }
+        else if (kind === 2) {
           const uid = randInt(50_000)
           const out = (r as any).matchWithParams(
             `users[id=${uid}].profile.name`,
-          ) as Array<{ payload: string; params: Record<string, unknown> }>
+          ) as Array<{ payload: string, params: Record<string, unknown> }>
           results.push(out.length)
           // deep-маска не содержит params
-        } else {
+        }
+        else {
           const uid = randInt(50_000)
           const tid = randInt(100)
           const out = (r as any).matchWithParams(
             `users[id=${uid}].profile.tags[id=${tid}]`,
-          ) as Array<{ payload: string; params: Record<string, unknown> }>
+          ) as Array<{ payload: string, params: Record<string, unknown> }>
           results.push(out.length)
           if (out.length > 0) {
             expect(out[0].params.uid).toBe(uid)
@@ -134,18 +139,20 @@ describe('RaphRouter - бенчмарки с параметрическими п
       for (let i = 0; i < Q; i++) {
         const kind = i % 4
         let res:
-          | Array<{ payload: string; params: Record<string, unknown> }>
+          | Array<{ payload: string, params: Record<string, unknown> }>
           | undefined
 
         if (kind === 0) {
           res = (r as any).matchIncludingPrefixWithParams('FLT_ARR')
-        } else if (kind === 1) {
+        }
+        else if (kind === 1) {
           // конкретный индекс затем попадёт под legs[*] и legs[*].*
           const idx = randInt(16)
           res = (r as any).matchIncludingPrefixWithParams(
             `FLT_ARR.legs[${idx}]`,
           )
-        } else if (kind === 2) {
+        }
+        else if (kind === 2) {
           const oid = randInt(5000)
           res = (r as any).matchIncludingPrefixWithParams(`orders[id=${oid}]`)
           // должны приходить payload'ы с params.oid
@@ -156,7 +163,8 @@ describe('RaphRouter - бенчмарки с параметрическими п
               counter.cap++
             }
           }
-        } else {
+        }
+        else {
           const oid = randInt(5000)
           const iid = randInt(64)
           res = (r as any).matchIncludingPrefixWithParams(
@@ -167,7 +175,9 @@ describe('RaphRouter - бенчмарки с параметрическими п
             const withBoth = res.find(
               x => x.params && x.params.oid === oid && x.params.iid === iid,
             )
-            if (withBoth) counter.cap++
+            if (withBoth) {
+              counter.cap++
+            }
           }
         }
 
@@ -210,10 +220,10 @@ describe('RaphRouter - бенчмарки с параметрическими п
     // просто проверим, что не взорвались и что что-то матчится:
     const res1 = (r as any).matchWithParams(
       'orders[id=7].items[id=3].price',
-    ) as Array<{ payload: string; params: Record<string, unknown> }>
+    ) as Array<{ payload: string, params: Record<string, unknown> }>
     const res2 = (r as any).matchWithParams(
       'users[id=42].profile.name',
-    ) as Array<{ payload: string; params: Record<string, unknown> }>
+    ) as Array<{ payload: string, params: Record<string, unknown> }>
 
     expect(Array.isArray(res1)).toBe(true)
     expect(Array.isArray(res2)).toBe(true)

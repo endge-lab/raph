@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import type { PhaseName } from '@/domain/types/phase.types'
+import { describe, expect, it } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
-import type { PhaseName } from '@/domain/types/phase.types'
 
-describe('RaphApp track/untrack (router-based)', () => {
+describe('raphApp track/untrack (router-based)', () => {
   function makeRaphWithPhase(route: string) {
     const raph = new RaphApp()
     const fired: Array<RaphNode> = []
@@ -71,7 +71,7 @@ describe('RaphApp track/untrack (router-based)', () => {
   it('track должен добавлять один и тот же узел в несколько масок', () => {
     // фаза слушает оба маршрута, чтобы удобнее считать срабатывания
     const raph = new RaphApp()
-    const fired: Array<{ path: string; node: RaphNode }> = []
+    const fired: Array<{ path: string, node: RaphNode }> = []
 
     raph.definePhases([
       {

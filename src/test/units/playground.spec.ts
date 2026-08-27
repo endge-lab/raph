@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { SchedulerType } from '@/domain/types/base.types'
-import { RaphNode } from '@/domain/core/RaphNode'
 import { Raph } from '@/domain/core/Raph'
+import { RaphNode } from '@/domain/core/RaphNode'
 import { RaphRouter } from '@/domain/core/RaphRouter'
+import { SchedulerType } from '@/domain/types/base.types'
 
-describe('RaphApp Base', () => {
+describe('raphApp Base', () => {
   it('base', () => {
     //
     Raph.options({
@@ -30,7 +30,7 @@ describe('RaphApp Base', () => {
     // Raph.watch('FLT_ARR', () => {
     //   console.log('Watch FLT_ARR')
     // })
-    Raph.watch('FLT_ARR.legs[id=$id].*', p => {
+    Raph.watch('FLT_ARR.legs[id=$id].*', (p) => {
       console.log('Watch FLT_ARR.legs[*]')
       console.log(p)
     })
@@ -47,7 +47,9 @@ describe('RaphApp Base', () => {
 
   function expectSetEqual<T>(set: Set<T>, arr: Array<T>): void {
     expect(set.size).toBe(arr.length)
-    for (const v of arr) expect(set.has(v)).toBe(true)
+    for (const v of arr) {
+      expect(set.has(v)).toBe(true)
+    }
   }
 
   it('matches exact keys', () => {

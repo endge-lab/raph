@@ -1,19 +1,19 @@
-import { describe, it, expect, vi } from 'vitest'
-import { RaphApp } from '@/domain/core/RaphApp'
-import { SchedulerType } from '@/domain/types/base.types'
 import type {
   PhaseExecutorContext,
   PhaseName,
   RaphPhase,
 } from '@/domain/types/phase.types'
+import { describe, expect, it, vi } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
-describe('RaphApp.scheduler (microtask)', () => {
+describe('raphApp.scheduler (microtask)', () => {
   it('запускает выполнение в микротаске (не синхронно), затем выполняет each фазы', async () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Microtask })
 
-    const calls: Array<{ phase: string; node: string }> = []
+    const calls: Array<{ phase: string, node: string }> = []
 
     const phase: RaphPhase = {
       name: 'phase-1' as PhaseName,

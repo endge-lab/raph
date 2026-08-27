@@ -1,8 +1,3 @@
-import { RaphRuntime } from '@/domain/core/RaphRuntime'
-import { RaphRouter } from '@/domain/core/RaphRouter'
-import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
-import { DataPath } from '@/domain/entities/DataPath'
-import { RaphDerivedManager } from '@/domain/derived/RaphDerivedManager'
 import type { RaphDerivedHandle } from '@/domain/derived/RaphDerivedHandle'
 import type {
   DataAdapter,
@@ -11,17 +6,22 @@ import type {
   RaphProperties,
 } from '@/domain/types/base.types'
 import type {
-  RaphDataObserver,
-  RaphKernelPendingEvent,
-  RaphObserveDataOptions,
-  RaphRuntimeOptions,
-} from '@/domain/types/runtime.types'
-import type {
   RaphDerivedManagerSnapshot,
   RaphDerivedMutationKind,
   RaphDerivedMutationRecord,
   RaphDerivedOptions,
 } from '@/domain/types/derived.types'
+import type {
+  RaphDataObserver,
+  RaphKernelPendingEvent,
+  RaphObserveDataOptions,
+  RaphRuntimeOptions,
+} from '@/domain/types/runtime.types'
+import { RaphRouter } from '@/domain/core/RaphRouter'
+import { RaphRuntime } from '@/domain/core/RaphRuntime'
+import { RaphDerivedManager } from '@/domain/derived/RaphDerivedManager'
+import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
+import { DataPath } from '@/domain/entities/DataPath'
 
 /**
  * Управляет shared data-store и маршрутизацией business data events между runtime lanes.
@@ -188,12 +188,15 @@ export class RaphKernel {
         }
       }
     }
-    if (callbackError && flushError)
+    if (callbackError && flushError) {
       throw new AggregateError([callbackError, flushError], '[RaphKernel] Transaction and derived stabilization failed.')
-    if (callbackError)
+    }
+    if (callbackError) {
       throw callbackError
-    if (flushError)
+    }
+    if (flushError) {
       throw flushError
+    }
   }
 
   /**
@@ -214,8 +217,9 @@ export class RaphKernel {
     value: unknown,
     opts?: { invalidate?: boolean, vars?: Record<string, any> },
   ): void {
-    if (this._derivedManager?.size)
+    if (this._derivedManager?.size) {
       this._derivedManager.assertExternalMutationAllowed(path)
+    }
     this._dataAdapter.set(path, value, opts)
     this._recordMutation('set', path, opts)
   }
@@ -228,8 +232,9 @@ export class RaphKernel {
     value: unknown,
     opts?: { invalidate?: boolean, vars?: Record<string, any> },
   ): void {
-    if (this._derivedManager?.size)
+    if (this._derivedManager?.size) {
       this._derivedManager.assertExternalMutationAllowed(path)
+    }
     this._dataAdapter.merge(path, value, opts)
     this._recordMutation('merge', path, opts)
   }
@@ -241,8 +246,9 @@ export class RaphKernel {
     path: DataPathDef,
     opts?: { invalidate?: boolean, vars?: Record<string, any> },
   ): void {
-    if (this._derivedManager?.size)
+    if (this._derivedManager?.size) {
       this._derivedManager.assertExternalMutationAllowed(path)
+    }
     this._dataAdapter.delete(path, opts)
     this._recordMutation('delete', path, opts)
   }
@@ -254,8 +260,9 @@ export class RaphKernel {
     path: DataPathDef,
     opts?: { invalidate?: boolean, vars?: Record<string, any> },
   ): void {
-    if (this._derivedManager?.size)
+    if (this._derivedManager?.size) {
       this._derivedManager.assertExternalMutationAllowed(path)
+    }
     this._recordMutation('notify', path, opts)
   }
 
@@ -306,7 +313,9 @@ export class RaphKernel {
 
       for (const observer of observers) {
         if (observer.runtime.enqueueDataObserver(observer, pending.path, pending.opts)) {
-          if (invalidate) runtimesToInvalidate.add(observer.runtime)
+          if (invalidate) {
+            runtimesToInvalidate.add(observer.runtime)
+          }
         }
       }
 
@@ -347,8 +356,9 @@ export class RaphKernel {
 
   /** Выполняет derived fast-path и публикует events только после стабилизации. */
   private _stabilizeAndDeliver(mutations: RaphDerivedMutationRecord[]): void {
-    if (!mutations.length)
+    if (!mutations.length) {
       return
+    }
     if (!this._derivedManager?.size) {
       this._deliverEvents(mutations.map(mutation => ({
         path: mutation.originalPath,
@@ -368,10 +378,12 @@ export class RaphKernel {
         opts: record.opts,
       })))
     }
-    if (errors.length === 1)
+    if (errors.length === 1) {
       throw errors[0]
-    if (errors.length > 1)
+    }
+    if (errors.length > 1) {
       throw new AggregateError(errors, '[RaphDerived] Multiple computations failed.')
+    }
   }
 
   private _getDerivedManager(): RaphDerivedManager {

@@ -22,7 +22,7 @@ import { keyParam } from '@/utils/path'
 /**
  * Описывает тип RouterNodeWithVarName.
  */
-type RouterNodeWithVarName = {
+interface RouterNodeWithVarName {
   node: RouterNode<any>
   varName: string
 }
@@ -86,7 +86,9 @@ export class RouterNode<P> {
    */
   addParamAny(pk: string, varName: string): RouterNode<P> {
     const m = this.paramAny || (this.paramAny = Object.create(null))
-    if (!m[pk]) m[pk] = { node: new RouterNode<P>(), varName }
+    if (!m[pk]) {
+      m[pk] = { node: new RouterNode<P>(), varName }
+    }
     return m[pk].node
   }
 

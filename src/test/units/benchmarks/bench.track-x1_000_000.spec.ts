@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
@@ -39,9 +39,13 @@ describe('bench.track-x1_000_000', () => {
       const deps: Array<string> = []
       for (let d = 0; d < DEPS_PER_NODE; d++) {
         // чередуем индексы массива, свойства и параметры с wildcard
-        if (d % 3 === 0) deps.push(`data[${d % 10}].val`)
-        else if (d % 3 === 1) deps.push(`com[id="${i}"].p${d % 5}`)
-        else deps.push(`rows[id=${d}].x`)
+        if (d % 3 === 0) {
+          deps.push(`data[${d % 10}].val`)
+        }
+        else if (d % 3 === 1) {
+          deps.push(`com[id="${i}"].p${d % 5}`)
+        }
+        else { deps.push(`rows[id=${d}].x`) }
       }
       return deps
     })

@@ -43,10 +43,14 @@ export class DataPath {
    */
   static from(
     input: string | DataPath | Record<string, any>,
-    opts?: { vars?: Record<string, unknown>; wildcardDynamic?: boolean },
+    opts?: { vars?: Record<string, unknown>, wildcardDynamic?: boolean },
   ): DataPath {
-    if (input instanceof DataPath) return input
-    if (typeof input === 'string') return DataPath.fromString(input, opts)
+    if (input instanceof DataPath) {
+      return input
+    }
+    if (typeof input === 'string') {
+      return DataPath.fromString(input, opts)
+    }
     return DataPath.fromPlain(input)
   }
 
@@ -55,9 +59,11 @@ export class DataPath {
    */
   static fromString(
     path: string,
-    opts?: { vars?: Record<string, unknown>; wildcardDynamic?: boolean },
+    opts?: { vars?: Record<string, unknown>, wildcardDynamic?: boolean },
   ): DataPath {
-    if (!path) return new DataPath([])
+    if (!path) {
+      return new DataPath([])
+    }
 
     const WILDCARD = Boolean(opts?.wildcardDynamic)
 
@@ -66,7 +72,9 @@ export class DataPath {
 
     // Кэш готового DataPath
     const cached = DataPath._cacheFromString.get(path)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
 
     // Кэш сегментов
     const segsFromCache = DataPath._cacheSegments.get(path)
@@ -98,20 +106,22 @@ export class DataPath {
     wildcardDynamic: boolean,
   ): string {
     const has = (name: string) =>
-      Object.prototype.hasOwnProperty.call(vars, name)
+      Object.hasOwn(vars, name)
     const get = (name: string) => (has(name) ? vars[name] : undefined)
 
     let s = src
 
     // [key=$var]
     s = s.replace(
-      /\[([a-zA-Z_$][\w$]*)\s*=\s*(\$[a-zA-Z_$][\w$]*)\]/g,
+      /\[([a-z_$][\w$]*)\s*=\s*(\$[a-z_$][\w$]*)\]/gi,
       (_m, key, v) => {
         const name = v.slice(1)
         const val = get(name)
-        if (val === undefined) return wildcardDynamic ? '[*]' : _m
-        const rendered =
-          typeof val === 'number' || typeof val === 'boolean'
+        if (val === undefined) {
+          return wildcardDynamic ? '[*]' : _m
+        }
+        const rendered
+          = typeof val === 'number' || typeof val === 'boolean'
             ? String(val)
             : JSON.stringify(String(val))
         return `[${key}=${rendered}]`
@@ -119,10 +129,12 @@ export class DataPath {
     )
 
     // [$var]
-    s = s.replace(/\[\s*(\$[a-zA-Z_$][\w$]*)\s*\]/g, (_m, v) => {
+    s = s.replace(/\[\s*(\$[a-z_$][\w$]*)\s*\]/gi, (_m, v) => {
       const name = v.slice(1)
       const val = get(name)
-      if (typeof val === 'number' && Number.isFinite(val)) return `[${val}]`
+      if (typeof val === 'number' && Number.isFinite(val)) {
+        return `[${val}]`
+      }
       return wildcardDynamic ? '[*]' : _m
     })
 
@@ -157,12 +169,16 @@ export class DataPath {
           }
 
           if (inSingle) {
-            if (c === '\'') inSingle = false
+            if (c === '\'') {
+              inSingle = false
+            }
             i++
             continue
           }
           if (inDouble) {
-            if (c === '"') inDouble = false
+            if (c === '"') {
+              inDouble = false
+            }
             i++
             continue
           }
@@ -197,20 +213,25 @@ export class DataPath {
         // если внутри осталась "$" (любая неразрешённая переменная), то сворачиваем в [*]
         if (inner.includes('$')) {
           out += '[*]'
-        } else {
-          out += '[' + inner + ']'
+        }
+        else {
+          out += `[${inner}]`
         }
       }
       s = out
     }
 
     // $key (dot)
-    s = s.replace(/(^|\.)(\$[a-zA-Z_$][\w$]*)(?=\.|\[|$)/g, (_m, lead, v) => {
+    s = s.replace(/(^|\.)(\$[a-z_$][\w$]*)(?=\.|\[|$)/gi, (_m, lead, v) => {
       const name = v.slice(1)
       const val = get(name)
-      if (val === undefined) return wildcardDynamic ? `${lead}*` : `${lead}${v}`
+      if (val === undefined) {
+        return wildcardDynamic ? `${lead}*` : `${lead}${v}`
+      }
       const key = String(val)
-      if (!/^[a-zA-Z_$][\w$-]*$/.test(key)) return `${lead}${v}`
+      if (!/^[a-z_$][\w$-]*$/i.test(key)) {
+        return `${lead}${v}`
+      }
       return `${lead}${key}`
     })
 
@@ -241,7 +262,7 @@ export class DataPath {
           const ch = path[i]
 
           // строковые литералы
-          if (ch === '"' || ch === "'") {
+          if (ch === '"' || ch === '\'') {
             const q = ch
             sb.push(ch)
             i++
@@ -256,7 +277,9 @@ export class DataPath {
                 }
                 continue
               }
-              if (c2 === q) break
+              if (c2 === q) {
+                break
+              }
             }
             continue
           }
@@ -284,7 +307,9 @@ export class DataPath {
         }
 
         const inner = sb.join('').trim()
-        if (inner.length === 0) continue
+        if (inner.length === 0) {
+          continue
+        }
 
         // [123] - точный индекс
         if (/^\d+$/.test(inner)) {
@@ -299,19 +324,19 @@ export class DataPath {
         }
 
         // [$name] - плейсхолдер индекса
-        if (/^\$[A-Za-z_]\w*$/.test(inner)) {
+        if (/^\$[A-Z_]\w*$/i.test(inner)) {
           segs.push({ kind: SegKind.Param, pkey: '$index', pval: inner })
           continue
         }
 
         // [key=value] (value может быть с кавычками или без; key может содержать дефис)
-        const kv = inner.match(/^([a-zA-Z_$][\w\d_$-]*)\s*=\s*(.+)$/)
+        const kv = inner.match(/^([a-z_$][\w$-]*)\s*=\s*(.+)$/i)
         if (kv) {
           const pkey = kv[1]
           let rawVal = kv[2].trim()
-          const quoted =
-            (rawVal.startsWith('"') && rawVal.endsWith('"')) ||
-            (rawVal.startsWith("'") && rawVal.endsWith("'"))
+          const quoted
+            = (rawVal.startsWith('"') && rawVal.endsWith('"'))
+              || (rawVal.startsWith('\'') && rawVal.endsWith('\''))
           if (quoted) {
             if (rawVal.startsWith('"')) {
               try {
@@ -331,8 +356,8 @@ export class DataPath {
             continue
           }
 
-          const pval: ParamValue =
-            !quoted && /^\d+$/.test(rawVal) ? Number(rawVal) : rawVal
+          const pval: ParamValue
+            = !quoted && /^\d+$/.test(rawVal) ? Number(rawVal) : rawVal
           segs.push({ kind: SegKind.Param, pkey, pval })
           continue
         }
@@ -344,15 +369,21 @@ export class DataPath {
 
       // дот-сегмент до '.' или '['
       const start = i
-      while (i < n && path[i] !== '.' && path[i] !== '[') i++
+      while (i < n && path[i] !== '.' && path[i] !== '[') {
+        i++
+      }
       const raw = path.slice(start, i).trim()
-      if (raw.length === 0) continue
+      if (raw.length === 0) {
+        continue
+      }
 
       if (raw === '*') {
         segs.push({ kind: SegKind.Wildcard, asIndex: false } as any)
-      } else if (raw.startsWith('$')) {
+      }
+      else if (raw.startsWith('$')) {
         segs.push({ kind: SegKind.Key, key: raw })
-      } else {
+      }
+      else {
         segs.push({ kind: SegKind.Key, key: raw })
       }
     }
@@ -365,7 +396,9 @@ export class DataPath {
     const src = Array.isArray(plain?.segs) ? plain.segs : []
     const segs: Array<DataPathSegment> = []
     for (const s of src) {
-      if (!s || typeof s !== 'object') continue
+      if (!s || typeof s !== 'object') {
+        continue
+      }
       switch (s.t) {
         case 'key':
           segs.push({ kind: SegKind.Key, key: s.k })
@@ -393,7 +426,7 @@ export class DataPath {
 
   /** Сериализовать путь в plain-объект. */
   toPlain(): Record<string, any> {
-    const segs = this._segs.map(s => {
+    const segs = this._segs.map((s) => {
       switch (s.kind) {
         case SegKind.Key:
           return { t: 'key', k: (s as any).key }
@@ -406,20 +439,24 @@ export class DataPath {
       }
     })
     const last = this._segs[this._segs.length - 1] as any
-    const deepOnTail =
-      this._segs.length > 0 && last.kind === SegKind.Wildcard && !last.asIndex
+    const deepOnTail
+      = this._segs.length > 0 && last.kind === SegKind.Wildcard && !last.asIndex
     return { segs, deepOnTail }
   }
 
   /** Преобразовать путь в каноническую строку. */
   toStringPath(): string {
     const cached = DataPath._cacheToString.get(this)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
 
     let out = ''
     const pushDotKey = (k: string) => {
-      if (out.length === 0) out += k
-      else out += '.' + k
+      if (out.length === 0) {
+        out += k
+      }
+      else { out += `.${k}` }
     }
 
     for (let i = 0; i < this._segs.length; i++) {
@@ -436,11 +473,13 @@ export class DataPath {
           if (asIndex) {
             // индексный wildcard
             out += '[*]'
-          } else {
+          }
+          else {
             // ключевой wildcard
             if (out.length === 0 || out.endsWith(']') || out.endsWith('*')) {
               out += '*'
-            } else {
+            }
+            else {
               out += '.*'
             }
           }
@@ -481,24 +520,36 @@ export class DataPath {
         return true
       }
 
-      if (j >= t.length) return false
+      if (j >= t.length) {
+        return false
+      }
       const ts = t[j]
 
       switch (ms.kind) {
         case SegKind.Key:
-          if (ts.kind !== SegKind.Key || ts.key !== ms.key) return false
+          if (ts.kind !== SegKind.Key || ts.key !== ms.key) {
+            return false
+          }
           break
         case SegKind.Index:
-          if (ts.kind !== SegKind.Index || ts.index !== ms.index) return false
+          if (ts.kind !== SegKind.Index || ts.index !== ms.index) {
+            return false
+          }
           break
         case SegKind.Wildcard:
           // одиночный wildcard - совпадает с любым одним сегментом
           // (Key | Index | Param | Wildcard)
           break
         case SegKind.Param:
-          if (ts.kind !== SegKind.Param) return false
-          if (ts.pkey !== ms.pkey) return false
-          if (ts.pval !== ms.pval) return false
+          if (ts.kind !== SegKind.Param) {
+            return false
+          }
+          if (ts.pkey !== ms.pkey) {
+            return false
+          }
+          if (ts.pval !== ms.pval) {
+            return false
+          }
           break
       }
 

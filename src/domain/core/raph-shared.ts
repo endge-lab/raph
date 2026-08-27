@@ -1,6 +1,6 @@
 import type { RaphEventPayloads } from '@/domain/types/events.types'
-import { EventBus } from '@/utils/EventBus'
 import { RaphDebug } from '@/domain/core/RaphDebug'
+import { EventBus } from '@/utils/EventBus'
 
 /**
  * Shared Raph runtime constants and singleton diagnostics.

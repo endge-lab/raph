@@ -3,7 +3,7 @@ import type { RaphNode } from '@/domain/core/RaphNode'
 /**
  * Описывает тип GraphNode.
  */
-type GraphNode = {
+interface GraphNode {
   id: string
 }
 
@@ -33,7 +33,9 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
    */
   addNode(node: N): void {
     const id = node.id
-    if (this._nodes.has(id)) return
+    if (this._nodes.has(id)) {
+      return
+    }
     this._nodes.set(id, node)
     this._children.set(id, new Set())
     this._parents.set(id, new Set())
@@ -48,7 +50,9 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
    */
   removeNode(nodeOrId: string | N): void {
     const id = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id
-    if (!this._nodes.has(id)) return
+    if (!this._nodes.has(id)) {
+      return
+    }
 
     // удалить ребро у всех родителей
     const parents = this._parents.get(id)!
@@ -61,7 +65,9 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     for (const ch of children) {
       const ps = this._parents.get(ch)!
       ps.delete(id)
-      if (ps.size === 0) this._roots.add(ch)
+      if (ps.size === 0) {
+        this._roots.add(ch)
+      }
       this._recomputeDepthCascade(ch)
     }
 
@@ -101,8 +107,12 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
   addEdge(parent: string | N, child: string | N): boolean {
     const p = typeof parent === 'string' ? parent : parent.id
     const c = typeof child === 'string' ? child : child.id
-    if (p === c) return false
-    if (!this._nodes.has(p) || !this._nodes.has(c)) return false
+    if (p === c) {
+      return false
+    }
+    if (!this._nodes.has(p) || !this._nodes.has(c)) {
+      return false
+    }
 
     // цикл? проверяем достижимость p из c по children
     if (this._wouldCreateCycle(p, c)) {
@@ -116,7 +126,9 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
       const ps = this._parents.get(c)!
       const wasRoot = ps.size === 0
       ps.add(p)
-      if (wasRoot) this._roots.delete(c)
+      if (wasRoot) {
+        this._roots.delete(c)
+      }
       this._recomputeDepthCascade(c)
     }
     return true
@@ -132,7 +144,9 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     if (ch && ch.delete(c)) {
       const ps = this._parents.get(c)!
       ps.delete(p)
-      if (ps.size === 0) this._roots.add(c)
+      if (ps.size === 0) {
+        this._roots.add(c)
+      }
       this._recomputeDepthCascade(c)
     }
   }
@@ -145,7 +159,9 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     const out = new Set<N>()
     for (const pid of this._parents.get(id) ?? EMPTY_SET_STR) {
       const n = this._nodes.get(pid)
-      if (n) out.add(n)
+      if (n) {
+        out.add(n)
+      }
     }
     return out
   }
@@ -158,7 +174,9 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     const out = new Set<N>()
     for (const cid of this._children.get(id) ?? EMPTY_SET_STR) {
       const n = this._nodes.get(cid)
-      if (n) out.add(n)
+      if (n) {
+        out.add(n)
+      }
     }
     return out
   }
@@ -177,7 +195,9 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     const out = new Set<N>()
     for (const id of this._roots) {
       const n = this._nodes.get(id)
-      if (n) out.add(n)
+      if (n) {
+        out.add(n)
+      }
     }
     return out
   }
@@ -197,22 +217,31 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
   topoOrder(): Array<N> {
     // локальная копия степеней внутри всего графа
     const indeg = new Map<string, number>()
-    for (const id of this._nodes.keys())
-      {indeg.set(id, this._parents.get(id)!.size)}
+    for (const id of this._nodes.keys()) {
+      indeg.set(id, this._parents.get(id)!.size)
+    }
 
     // очередь вершин с inDeg=0, упорядочим по depth/weight при желании вне
     const q: Array<string> = []
-    for (const [id, d] of indeg) if (d === 0) q.push(id)
+    for (const [id, d] of indeg) {
+      if (d === 0) {
+        q.push(id)
+      }
+    }
 
     const out: Array<N> = []
     while (q.length) {
       const id = q.shift()!
       const n = this._nodes.get(id)
-      if (n) out.push(n)
+      if (n) {
+        out.push(n)
+      }
       for (const ch of this._children.get(id) ?? EMPTY_SET_STR) {
         const d = (indeg.get(ch) || 0) - 1
         indeg.set(ch, d)
-        if (d === 0) q.push(ch)
+        if (d === 0) {
+          q.push(ch)
+        }
       }
     }
 
@@ -233,7 +262,9 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     const out = new Set<N>()
 
     if (traversal === 'all') {
-      for (const n of this._nodes.values()) out.add(n)
+      for (const n of this._nodes.values()) {
+        out.add(n)
+      }
       return out
     }
 
@@ -242,15 +273,23 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     }
 
     if (traversal === 'dirty-only') {
-      for (const n of base) if (this._nodes.has(n.id)) out.add(n)
+      for (const n of base) {
+        if (this._nodes.has(n.id)) {
+          out.add(n)
+        }
+      }
       return out
     }
 
     if (traversal === 'dirty-and-down') {
       const queue: Array<string> = []
       for (const n of base) {
-        if (!this._nodes.has(n.id)) continue
-        if (!out.has(n)) out.add(n)
+        if (!this._nodes.has(n.id)) {
+          continue
+        }
+        if (!out.has(n)) {
+          out.add(n)
+        }
         queue.push(n.id)
       }
       while (queue.length) {
@@ -269,8 +308,12 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     if (traversal === 'dirty-and-up') {
       const queue: Array<string> = []
       for (const n of base) {
-        if (!this._nodes.has(n.id)) continue
-        if (!out.has(n)) out.add(n)
+        if (!this._nodes.has(n.id)) {
+          continue
+        }
+        if (!out.has(n)) {
+          out.add(n)
+        }
         queue.push(n.id)
       }
       while (queue.length) {
@@ -293,15 +336,25 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
    * Проверка цикла: существует ли путь child => ... => parent (по children-ребрам)
    */
   private _wouldCreateCycle(parentId: string, childId: string): boolean {
-    if (parentId === childId) return true
+    if (parentId === childId) {
+      return true
+    }
     const seen = new Set<string>()
     const q: Array<string> = [childId]
     while (q.length) {
       const id = q.pop()!
-      if (!seen.add(id)) continue
-      if (id === parentId) return true
+      if (!seen.add(id)) {
+        continue
+      }
+      if (id === parentId) {
+        return true
+      }
       const ch = this._children.get(id)
-      if (ch) for (const next of ch) q.push(next)
+      if (ch) {
+        for (const next of ch) {
+          q.push(next)
+        }
+      }
     }
     return false
   }
@@ -311,18 +364,24 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
    */
   private _recomputeDepthCascade(startId: string): void {
     const newDepth = this._calcDepth(startId)
-    if (newDepth === this._depth.get(startId)) return
+    if (newDepth === this._depth.get(startId)) {
+      return
+    }
     this._depth.set(startId, newDepth)
 
     const q: Array<string> = []
-    for (const ch of this._children.get(startId) ?? EMPTY_SET_STR) q.push(ch)
+    for (const ch of this._children.get(startId) ?? EMPTY_SET_STR) {
+      q.push(ch)
+    }
 
     while (q.length) {
       const id = q.pop()!
       const nd = this._calcDepth(id)
       if (nd !== this._depth.get(id)) {
         this._depth.set(id, nd)
-        for (const ch of this._children.get(id) ?? EMPTY_SET_STR) q.push(ch)
+        for (const ch of this._children.get(id) ?? EMPTY_SET_STR) {
+          q.push(ch)
+        }
       }
     }
   }
@@ -332,11 +391,15 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
    */
   private _calcDepth(id: string): number {
     const ps = this._parents.get(id)
-    if (!ps || ps.size === 0) return 0
+    if (!ps || ps.size === 0) {
+      return 0
+    }
     let maxd = 0
     for (const p of ps) {
       const d = this._depth.get(p) ?? 0
-      if (d + 1 > maxd) maxd = d + 1
+      if (d + 1 > maxd) {
+        maxd = d + 1
+      }
     }
     return maxd
   }

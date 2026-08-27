@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { DataPath } from '@/domain/entities/DataPath'
 
 function ok(mask: string, target: string): void {
@@ -8,7 +8,7 @@ function no(mask: string, target: string): void {
   expect(DataPath.match(mask, target)).toBe(false)
 }
 
-describe('DataPath.match', () => {
+describe('dataPath.match', () => {
   it('точные ключи (без wildcard)', () => {
     ok('com.x', 'com.x')
     no('com.x', 'com.y')

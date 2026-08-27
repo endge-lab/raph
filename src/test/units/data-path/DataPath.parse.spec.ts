@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { DataPath } from '@/domain/entities/DataPath'
 import { SegKind } from '@/domain/types/path.types'
 
 const kinds = (dp: DataPath) => dp.segments().map(s => s.kind)
 
-describe('DataPath.fromString / segments()', () => {
+describe('dataPath.fromString / segments()', () => {
   it('разбирает простые ключи через точку', () => {
     const dp = DataPath.from('com.x.y')
     expect(kinds(dp)).toEqual([SegKind.Key, SegKind.Key, SegKind.Key])

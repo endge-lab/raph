@@ -1,13 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { SchedulerType } from '@/domain/types/base.types'
-import { RaphApp } from '@/domain/core/RaphApp'
 import type {
   PhaseExecutorContext,
   PhaseName,
 } from '@/domain/types/phase.types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
-describe('RaphApp.scheduler-sync', () => {
+describe('raphApp.scheduler-sync', () => {
   beforeEach(() => {
     vi.useRealTimers()
   })
@@ -16,7 +16,7 @@ describe('RaphApp.scheduler-sync', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const calls: Array<{ phase: string; nodeId: string }> = []
+    const calls: Array<{ phase: string, nodeId: string }> = []
     raph.definePhases([
       {
         name: 'sync-phase' as PhaseName,
@@ -96,7 +96,7 @@ describe('RaphApp.scheduler-sync', () => {
         name: 'sync-phase' as PhaseName,
         traversal: 'dirty-and-down',
         routes: ['com.*'],
-        each: ctx => {
+        each: (ctx) => {
           seen.push(ctx.node.id)
         },
       },

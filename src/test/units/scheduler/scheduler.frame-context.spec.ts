@@ -1,10 +1,10 @@
+import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
-import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 
-describe('RaphApp frame context', () => {
+describe('raphApp frame context', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(0)
@@ -56,7 +56,7 @@ describe('RaphApp frame context', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
-    const frames: Array<{ delta: number; elapsed: number; frame: number }> = []
+    const frames: Array<{ delta: number, elapsed: number, frame: number }> = []
     raph.definePhases([
       {
         name: 'phase' as PhaseName,

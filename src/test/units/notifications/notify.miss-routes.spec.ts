@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { RaphApp } from '@/domain/core/RaphApp'
-import { SchedulerType } from '@/domain/types/base.types'
 import type { PhaseName } from '@/domain/types/phase.types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
-describe('RaphApp notify – miss routes', () => {
+describe('raphApp notify – miss routes', () => {
   let raph: RaphApp
   const execA = vi.fn()
   const execB = vi.fn()

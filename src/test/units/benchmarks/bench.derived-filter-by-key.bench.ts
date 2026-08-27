@@ -72,15 +72,17 @@ function fixture(size: number, incremental: boolean, scenario: Scenario): Filter
     strategy: incremental ? filterByKey('id') : undefined,
     compute: (rows: Array<{ id: number, value: number, visible: boolean }>) => rows
       .filter((row) => {
-        if (!row.visible)
+        if (!row.visible) {
           return false
+        }
         return scenario === 'membership-churn' ? row.value % 2 === 0 : true
       })
       .map((row) => {
         let score = row.value * 2
         if (scenario === 'cpu-heavy') {
-          for (let iteration = 0; iteration < 250; iteration++)
+          for (let iteration = 0; iteration < 250; iteration++) {
             score = Math.imul(score ^ iteration, 2654435761) >>> 0
+          }
         }
         return { id: row.id, score }
       }),
@@ -91,8 +93,9 @@ function fixture(size: number, incremental: boolean, scenario: Scenario): Filter
 function mutate(input: FilterFixture, updates: number): void {
   const epoch = input.epoch++
   input.kernel.transaction(() => {
-    for (let id = 0; id < updates; id++)
+    for (let id = 0; id < updates; id++) {
       input.kernel.set(`source[id=${id}].value`, id + epoch + 1)
+    }
   })
 }
 

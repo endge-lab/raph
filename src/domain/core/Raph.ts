@@ -1,3 +1,12 @@
+import type { RaphDebug } from '@/domain/core/RaphDebug'
+import type { RaphRuntime } from '@/domain/core/RaphRuntime'
+import type { RaphDerivedHandle } from '@/domain/derived/RaphDerivedHandle'
+import type {
+  RaphLocalConfiguration,
+  RaphLocalPhase,
+  RaphLocalPhaseContext,
+  RaphLocalPropertyDescriptor,
+} from '@/domain/local/local.types'
 import type {
   DataObject,
   DataPathDef,
@@ -9,21 +18,16 @@ import type {
   ControlFlowCallback,
   ControlFlowSubscribeOptions,
 } from '@/domain/types/control-flow.types'
+import type { RaphDerivedManagerSnapshot, RaphDerivedOptions } from '@/domain/types/derived.types'
 import type { RaphEventPayloads } from '@/domain/types/events.types'
 import type {
   PhaseExecutorContext,
   PhaseName,
   RaphPhase,
 } from '@/domain/types/phase.types'
-import type { RaphRuntimeOptions } from '@/domain/types/runtime.types'
-import type { RaphDerivedManagerSnapshot, RaphDerivedOptions } from '@/domain/types/derived.types'
-import type { RaphDerivedHandle } from '@/domain/derived/RaphDerivedHandle'
 import type { WatchCallback } from '@/domain/types/reactive.types'
-import type { RaphDebug } from '@/domain/core/RaphDebug'
+import type { RaphRuntimeOptions } from '@/domain/types/runtime.types'
 import type { EventBus } from '@/utils/EventBus'
-import { RaphApp } from '@/domain/core/RaphApp'
-import { RaphKernel } from '@/domain/core/RaphKernel'
-import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import {
   RAPH_DEBUG,
   RAPH_EVENTS,
@@ -31,6 +35,8 @@ import {
   RAPH_MAX_UPS,
   RAPH_WEIGHT_LIMIT,
 } from '@/domain/core/raph-shared'
+import { RaphApp } from '@/domain/core/RaphApp'
+import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { DataPath } from '@/domain/entities/DataPath'
 import {
@@ -38,15 +44,9 @@ import {
   extractRaphLocalPhases,
   extractRaphLocalProperties,
 } from '@/domain/local/decorators'
+import { RaphPropagation } from '@/domain/local/local.types'
 import { RaphLocalPhaseRuntime } from '@/domain/local/raph-local-phase'
 import { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
-import { RaphPropagation } from '@/domain/local/local.types'
-import type {
-  RaphLocalConfiguration,
-  RaphLocalPhase,
-  RaphLocalPhaseContext,
-  RaphLocalPropertyDescriptor,
-} from '@/domain/local/local.types'
 import { RaphEffect } from '@/domain/reactivity/RaphEffect'
 import { RaphSignal } from '@/domain/reactivity/RaphSignal'
 import { RaphWatch } from '@/domain/reactivity/RaphWatch'

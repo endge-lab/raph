@@ -35,8 +35,9 @@ export class RaphDerivedHandle implements RaphDerivedHandleContract {
   }
 
   public dispose(): void {
-    if (this.status === 'disposed')
+    if (this.status === 'disposed') {
       return
+    }
     this.node.dispose()
   }
 
@@ -60,8 +61,9 @@ export class RaphDerivedHandle implements RaphDerivedHandleContract {
   }
 
   private _requireManager(): RaphDerivedManager {
-    if (!this._manager)
+    if (!this._manager) {
       throw new RaphDerivedDisposedError(`[RaphDerived] Handle "${this.id}" is disposed.`)
+    }
     return this._manager
   }
 }

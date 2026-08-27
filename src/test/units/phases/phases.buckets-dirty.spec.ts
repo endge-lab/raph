@@ -1,28 +1,32 @@
-import { describe, it, expect, vi } from 'vitest'
-import { RaphApp } from '@/domain/core/RaphApp'
 import type {
   PhaseExecutorContext,
   PhaseName,
 } from '@/domain/types/phase.types'
+import { describe, expect, it, vi } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
 function getPhaseDirty(app: RaphApp, name: PhaseName) {
   const dirty = (app as any)._dirty as Map<
     PhaseName,
-    { buckets: Map<number, Array<RaphNode>>; heap: any; inHeap: Set<number> }
+    { buckets: Map<number, Array<RaphNode>>, heap: any, inHeap: Set<number> }
   >
   return dirty.get(name)
 }
 
 // depth=0 (без рёбер) - приоритет монотонно убывает с ростом weight.
 // Если в коде приоритет = depth*weightLimit - weight, то при depth=0 индекс = -weight.
-const findBucketIndex = (q: ReturnType<typeof getPhaseDirty>, n: RaphNode) => {
-  for (const [idx, arr] of q!.buckets) if (arr.includes(n)) return idx
+function findBucketIndex(q: ReturnType<typeof getPhaseDirty>, n: RaphNode) {
+  for (const [idx, arr] of q!.buckets) {
+    if (arr.includes(n)) {
+      return idx
+    }
+  }
   return undefined
 }
 
-describe('RaphApp.dirty-buckets (Map + MinHeap)', () => {
+describe('raphApp.dirty-buckets (Map + MinHeap)', () => {
   it('складывает ноды в buckets по индексу приоритета; heap/inHeap получают индекс бакета (lazy alloc)', () => {
     const app = new RaphApp()
     app.options({ scheduler: SchedulerType.Microtask })
@@ -237,18 +241,18 @@ describe('RaphApp.dirty-buckets (Map + MinHeap)', () => {
     const n = new RaphNode(app, { id: 'n' })
     app.addNode(n)
 
-    expect(n['__dirtyPhasesMask'] | 0).toBe(0)
+    expect(n.__dirtyPhasesMask | 0).toBe(0)
 
     const saved = app.run
     ;(app as any).run = () => {}
 
     app.dirty(PHASE, n)
-    const maskAfterDirty = n['__dirtyPhasesMask'] | 0
+    const maskAfterDirty = n.__dirtyPhasesMask | 0
     expect(maskAfterDirty).not.toBe(0)
     ;(app as any).run = saved
     app.run()
 
-    const maskAfterRun = (n as any)['__dirtyPhasesMask'] | 0
+    const maskAfterRun = (n as any).__dirtyPhasesMask | 0
     expect(maskAfterRun).toBe(0)
   })
 

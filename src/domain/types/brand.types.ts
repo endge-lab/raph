@@ -6,7 +6,7 @@ declare const __brand: unique symbol
 /**
  * Маркер бренда.
  */
-export type BrandTypes<B> = { readonly [__brand]: B }
+export interface BrandTypes<B> { readonly [__brand]: B }
 
 /**
  * Делает номинальный (opaque) тип на основе базового структурного типа.

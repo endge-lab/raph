@@ -15,22 +15,26 @@ const THRESH_BUILD_POP_MS = Number(
 const N_SMALL = 5000
 const N_MED = 100_000
 
-describe('MinHeap: бенчмарки (CI-friendly)', () => {
+describe('minHeap: бенчмарки (CI-friendly)', () => {
   it(`bench: push(${N_MED}) + pop(${N_MED}) укладывается в ${THRESH_PUSH_POP_MS}ms`, () => {
     const h = new MinHeap()
     const rng = makeLCG(2025)
 
     const t0 = performance.now()
-    for (let i = 0; i < N_MED; i++) h.push(rng() % 1_000_000 | 0)
-    for (let i = 0; i < N_MED; i++) h.pop()
+    for (let i = 0; i < N_MED; i++) {
+      h.push(rng() % 1_000_000 | 0)
+    }
+    for (let i = 0; i < N_MED; i++) {
+      h.pop()
+    }
     const t1 = performance.now()
 
     const elapsed = t1 - t0
 
     console.log(
       `[MinHeap bench] push+pop N=${N_MED}, time=${elapsed.toFixed(2)}ms, perOp=${(
-        (elapsed * 1000) /
-        (N_MED * 2)
+        (elapsed * 1000)
+        / (N_MED * 2)
       ).toFixed(2)}ns`,
     )
     expect(elapsed).toBeLessThan(THRESH_PUSH_POP_MS)
@@ -43,7 +47,9 @@ describe('MinHeap: бенчмарки (CI-friendly)', () => {
 
     const t0 = performance.now()
     h.buildFrom(arr)
-    for (let i = 0; i < N_MED; i++) h.pop()
+    for (let i = 0; i < N_MED; i++) {
+      h.pop()
+    }
     const t1 = performance.now()
 
     const elapsed = t1 - t0
@@ -66,15 +72,21 @@ describe('MinHeap: бенчмарки (CI-friendly)', () => {
     const hb = new MinHeap()
     let t0 = performance.now()
     hb.buildFrom(arr1)
-    while (!hb.empty) hb.pop()
+    while (!hb.empty) {
+      hb.pop()
+    }
     let t1 = performance.now()
     const tBuild = t1 - t0
 
     // push
     const hp = new MinHeap()
     t0 = performance.now()
-    for (let i = 0; i < arr2.length; i++) hp.push(arr2[i])
-    while (!hp.empty) hp.pop()
+    for (let i = 0; i < arr2.length; i++) {
+      hp.push(arr2[i])
+    }
+    while (!hp.empty) {
+      hp.pop()
+    }
     t1 = performance.now()
     const tPush = t1 - t0
 

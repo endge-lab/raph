@@ -6,7 +6,7 @@ function rootOf(router: RaphRouter<unknown>) {
   return (router as unknown as { _root: Record<string, unknown> })._root
 }
 
-describe('RaphRouter lifecycle', () => {
+describe('raphRouter lifecycle', () => {
   it.each([
     ['exact', 'orders.rows.name', 'orders.rows.name'],
     ['wildcard', 'orders.*.name', 'orders.any.name'],
@@ -101,8 +101,9 @@ describe('RaphRouter lifecycle', () => {
   it('bounds global DataPath string caches for unique runtime paths', () => {
     DataPath._cacheFromString.clear()
     DataPath._cacheSegments.clear()
-    for (let index = 0; index < 20_500; index++)
+    for (let index = 0; index < 20_500; index++) {
       DataPath.from(`runtime.unique${index}.value`)
+    }
 
     expect(DataPath._cacheFromString.size).toBeLessThanOrEqual(20_000)
     expect(DataPath._cacheSegments.size).toBeLessThanOrEqual(20_000)

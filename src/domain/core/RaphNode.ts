@@ -5,7 +5,7 @@ import type { PhaseName } from '@/domain/types/phase.types'
 /**
  * Описывает тип RaphNodeOptions.
  */
-type RaphNodeOptions = {
+interface RaphNodeOptions {
   id?: string
   weight?: number
   meta?: Record<string, unknown>
@@ -15,14 +15,14 @@ type RaphNodeOptions = {
 /**
  * Описывает тип RaphAddChildOptions.
  */
-type RaphAddChildOptions = {
+interface RaphAddChildOptions {
   invalidate?: boolean
 }
 
 /**
  * Описывает тип RaphLocalApi.
  */
-type RaphLocalApi<P extends RaphProperties> = {
+interface RaphLocalApi<P extends RaphProperties> {
   get: <K extends keyof P>(key: K) => P[K]
   set: <K extends keyof P>(key: K, value: P[K]) => void
 }

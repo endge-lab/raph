@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 
-describe('RaphRouter memory cleanup', () => {
+describe('raphRouter memory cleanup', () => {
   it('releases an untracked payload and its callback', async () => {
     const refs = registerThenRemovePayload()
     await collectGarbage()
@@ -70,9 +70,13 @@ function runUniqueRouteCycle(count: number, cycle: number): void {
 async function collectGarbage(): Promise<void> {
   const gc = (globalThis as { gc?: () => void }).gc
   for (let pass = 0; pass < 20; pass++) {
-    if (typeof gc === 'function') gc()
+    if (typeof gc === 'function') {
+      gc()
+    }
     const pressure = new Array(10_000).fill(pass)
-    if (pressure.length === 0) throw new Error('unreachable')
+    if (pressure.length === 0) {
+      throw new Error('unreachable')
+    }
     await new Promise(resolve => setTimeout(resolve, 0))
   }
 }

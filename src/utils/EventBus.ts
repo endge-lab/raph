@@ -41,7 +41,7 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
    * @param predefinedEvents Предопределённые события, для которых заранее создаются записи в карте.
    */
   constructor(predefinedEvents: Array<keyof StaticEvents> = []) {
-    predefinedEvents.forEach(event => {
+    predefinedEvents.forEach((event) => {
       this.listeners.set(event as string, new Set())
     })
   }
@@ -123,7 +123,9 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
    */
   emit(event: string, payload?: any): void {
     const callbacks = this.listeners.get(event)
-    if (!callbacks) return
+    if (!callbacks) {
+      return
+    }
     for (const cb of callbacks) {
       cb(payload)
     }
@@ -160,7 +162,8 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
   clear(event?: string): void {
     if (event) {
       this.listeners.get(event)?.clear()
-    } else {
+    }
+    else {
       this.listeners.clear()
     }
   }
@@ -170,7 +173,7 @@ export class EventBus<StaticEvents extends Record<string, any> = {}> {
 /**
  * Описывает тип GlobalEvents.
  */
-export type GlobalEvents = {
+export interface GlobalEvents {
   // Единая точка всех асинхронных UI-сообщений.
   notify: {
     severity: 'success' | 'error' | 'info' | 'warn'

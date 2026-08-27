@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { DataPath } from '@/domain/entities/DataPath'
 import { SegKind } from '@/domain/types/path.types'
 
@@ -18,7 +18,7 @@ function roundTripString(s: string): void {
   )
 }
 
-describe('DataPath.toStringPath / toPlain (сериализация)', () => {
+describe('dataPath.toStringPath / toPlain (сериализация)', () => {
   it('string round‑trip: простая точечная нотация', () => {
     roundTripString('com.x.y')
   })
@@ -40,7 +40,7 @@ describe('DataPath.toStringPath / toPlain (сериализация)', () => {
   it('string round‑trip: параметры с числами и кавычками', () => {
     roundTripString('com[id=10].x')
     roundTripString('n[name="foo"].v')
-    roundTripString("n[name='bar'].v")
+    roundTripString('n[name=\'bar\'].v')
   })
 
   it('toPlain / fromPlain round‑trip сохраняет структуру и флаг deep', () => {

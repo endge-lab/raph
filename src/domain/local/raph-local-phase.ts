@@ -1,11 +1,11 @@
 import type { RaphNode } from '@/domain/core/RaphNode'
-import type { RaphFrameContext, RaphProperties } from '@/domain/types/base.types'
 import type {
   RaphLocalNodeCallback,
   RaphLocalPhaseMode,
   RaphLocalPhaseRunner,
 } from '@/domain/local/local.types'
 import type { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
+import type { RaphFrameContext, RaphProperties } from '@/domain/types/base.types'
 
 /**
  * Хранит runtime-описание local phase и правила ее выполнения.

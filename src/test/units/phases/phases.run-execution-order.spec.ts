@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { SchedulerType } from '@/domain/types/base.types'
-import { RaphApp } from '@/domain/core/RaphApp'
-import { RaphNode } from '@/domain/core/RaphNode'
 import type {
   PhaseExecutorContext,
   PhaseName,
 } from '@/domain/types/phase.types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
+import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
 /**
  * В этом наборе проверяется порядок выполнения:
@@ -14,12 +14,12 @@ import type {
  * 3) Поведение traversal: 'dirty-only' | 'dirty-and-down' | 'dirty-and-up' | 'all'
  */
 
-describe('RaphApp.run - порядок выполнения', () => {
+describe('raphApp.run - порядок выполнения', () => {
   beforeEach(() => {
     vi.useRealTimers()
   })
 
-  it('Порядок выполнения фаз строго по порядку definePhases', () => {
+  it('порядок выполнения фаз строго по порядку definePhases', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 

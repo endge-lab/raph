@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { RaphApp } from '@/domain/core/RaphApp'
-import { RaphNode } from '@/domain/core/RaphNode'
-import { SchedulerType } from '@/domain/types/base.types'
 import type {
   PhaseExecutorContext,
   PhaseName,
 } from '@/domain/types/phase.types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
+import { RaphNode } from '@/domain/core/RaphNode'
+import { SchedulerType } from '@/domain/types/base.types'
 
 /**
  *
@@ -35,7 +35,7 @@ function makeTree(raph: RaphApp) {
   return { A, B, C, D, E, F }
 }
 
-describe('RaphApp.traversal', () => {
+describe('raphApp.traversal', () => {
   beforeEach(() => {
     vi.useRealTimers()
   })

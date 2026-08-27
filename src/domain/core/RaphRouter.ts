@@ -1,7 +1,7 @@
-import { DataPath } from '@/domain/entities/DataPath'
-import { RouterNode } from '@/domain/core/raph-router-node'
 import type { DataPathDef, MatchParams } from '@/domain/types/base.types'
 import type { DataPathSegment } from '@/domain/types/path.types'
+import { RouterNode } from '@/domain/core/raph-router-node'
+import { DataPath } from '@/domain/entities/DataPath'
 import { SegKind } from '@/domain/types/path.types'
 import { keyIndex, keyLiteralStr, keyParam } from '@/utils/path'
 
@@ -18,8 +18,8 @@ export class RaphRouter<P = string> {
 
   // --- Caches ---
   private _segCache = new Map<string, ReturnType<DataPath['segments']>>()
-  private _matchCache = new Map<string, { v: number; res: Set<P> }>()
-  private _prefixCache = new Map<string, { v: number; res: Set<P> }>() // cache for collectByPrefix
+  private _matchCache = new Map<string, { v: number, res: Set<P> }>()
+  private _prefixCache = new Map<string, { v: number, res: Set<P> }>() // cache for collectByPrefix
 
   private static readonly MAX_SEG_CACHE = 20_000
   private static readonly MAX_MATCH_CACHE = 50_000
@@ -32,7 +32,9 @@ export class RaphRouter<P = string> {
    * Выполняет внутреннюю операцию to key.
    */
   private _toKey(dp: DataPathDef): string {
-    if (typeof dp === 'string') return dp
+    if (typeof dp === 'string') {
+      return dp
+    }
     return DataPath.from(dp).toStringPath()
   }
 
@@ -42,9 +44,13 @@ export class RaphRouter<P = string> {
   private _getSegs(input: DataPathDef): ReadonlyArray<DataPathSegment> {
     const key = this._toKey(input)
     const hit = this._segCache.get(key)
-    if (hit) return hit
+    if (hit) {
+      return hit
+    }
     const segs = DataPath.from(key).segments()
-    if (this._segCache.size >= RaphRouter.MAX_SEG_CACHE) this._segCache.clear()
+    if (this._segCache.size >= RaphRouter.MAX_SEG_CACHE) {
+      this._segCache.clear()
+    }
     this._segCache.set(key, segs)
     return segs
   }
@@ -54,7 +60,9 @@ export class RaphRouter<P = string> {
    */
   private _cacheMatchRead(pathKey: string): Set<P> | null {
     const c = this._matchCache.get(pathKey)
-    if (!c || c.v !== this._version) return null
+    if (!c || c.v !== this._version) {
+      return null
+    }
     return c.res
   }
 
@@ -62,8 +70,9 @@ export class RaphRouter<P = string> {
    * Выполняет внутреннюю операцию cache match write.
    */
   private _cacheMatchWrite(pathKey: string, res: Set<P>): void {
-    if (this._matchCache.size > RaphRouter.MAX_MATCH_CACHE)
-      {this._matchCache.clear()}
+    if (this._matchCache.size > RaphRouter.MAX_MATCH_CACHE) {
+      this._matchCache.clear()
+    }
     this._matchCache.set(pathKey, { v: this._version, res })
   }
 
@@ -72,7 +81,9 @@ export class RaphRouter<P = string> {
    */
   private _cachePrefixRead(pathKey: string): Set<P> | null {
     const c = this._prefixCache.get(pathKey)
-    if (!c || c.v !== this._version) return null
+    if (!c || c.v !== this._version) {
+      return null
+    }
     return c.res
   }
 
@@ -80,8 +91,9 @@ export class RaphRouter<P = string> {
    * Выполняет внутреннюю операцию cache prefix write.
    */
   private _cachePrefixWrite(pathKey: string, res: Set<P>): void {
-    if (this._prefixCache.size > RaphRouter.MAX_PREFIX_CACHE)
-      {this._prefixCache.clear()}
+    if (this._prefixCache.size > RaphRouter.MAX_PREFIX_CACHE) {
+      this._prefixCache.clear()
+    }
     this._prefixCache.set(pathKey, { v: this._version, res })
   }
 
@@ -112,9 +124,13 @@ export class RaphRouter<P = string> {
 
   private _forgetMask(payload: P, mask: string): void {
     const masks = this._payloadMasks.get(payload)
-    if (!masks) return
+    if (!masks) {
+      return
+    }
     masks.delete(mask)
-    if (masks.size === 0) this._payloadMasks.delete(payload)
+    if (masks.size === 0) {
+      this._payloadMasks.delete(payload)
+    }
   }
 
   private _isEmpty(node: RouterNode<P>): boolean {
@@ -127,8 +143,9 @@ export class RaphRouter<P = string> {
   }
 
   private _rememberBranch(container: object, existed: boolean): void {
-    if (!existed)
+    if (!existed) {
       this._branchSizes.set(container, (this._branchSizes.get(container) ?? 0) + 1)
+    }
   }
 
   private _forgetBranch(container: object): boolean {
@@ -154,17 +171,23 @@ export class RaphRouter<P = string> {
   ): void {
     for (let i = stack.length - 1; i > 0; i--) {
       const current = stack[i]
-      if (!this._isEmpty(current.node)) break
+      if (!this._isEmpty(current.node)) {
+        break
+      }
       const parent = stack[i - 1].node
       const via = current.via!
 
       if (via.typ === 'exact' && parent.exact) {
         const container = parent.exact
         delete parent.exact[via.key!]
-        if (this._forgetBranch(container)) parent.exact = null
-      } else if (via.typ === 'wc') {
+        if (this._forgetBranch(container)) {
+          parent.exact = null
+        }
+      }
+      else if (via.typ === 'wc') {
         parent.wc = null
-      } else if (via.typ === 'param' && parent.param) {
+      }
+      else if (via.typ === 'param' && parent.param) {
         const bucket = parent.param[via.pk!]
         if (bucket) {
           const bucketIsEmpty = this._forgetBranch(bucket)
@@ -172,13 +195,18 @@ export class RaphRouter<P = string> {
           if (bucketIsEmpty) {
             const params = parent.param
             delete params[via.pk!]
-            if (this._forgetBranch(params)) parent.param = null
+            if (this._forgetBranch(params)) {
+              parent.param = null
+            }
           }
         }
-      } else if (via.typ === 'paramAny' && parent.paramAny) {
+      }
+      else if (via.typ === 'paramAny' && parent.paramAny) {
         const container = parent.paramAny
         delete parent.paramAny[via.pk!]
-        if (this._forgetBranch(container)) parent.paramAny = null
+        if (this._forgetBranch(container)) {
+          parent.paramAny = null
+        }
       }
     }
   }
@@ -237,7 +265,8 @@ export class RaphRouter<P = string> {
             const existed = parent.paramAny?.[pk] != null
             node = parent.addParamAny(pk, varName)
             this._rememberBranch(parent.paramAny!, existed)
-          } else {
+          }
+          else {
             const parent = node
             const pk = s.pkey!
             const pvKey = keyParam(pk, s.pval!)
@@ -259,8 +288,12 @@ export class RaphRouter<P = string> {
   /** Снять payload из всех узлов роутера (и deep, и end). */
   removePayload(payload: P): void {
     const masks = this._payloadMasks.get(payload)
-    if (!masks) return
-    for (const mask of [...masks]) this.remove(mask, payload)
+    if (!masks) {
+      return
+    }
+    for (const mask of [...masks]) {
+      this.remove(mask, payload)
+    }
   }
 
   /** Возвращает snapshot живых canonical masks, принадлежащих payload. */
@@ -295,10 +328,16 @@ export class RaphRouter<P = string> {
           const changed = payload === undefined
             ? node.deep.size > 0
             : node.deep.delete(payload)
-          if (payload === undefined) node.deep.clear()
-          if (node.deep.size === 0) node.deep = null
+          if (payload === undefined) {
+            node.deep.clear()
+          }
+          if (node.deep.size === 0) {
+            node.deep = null
+          }
           if (changed) {
-            for (const item of removed) this._forgetMask(item, canonicalMask)
+            for (const item of removed) {
+              this._forgetMask(item, canonicalMask)
+            }
             this._prune(stack)
             this._bumpVersion()
           }
@@ -309,31 +348,45 @@ export class RaphRouter<P = string> {
       if (s.kind === SegKind.Key) {
         const key = keyLiteralStr(s.key!)
         const next = node.exact?.[key]
-        if (!next) return
+        if (!next) {
+          return
+        }
         stack.push({ node: next, via: { typ: 'exact', key } })
         node = next
-      } else if (s.kind === SegKind.Index) {
+      }
+      else if (s.kind === SegKind.Index) {
         const key = keyIndex(s.index!)
         const next = node.exact?.[key]
-        if (!next) return
+        if (!next) {
+          return
+        }
         stack.push({ node: next, via: { typ: 'exact', key } })
         node = next
-      } else if (s.kind === SegKind.Wildcard) {
+      }
+      else if (s.kind === SegKind.Wildcard) {
         const next = node.wc
-        if (!next) return
+        if (!next) {
+          return
+        }
         stack.push({ node: next, via: { typ: 'wc' } })
         node = next
-      } else {
+      }
+      else {
         const pk = s.pkey!
         if (typeof s.pval === 'string' && s.pval.startsWith('$')) {
           const next = node.paramAny?.[pk]?.node
-          if (!next) return
+          if (!next) {
+            return
+          }
           stack.push({ node: next, via: { typ: 'paramAny', pk } })
           node = next
-        } else {
+        }
+        else {
           const pvKey = keyParam(pk, s.pval!)
           const next = node.param?.[pk]?.[pvKey]
-          if (!next) return
+          if (!next) {
+            return
+          }
           stack.push({ node: next, via: { typ: 'param', pk, pvKey } })
           node = next
         }
@@ -345,10 +398,16 @@ export class RaphRouter<P = string> {
       const changed = payload === undefined
         ? node.end.size > 0
         : node.end.delete(payload)
-      if (payload === undefined) node.end.clear()
-      if (node.end.size === 0) node.end = null
+      if (payload === undefined) {
+        node.end.clear()
+      }
+      if (node.end.size === 0) {
+        node.end = null
+      }
       if (changed) {
-        for (const item of removed) this._forgetMask(item, canonicalMask)
+        for (const item of removed) {
+          this._forgetMask(item, canonicalMask)
+        }
         this._prune(stack)
         this._bumpVersion()
       }
@@ -367,22 +426,32 @@ export class RaphRouter<P = string> {
   match(path: DataPathDef): Set<P> {
     const pathKey = this._toKey(path)
     const cached = this._cacheMatchRead(pathKey)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
 
     const segs = this._getSegs(path)
     const out = new Set<P>()
 
-    type Frame = { node: RouterNode<P>; i: number }
+    interface Frame { node: RouterNode<P>, i: number }
     const stack: Array<Frame> = [{ node: this._root, i: 0 }]
 
     while (stack.length) {
       const { node, i } = stack.pop()!
 
       // deep-payload: валидны для любого хвоста (включая пустой)
-      if (node.deep) for (const p of node.deep) out.add(p)
+      if (node.deep) {
+        for (const p of node.deep) {
+          out.add(p)
+        }
+      }
 
       if (i === segs.length) {
-        if (node.end) for (const p of node.end) out.add(p)
+        if (node.end) {
+          for (const p of node.end) {
+            out.add(p)
+          }
+        }
         continue
       }
 
@@ -392,10 +461,15 @@ export class RaphRouter<P = string> {
       if (node.exact) {
         if (s.kind === SegKind.Key) {
           const nx = node.exact[keyLiteralStr(s.key!)]
-          if (nx) stack.push({ node: nx, i: i + 1 })
-        } else if (s.kind === SegKind.Index) {
+          if (nx) {
+            stack.push({ node: nx, i: i + 1 })
+          }
+        }
+        else if (s.kind === SegKind.Index) {
           const nx = node.exact[keyIndex(s.index!)]
-          if (nx) stack.push({ node: nx, i: i + 1 })
+          if (nx) {
+            stack.push({ node: nx, i: i + 1 })
+          }
         }
         // Param / Wildcard цели не появляются в exact-ветке
       }
@@ -411,7 +485,9 @@ export class RaphRouter<P = string> {
         const bucket = node.param[s.pkey!]
         if (bucket) {
           const nx = bucket[keyParam(s.pkey!, s.pval!)]
-          if (nx) stack.push({ node: nx, i: i + 1 })
+          if (nx) {
+            stack.push({ node: nx, i: i + 1 })
+          }
         }
       }
 
@@ -427,7 +503,7 @@ export class RaphRouter<P = string> {
 
       // внутри while-stack цикла, после блока node.paramAny && s.kind===Param:
       if (node.paramAny && s.kind === SegKind.Index) {
-        const anyEntry = node.paramAny['$index']
+        const anyEntry = node.paramAny.$index
         if (anyEntry) {
           stack.push({ node: anyEntry.node, i: i + 1 })
         }
@@ -443,23 +519,27 @@ export class RaphRouter<P = string> {
    */
   matchWithParams(
     path: DataPathDef,
-  ): Array<{ payload: P; params: MatchParams }> {
+  ): Array<{ payload: P, params: MatchParams }> {
     const segs = this._getSegs(path)
-    type Frame = { node: RouterNode<P>; i: number; caps: MatchParams }
+    interface Frame { node: RouterNode<P>, i: number, caps: MatchParams }
     const stack: Array<Frame> = [{ node: this._root, i: 0, caps: {} }]
-    const out: Array<{ payload: P; params: MatchParams }> = []
+    const out: Array<{ payload: P, params: MatchParams }> = []
 
     while (stack.length) {
       const { node, i, caps } = stack.pop()!
 
       // deep-payload: валидны для любого хвоста
       if (node.deep) {
-        for (const p of node.deep) out.push({ payload: p, params: caps })
+        for (const p of node.deep) {
+          out.push({ payload: p, params: caps })
+        }
       }
 
       if (i === segs.length) {
         if (node.end) {
-          for (const p of node.end) out.push({ payload: p, params: caps })
+          for (const p of node.end) {
+            out.push({ payload: p, params: caps })
+          }
         }
         continue
       }
@@ -470,10 +550,15 @@ export class RaphRouter<P = string> {
       if (node.exact) {
         if (s.kind === SegKind.Key) {
           const nx = node.exact[keyLiteralStr(s.key!)]
-          if (nx) stack.push({ node: nx, i: i + 1, caps })
-        } else if (s.kind === SegKind.Index) {
+          if (nx) {
+            stack.push({ node: nx, i: i + 1, caps })
+          }
+        }
+        else if (s.kind === SegKind.Index) {
           const nx = node.exact[keyIndex(s.index!)]
-          if (nx) stack.push({ node: nx, i: i + 1, caps })
+          if (nx) {
+            stack.push({ node: nx, i: i + 1, caps })
+          }
         }
       }
 
@@ -487,7 +572,9 @@ export class RaphRouter<P = string> {
         const bucket = node.param[s.pkey!]
         if (bucket) {
           const nx = bucket[keyParam(s.pkey!, s.pval!)]
-          if (nx) stack.push({ node: nx, i: i + 1, caps })
+          if (nx) {
+            stack.push({ node: nx, i: i + 1, caps })
+          }
         }
       }
 
@@ -503,7 +590,7 @@ export class RaphRouter<P = string> {
       }
 
       if (node.paramAny && s.kind === SegKind.Index) {
-        const anyEntry = node.paramAny['$index']
+        const anyEntry = node.paramAny.$index
         if (anyEntry) {
           const nextCaps = { ...caps, [anyEntry.varName]: s.index }
           stack.push({ node: anyEntry.node, i: i + 1, caps: nextCaps })
@@ -521,13 +608,18 @@ export class RaphRouter<P = string> {
   matchIncludingPrefix(path: DataPathDef): Set<P> {
     const exact = this.match(path)
     const below = this.collectByPrefix(path)
-    if (below.size === 0) return exact
+    if (below.size === 0) {
+      return exact
+    }
     const out = new Set<P>(exact)
-    for (const p of below) out.add(p)
+    for (const p of below) {
+      out.add(p)
+    }
     return out
   }
 
-  /** Объединённый режим с параметрами:
+  /**
+   * Объединённый режим с параметрами:
    *  - точный матч по path (как matchWithParams)
    *  - плюс все подписки, лежащие "ниже" этого префикса.
    *  Переменные ($var), встреченные по пути до узла префикса, попадают в params.
@@ -535,13 +627,13 @@ export class RaphRouter<P = string> {
    */
   matchIncludingPrefixWithParams(
     path: DataPathDef,
-  ): Array<{ payload: P; params: Record<string, unknown> }> {
+  ): Array<{ payload: P, params: Record<string, unknown> }> {
     const segs = this._getSegs(path)
 
     // --- 1) exact-путь: как matchWithParams (упрощённо, без кэша - обычно это недорогая часть)
-    const exact: Array<{ payload: P; params: Record<string, unknown> }> = []
+    const exact: Array<{ payload: P, params: Record<string, unknown> }> = []
     {
-      type Frame = {
+      interface Frame {
         node: RouterNode<P>
         i: number
         params: Record<string, unknown>
@@ -553,14 +645,16 @@ export class RaphRouter<P = string> {
 
         // deep: всегда валидны (включая пустой хвост)
         if (node.deep) {
-          for (const p of node.deep)
-            {exact.push({ payload: p, params: { ...params } })}
+          for (const p of node.deep) {
+            exact.push({ payload: p, params: { ...params } })
+          }
         }
 
         if (i === segs.length) {
           if (node.end) {
-            for (const p of node.end)
-              {exact.push({ payload: p, params: { ...params } })}
+            for (const p of node.end) {
+              exact.push({ payload: p, params: { ...params } })
+            }
           }
           continue
         }
@@ -571,10 +665,15 @@ export class RaphRouter<P = string> {
         if (node.exact) {
           if (s.kind === SegKind.Key) {
             const nx = node.exact[keyLiteralStr(s.key!)]
-            if (nx) stack.push({ node: nx, i: i + 1, params })
-          } else if (s.kind === SegKind.Index) {
+            if (nx) {
+              stack.push({ node: nx, i: i + 1, params })
+            }
+          }
+          else if (s.kind === SegKind.Index) {
             const nx = node.exact[keyIndex(s.index!)]
-            if (nx) stack.push({ node: nx, i: i + 1, params })
+            if (nx) {
+              stack.push({ node: nx, i: i + 1, params })
+            }
           }
         }
 
@@ -588,7 +687,9 @@ export class RaphRouter<P = string> {
           const bucket = node.param[s.pkey!]
           if (bucket) {
             const nx = bucket[keyParam(s.pkey!, s.pval!)]
-            if (nx) stack.push({ node: nx, i: i + 1, params })
+            if (nx) {
+              stack.push({ node: nx, i: i + 1, params })
+            }
           }
         }
 
@@ -602,7 +703,7 @@ export class RaphRouter<P = string> {
         }
 
         if (node.paramAny && s.kind === SegKind.Index) {
-          const entry = node.paramAny['$index']
+          const entry = node.paramAny.$index
           if (entry) {
             const cap = { ...params, [entry.varName]: s.index }
             stack.push({ node: entry.node, i: i + 1, params: cap })
@@ -613,11 +714,11 @@ export class RaphRouter<P = string> {
 
     // --- 2) префикс: спуститься по segs до всех возможных узлов и собрать всё "ниже"
     //      (с унаследованными params, которые мы могли захватить по дороге)
-    const below: Array<{ payload: P; params: Record<string, unknown> }> = []
+    const below: Array<{ payload: P, params: Record<string, unknown> }> = []
 
-    type Seed = { node: RouterNode<P>; params: Record<string, unknown> }
+    interface Seed { node: RouterNode<P>, params: Record<string, unknown> }
     const seeds: Array<Seed> = (() => {
-      type Frame = {
+      interface Frame {
         node: RouterNode<P>
         i: number
         params: Record<string, unknown>
@@ -637,10 +738,15 @@ export class RaphRouter<P = string> {
         if (node.exact) {
           if (s.kind === SegKind.Key) {
             const nx = node.exact[keyLiteralStr(s.key!)]
-            if (nx) start.push({ node: nx, i: i + 1, params })
-          } else if (s.kind === SegKind.Index) {
+            if (nx) {
+              start.push({ node: nx, i: i + 1, params })
+            }
+          }
+          else if (s.kind === SegKind.Index) {
             const nx = node.exact[keyIndex(s.index!)]
-            if (nx) start.push({ node: nx, i: i + 1, params })
+            if (nx) {
+              start.push({ node: nx, i: i + 1, params })
+            }
           }
         }
 
@@ -655,7 +761,9 @@ export class RaphRouter<P = string> {
           const bucket = node.param[s.pkey!]
           if (bucket) {
             const nx = bucket[keyParam(s.pkey!, s.pval!)]
-            if (nx) start.push({ node: nx, i: i + 1, params })
+            if (nx) {
+              start.push({ node: nx, i: i + 1, params })
+            }
           }
         }
 
@@ -670,7 +778,7 @@ export class RaphRouter<P = string> {
 
         // индекс-плейсхолдер [$var] - тоже должен проходить и захватывать
         if (node.paramAny && s.kind === SegKind.Index) {
-          const entry = node.paramAny['$index']
+          const entry = node.paramAny.$index
           if (entry) {
             const cap = { ...params, [entry.varName]: s.index }
             start.push({ node: entry.node, i: i + 1, params: cap })
@@ -691,18 +799,22 @@ export class RaphRouter<P = string> {
         const { node, params } = stack.pop()!
 
         if (node.deep) {
-          for (const p of node.deep)
-            {below.push({ payload: p, params: { ...params } })}
+          for (const p of node.deep) {
+            below.push({ payload: p, params: { ...params } })
+          }
         }
         if (node.end) {
-          for (const p of node.end)
-            {below.push({ payload: p, params: { ...params } })}
+          for (const p of node.end) {
+            below.push({ payload: p, params: { ...params } })
+          }
         }
 
         if (node.exact) {
           for (const k in node.exact) {
             const child = node.exact[k]
-            if (child) stack.push({ node: child, params })
+            if (child) {
+              stack.push({ node: child, params })
+            }
           }
         }
         if (node.wc) {
@@ -714,7 +826,9 @@ export class RaphRouter<P = string> {
             if (bucket) {
               for (const pv in bucket) {
                 const child = bucket[pv]
-                if (child) stack.push({ node: child, params })
+                if (child) {
+                  stack.push({ node: child, params })
+                }
               }
             }
           }
@@ -734,10 +848,10 @@ export class RaphRouter<P = string> {
 
     // --- 3) слить exact + below и убрать дубликаты
     const seen = new Map<P, Set<string>>() // payload (по ссылке) -> множество строк params
-    const out: Array<{ payload: P; params: Record<string, unknown> }> = []
+    const out: Array<{ payload: P, params: Record<string, unknown> }> = []
 
     const pushUnique = (
-      arr: Array<{ payload: P; params: Record<string, unknown> }>,
+      arr: Array<{ payload: P, params: Record<string, unknown> }>,
     ) => {
       for (const e of arr) {
         const paramsKey = JSON.stringify(e.params ?? {})
@@ -769,7 +883,9 @@ export class RaphRouter<P = string> {
   collectByPrefix(prefix: DataPathDef): Set<P> {
     const pathKey = this._toKey(prefix)
     const cached = this._cachePrefixRead(pathKey)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
 
     const segs = this._getSegs(prefix)
 
@@ -777,17 +893,22 @@ export class RaphRouter<P = string> {
     let node: RouterNode<P> | null = this._root
 
     for (let i = 0; i < segs.length; i++) {
-      if (!node) break
+      if (!node) {
+        break
+      }
       const s = segs[i]
 
       if (s.kind === SegKind.Key) {
         node = node.exact?.[keyLiteralStr(s.key!)] ?? null
-      } else if (s.kind === SegKind.Index) {
+      }
+      else if (s.kind === SegKind.Index) {
         node = node.exact?.[keyIndex(s.index!)] ?? null
-      } else if (s.kind === SegKind.Param) {
+      }
+      else if (s.kind === SegKind.Param) {
         const bucket: Record<string, RouterNode<P>> | undefined = node.param?.[s.pkey!]
         node = bucket ? (bucket[keyParam(s.pkey!, s.pval!)] ?? null) : null
-      } else {
+      }
+      else {
         // В префиксе (конкретном пути) wildcard не должен встречаться.
         // Если встретился - префикс неопределён; возвращаем пусто.
         node = null
@@ -806,23 +927,37 @@ export class RaphRouter<P = string> {
 
     while (stack.length) {
       const n = stack.pop()!
-      if (n.deep) for (const p of n.deep) out.add(p)
-      if (n.end) for (const p of n.end) out.add(p)
+      if (n.deep) {
+        for (const p of n.deep) {
+          out.add(p)
+        }
+      }
+      if (n.end) {
+        for (const p of n.end) {
+          out.add(p)
+        }
+      }
 
       if (n.exact) {
         for (const k in n.exact) {
           const child = n.exact[k]
-          if (child) stack.push(child)
+          if (child) {
+            stack.push(child)
+          }
         }
       }
-      if (n.wc) stack.push(n.wc)
+      if (n.wc) {
+        stack.push(n.wc)
+      }
       if (n.param) {
         for (const pk in n.param) {
           const bucket = n.param[pk]
           if (bucket) {
             for (const pv in bucket) {
               const child = bucket[pv]
-              if (child) stack.push(child)
+              if (child) {
+                stack.push(child)
+              }
             }
           }
         }

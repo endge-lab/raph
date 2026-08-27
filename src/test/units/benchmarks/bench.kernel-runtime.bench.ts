@@ -1,18 +1,18 @@
+import type { PhaseExecutorContext, PhaseName, RaphPhase } from '@/domain/types/phase.types'
 import { bench, describe } from 'vitest'
+import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
-import { RaphApp } from '@/domain/core/RaphApp'
+import { RaphPropagation } from '@/domain/local/local.types'
 import { RaphLocalPhaseRuntime } from '@/domain/local/raph-local-phase'
 import { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
-import { RaphPropagation } from '@/domain/local/local.types'
 import { SchedulerType } from '@/domain/types/base.types'
-import type { PhaseExecutorContext, PhaseName, RaphPhase } from '@/domain/types/phase.types'
 
-type LocalProps = {
+interface LocalProps {
   value: number
 }
 
-describe('Raph kernel/runtime lane benchmarks', () => {
+describe('raph kernel/runtime lane benchmarks', () => {
   const benchOptions = {
     iterations: 5,
     warmupIterations: 1,

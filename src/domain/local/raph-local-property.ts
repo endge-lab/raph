@@ -1,6 +1,6 @@
 import type { RaphNode } from '@/domain/core/RaphNode'
+import type { RaphLocalPropertyCompute, RaphPropagation } from '@/domain/local/local.types'
 import type { RaphProperties } from '@/domain/types/base.types'
-import type { RaphPropagation , RaphLocalPropertyCompute } from '@/domain/local/local.types'
 
 /**
  * Хранит runtime-описание local property и способ ее вычисления.
