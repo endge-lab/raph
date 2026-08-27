@@ -330,7 +330,7 @@ export class DataPath {
         }
 
         // [key=value] (value может быть с кавычками или без; key может содержать дефис)
-        const kv = inner.match(/^([a-z_$][\w$-]*)\s*=\s*(.+)$/i)
+        const kv = inner.match(/^([a-z_$][\w$-]*)\s*=(.+)$/i)
         if (kv) {
           const pkey = kv[1]
           let rawVal = kv[2].trim()
@@ -437,6 +437,7 @@ export class DataPath {
         case SegKind.Param:
           return { t: 'param', pk: (s as any).pkey, pv: (s as any).pval }
       }
+      return undefined
     })
     const last = this._segs[this._segs.length - 1] as any
     const deepOnTail

@@ -117,6 +117,7 @@ describe('raph derived errors', () => {
       id: 'bad-b',
       from: 'source',
       to: 'bad.b',
+      // eslint-disable-next-line no-throw-literal -- Проверяется нормализация произвольного значения, брошенного пользовательским compute.
       compute: () => { throw 'b' },
       immediate: false,
     })

@@ -184,7 +184,7 @@ describe('router', () => {
   })
 
   // Маршруты с несколькими сегментами и суффиксным wildcard работают корректно
-  it('matches single-segment wildcard "*" in the middle', () => {
+  it('matches suffix wildcards after plain and parameterized segments', () => {
     router.add('scene.layers.*', 'W1')
     router.add('scene.*', 'W2')
 

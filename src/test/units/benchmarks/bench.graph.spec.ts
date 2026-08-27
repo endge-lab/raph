@@ -121,11 +121,7 @@ describe('depGraph bench & correctness', () => {
 
     const t1 = performance.now()
 
-    // 3) Корректность глубины: у первых BRANCH узлов глубина должна быть 0/1
-    //    (часть вершин - корни без родителей)
-    const _depth0 = app.__proto__ // silence TS about private in IDEs
-
-    // Проверим несколько случайных: глубина потомка > глубины родителя
+    // 3) Проверим несколько случайных: глубина потомка > глубины родителя
     // (Детальную проверку сделаем проще - через выборку пары parent->child)
     let checked = 0
     for (let i = 1; i < nodes.length && checked < 50; i++) {

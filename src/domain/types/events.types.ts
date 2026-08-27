@@ -29,6 +29,6 @@ export interface RaphEventPayloads {
   'phases:reinit': { phases: Array<RaphPhase> }
 
   //
-  'debug:nodes': {}
-  'debug:metrics': {}
+  'debug:nodes': Record<string, never>
+  'debug:metrics': Record<string, never>
 }

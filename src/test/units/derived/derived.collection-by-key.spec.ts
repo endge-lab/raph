@@ -129,6 +129,7 @@ describe('raph derived collectionByKey strategy', () => {
     kernel.set('source.rows[id=3]', { id: 3, value: 3 })
     expect(kernel.get('target.rows')).toEqual([{ id: 1, value: 10 }, { id: 2, value: 20 }, { id: 3, value: 30 }])
     kernel.delete('source.rows[id=2]')
+    // eslint-disable-next-line no-sparse-arrays -- Проверяется сохранение пустого индекса после удаления элемента коллекции.
     expect(kernel.get('target.rows')).toEqual([{ id: 1, value: 10 }, , { id: 3, value: 30 }])
 
     fail = true
@@ -136,9 +137,11 @@ describe('raph derived collectionByKey strategy', () => {
       kernel.set('source.rows[id=1].value', 10)
       kernel.set('source.rows[id=3].value', 30)
     })).toThrow('batch failed')
+    // eslint-disable-next-line no-sparse-arrays -- Проверяется откат с сохранением пустого индекса коллекции.
     expect(kernel.get('target.rows')).toEqual([{ id: 1, value: 10 }, , { id: 3, value: 30 }])
     fail = false
     kernel.set('source.rows[id=1].value', 11)
+    // eslint-disable-next-line no-sparse-arrays -- Проверяется повторное вычисление без заполнения удалённого индекса.
     expect(kernel.get('target.rows')).toEqual([{ id: 1, value: 110 }, , { id: 3, value: 300 }])
     runtime.destroy()
   })

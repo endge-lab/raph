@@ -13,7 +13,7 @@ export class MinHeap {
    */
   constructor(initialCapacity = 0) {
     // Вместимость сохраняется и используется повторно между кадрами
-    this._a = initialCapacity > 0 ? new Array(initialCapacity) : []
+    this._a = initialCapacity > 0 ? Array.from({ length: initialCapacity }) : []
     this._size = 0
   }
 

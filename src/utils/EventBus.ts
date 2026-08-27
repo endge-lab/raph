@@ -34,7 +34,7 @@ type EventCallback<T = any> = (payload: T) => void
  * console.log(bus.eventNames())              // ['userLogin']
  * ```
  */
-export class EventBus<StaticEvents extends Record<string, any> = {}> {
+export class EventBus<StaticEvents extends Record<string, any> = Record<string, never>> {
   protected listeners: Map<string, Set<EventCallback>> = new Map()
 
   /**

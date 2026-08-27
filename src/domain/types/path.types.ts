@@ -13,7 +13,7 @@ export type StableMaskKey = Branded<string, 'StableMaskKey'>
 /**
  * Внутренние коды сегментов для быстрого сравнения/ветвления
  */
-export const enum SegKind {
+export enum SegKind {
   Key = 0, // объектный ключ: foo
   Index = 1, // индекс массива: [5]
   Wildcard = 2, // '*' - одиночный сегмент (или глубокий, если последний)
