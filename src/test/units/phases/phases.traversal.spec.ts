@@ -57,7 +57,7 @@ describe('raphApp.traversal', () => {
       },
     ])
 
-    const { A, B, C } = makeTree(raph)
+    const { A, B, C: _C } = makeTree(raph)
 
     // подписываемся на re
     raph.track(A, 'com[id="A"].*')
@@ -86,7 +86,7 @@ describe('raphApp.traversal', () => {
       },
     ])
 
-    const { B, D, E, F, A, C } = makeTree(raph)
+    const { B, D: _D, E: _E, F: _F, A, C } = makeTree(raph)
     // Подписываем только B как data-dependent
     raph.track(B, 'com[id="B"].*')
 
@@ -144,7 +144,7 @@ describe('raphApp.traversal', () => {
       },
     ])
 
-    const { B, D } = makeTree(raph)
+    const { B: _B, D } = makeTree(raph)
     // Подписываем только D
     raph.track(D, 'com[id="D"].*')
 
@@ -174,7 +174,7 @@ describe('raphApp.traversal', () => {
       },
     ])
 
-    const { A, B, C, D, E, F } = makeTree(raph)
+    const { A, B: _B, C: _C, D: _D, E: _E, F: _F } = makeTree(raph)
     // Подписываем только A для триггера маршрута
     raph.track(A, 'com[id="A"].*')
 
@@ -216,7 +216,7 @@ describe('raphApp.traversal', () => {
       },
     ])
 
-    const { B, D, E, F } = makeTree(raph)
+    const { B: _B, D: _D, E, F: _F } = makeTree(raph)
     raph.track(E, 'com[id="E"].*') // E будет dirty
 
     raph.set('com[id="E"].v', 1)

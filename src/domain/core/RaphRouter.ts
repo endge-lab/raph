@@ -21,9 +21,9 @@ export class RaphRouter<P = string> {
   private _matchCache = new Map<string, { v: number, res: Set<P> }>()
   private _prefixCache = new Map<string, { v: number, res: Set<P> }>() // cache for collectByPrefix
 
-  private static readonly MAX_SEG_CACHE = 20_000
-  private static readonly MAX_MATCH_CACHE = 50_000
-  private static readonly MAX_PREFIX_CACHE = 50_000
+  private static readonly _MAX_SEG_CACHE = 20_000
+  private static readonly _MAX_MATCH_CACHE = 50_000
+  private static readonly _MAX_PREFIX_CACHE = 50_000
 
   // -------------------------
   // Helpers: caches / keys
@@ -48,7 +48,7 @@ export class RaphRouter<P = string> {
       return hit
     }
     const segs = DataPath.from(key).segments()
-    if (this._segCache.size >= RaphRouter.MAX_SEG_CACHE) {
+    if (this._segCache.size >= RaphRouter._MAX_SEG_CACHE) {
       this._segCache.clear()
     }
     this._segCache.set(key, segs)
@@ -70,7 +70,7 @@ export class RaphRouter<P = string> {
    * Выполняет внутреннюю операцию cache match write.
    */
   private _cacheMatchWrite(pathKey: string, res: Set<P>): void {
-    if (this._matchCache.size > RaphRouter.MAX_MATCH_CACHE) {
+    if (this._matchCache.size > RaphRouter._MAX_MATCH_CACHE) {
       this._matchCache.clear()
     }
     this._matchCache.set(pathKey, { v: this._version, res })
@@ -91,7 +91,7 @@ export class RaphRouter<P = string> {
    * Выполняет внутреннюю операцию cache prefix write.
    */
   private _cachePrefixWrite(pathKey: string, res: Set<P>): void {
-    if (this._prefixCache.size > RaphRouter.MAX_PREFIX_CACHE) {
+    if (this._prefixCache.size > RaphRouter._MAX_PREFIX_CACHE) {
       this._prefixCache.clear()
     }
     this._prefixCache.set(pathKey, { v: this._version, res })

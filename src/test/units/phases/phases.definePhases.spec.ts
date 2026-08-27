@@ -10,8 +10,8 @@ describe('raphApp.definePhases', () => {
   it('сохраняет фазы в массиве с сохранением порядка', () => {
     const raph = new RaphApp()
 
-    const execA = vi.fn((ctx: PhaseExecutorContext) => {})
-    const execB = vi.fn((ctx: PhaseExecutorContext) => {})
+    const execA = vi.fn((_ctx: PhaseExecutorContext) => {})
+    const execB = vi.fn((_ctx: PhaseExecutorContext) => {})
 
     const phases: Array<RaphPhase> = [
       {
@@ -40,8 +40,8 @@ describe('raphApp.definePhases', () => {
   it('заполняет карту фаз для быстрого поиска по имени', () => {
     const raph = new RaphApp()
 
-    const execA = vi.fn((ctx: PhaseExecutorContext) => {})
-    const execB = vi.fn((ctx: PhaseExecutorContext) => {})
+    const execA = vi.fn((_ctx: PhaseExecutorContext) => {})
+    const execB = vi.fn((_ctx: PhaseExecutorContext) => {})
 
     raph.definePhases([
       {

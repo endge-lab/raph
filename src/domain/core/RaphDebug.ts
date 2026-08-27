@@ -55,23 +55,23 @@ export interface NodeFlatDump {
  * Собирает debug-метрики Raph phases и dirty processing.
  */
 export class RaphDebug {
-  private enabled = false
-  private manuallyEnabled = false
-  private leases = new Set<symbol>()
-  private off: Array<EventOff> = []
-  private getApp?: () => RaphRuntime<any>
-  private events?: EventBus<any>
+  private _enabled = false
+  private _manuallyEnabled = false
+  private _leases = new Set<symbol>()
+  private _off: Array<EventOff> = []
+  private _getApp?: () => RaphRuntime<any>
+  private _events?: EventBus<any>
 
   // id -> агрегированная инфа (подписки + связи)
-  private nodes = new Map<string, NodeInfo>()
+  private _nodes = new Map<string, NodeInfo>()
 
   /** Вкл/выкл отладчик (подписки/отписки на события) */
   /**
    * Настроить источники runtime/event bus.
    */
   configure(options: RaphDebugOptions): void {
-    this.getApp = options.getApp
-    this.events = options.events
+    this._getApp = options.getApp
+    this._events = options.events
   }
 
   /** Вкл/выкл отладчик (подписки/отписки на события) */
@@ -79,15 +79,15 @@ export class RaphDebug {
    * Подключить или отключить debug-слежение за графом и маршрутами.
    */
   enable(value: boolean): void {
-    this.manuallyEnabled = value
-    this.syncEnabled()
+    this._manuallyEnabled = value
+    this._syncEnabled()
   }
 
   /** Keep debug active for the lifetime of an explicit inspection session. */
   acquire(): RaphDebugLease {
     const token = Symbol('raph-debug-lease')
-    this.leases.add(token)
-    this.syncEnabled()
+    this._leases.add(token)
+    this._syncEnabled()
     let released = false
     return {
       release: () => {
@@ -95,8 +95,8 @@ export class RaphDebug {
           return
         }
         released = true
-        this.leases.delete(token)
-        this.syncEnabled()
+        this._leases.delete(token)
+        this._syncEnabled()
       },
     }
   }
@@ -106,7 +106,7 @@ export class RaphDebug {
    * Очистить накопленное debug-состояние.
    */
   clear(): void {
-    this.nodes.clear()
+    this._nodes.clear()
   }
 
   /** Явный рефреш графовой иерархии (без сброса подписок) */
@@ -114,7 +114,7 @@ export class RaphDebug {
    * Пересобрать snapshot иерархии из текущего графа.
    */
   refresh(): void {
-    this.rebuildHierarchyFromGraph()
+    this._rebuildHierarchyFromGraph()
   }
 
   /** Плоский дамп для таблицы/списка */
@@ -123,7 +123,7 @@ export class RaphDebug {
    */
   getFlat(): Array<NodeFlatDump> {
     const out: Array<NodeFlatDump> = []
-    for (const [id, info] of this.nodes) {
+    for (const [id, info] of this._nodes) {
       out.push({
         id,
         type: info.type,
@@ -141,7 +141,7 @@ export class RaphDebug {
    * Вернуть дерево нод для визуального отображения.
    */
   getTree(): Array<NodeTree> {
-    const app = this.getApp?.()
+    const app = this._getApp?.()
     if (!app) {
       return []
     }
@@ -150,7 +150,7 @@ export class RaphDebug {
     const seen = new Set<string>()
 
     const build = (n: RaphNode): NodeTree => {
-      const info = this.ensureInfo(n)
+      const info = this._ensureInfo(n)
       const kids = Array.from(app.graph.childrenOf(n))
         .sort((a, b) => a.id.localeCompare(b.id))
         .map(ch => build(ch))
@@ -167,7 +167,7 @@ export class RaphDebug {
       .sort((a, b) => a.id.localeCompare(b.id))
       .map(r => build(r))
 
-    for (const id of this.nodes.keys()) {
+    for (const id of this._nodes.keys()) {
       if (seen.has(id)) {
         continue
       }
@@ -185,26 +185,26 @@ export class RaphDebug {
   /**
    * Подписаться на события Raph и начать сбор debug-данных.
    */
-  private attach(): void {
-    this.enabled = true
-    const events = this.events
-    const app = this.getApp?.()
+  private _attach(): void {
+    this._enabled = true
+    const events = this._events
+    const app = this._getApp?.()
     if (!events || !app) {
       return
     }
 
     // 1) Иерархия графа изменилась
-    this.off.push(
+    this._off.push(
       events.on('nodes:changed', () => {
-        this.rebuildHierarchyFromGraph()
+        this._rebuildHierarchyFromGraph()
         events.emit('debug:nodes', {})
       }),
     )
 
     // 2) Узел подписался на маску
-    this.off.push(
+    this._off.push(
       events.on('node:tracked', (p: { node: RaphNode, path: string }) => {
-        const info = this.ensureInfo(p.node)
+        const info = this._ensureInfo(p.node)
         if (typeof p.path === 'string' && p.path) {
           info.routes.add(p.path)
         }
@@ -212,9 +212,9 @@ export class RaphDebug {
       }),
     )
 
-    this.off.push(
+    this._off.push(
       events.on('node:untracked', (p: { node: RaphNode, path?: string }) => {
-        const info = this.nodes.get(p.node.id)
+        const info = this._nodes.get(p.node.id)
         if (!info) {
           return
         }
@@ -227,13 +227,13 @@ export class RaphDebug {
     )
 
     // 3) При каждом батче уведомлений считаем метрику и пушим в bus
-    this.off.push(
+    this._off.push(
       events.on(
         'nodes:notified',
         (_payload: {
           ctxs: Array<{ phase: string, node: RaphNode, events?: Array<any> }>
         }) => {
-          const currentApp = this.getApp?.()
+          const currentApp = this._getApp?.()
           if (!currentApp) {
             return
           }
@@ -247,15 +247,15 @@ export class RaphDebug {
     )
 
     // первичный прогон
-    this.rebuildHierarchyFromGraph()
+    this._rebuildHierarchyFromGraph()
   }
 
   /**
    * Отписаться от событий Raph.
    */
-  private detach(): void {
-    this.enabled = false
-    for (const f of this.off) {
+  private _detach(): void {
+    this._enabled = false
+    for (const f of this._off) {
       try {
         f()
       }
@@ -263,28 +263,28 @@ export class RaphDebug {
         //
       }
     }
-    this.off = []
+    this._off = []
   }
 
-  private syncEnabled(): void {
-    const next = this.manuallyEnabled || this.leases.size > 0
-    if (next === this.enabled) {
+  private _syncEnabled(): void {
+    const next = this._manuallyEnabled || this._leases.size > 0
+    if (next === this._enabled) {
       return
     }
     if (next) {
-      this.attach()
+      this._attach()
       return
     }
-    this.detach()
+    this._detach()
     this.clear()
   }
 
   /**
    * Получить или создать агрегированную debug-информацию по ноде.
    */
-  private ensureInfo(node: RaphNode): NodeInfo {
+  private _ensureInfo(node: RaphNode): NodeInfo {
     const id = node.id
-    let info = this.nodes.get(id)
+    let info = this._nodes.get(id)
     if (!info) {
       info = {
         id,
@@ -293,7 +293,7 @@ export class RaphDebug {
         parents: new Set<string>(),
         children: new Set<string>(),
       }
-      this.nodes.set(id, info)
+      this._nodes.set(id, info)
     }
     else if (!info.type && node.type) {
       info.type = node.type
@@ -302,13 +302,13 @@ export class RaphDebug {
   }
 
   /** Пересборка живой иерархии и маршрутов из runtime graph/router. */
-  private rebuildHierarchyFromGraph(): void {
-    const app = this.getApp?.()
+  private _rebuildHierarchyFromGraph(): void {
+    const app = this._getApp?.()
     if (!app) {
       return
     }
 
-    for (const info of this.nodes.values()) {
+    for (const info of this._nodes.values()) {
       info.parents.clear()
       info.children.clear()
       info.routes.clear()
@@ -319,12 +319,12 @@ export class RaphDebug {
       if (!seen.add(n.id)) {
         return
       }
-      const cur = this.ensureInfo(n)
+      const cur = this._ensureInfo(n)
       for (const route of app.getTrackedMasks(n)) {
         cur.routes.add(route)
       }
       for (const ch of app.graph.childrenOf(n)) {
-        const child = this.ensureInfo(ch)
+        const child = this._ensureInfo(ch)
         cur.children.add(ch.id)
         child.parents.add(n.id)
         dfs(ch)
@@ -334,7 +334,7 @@ export class RaphDebug {
     for (const r of app.graph.roots()) {
       dfs(r)
     }
-    for (const [id] of this.nodes) {
+    for (const [id] of this._nodes) {
       if (seen.has(id)) {
         continue
       }
@@ -344,11 +344,11 @@ export class RaphDebug {
       }
     }
 
-    for (const [id] of Array.from(this.nodes.entries())) {
+    for (const [id] of Array.from(this._nodes.entries())) {
       if (app.getNode(id)) {
         continue
       }
-      this.nodes.delete(id)
+      this._nodes.delete(id)
     }
   }
 }

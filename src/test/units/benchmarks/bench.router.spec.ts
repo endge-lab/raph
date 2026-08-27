@@ -216,7 +216,8 @@ describe('raphRouter – бенчмарки', () => {
       }
     }
 
-    const queries = new Array(Q)
+    const queries: string[] = []
+    queries.length = Q
     for (let i = 0; i < Q; i++) {
       queries[i] = makeQuery(i)
     }

@@ -457,7 +457,8 @@ export class RaphDerivedManager {
       }
 
       const sourceKeys = collectionKeys(source, keyField, 'source')
-      const nextTarget = new Array<unknown>(sourceKeys.length)
+      const nextTarget: unknown[] = []
+      nextTarget.length = sourceKeys.length
       for (let position = 0; position < sourceKeys.length; position++) {
         const key = sourceKeys[position]
         // DefaultDataAdapter может удалять array item через unset, сохраняя hole.

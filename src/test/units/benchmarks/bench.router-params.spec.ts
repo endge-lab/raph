@@ -20,7 +20,7 @@ describe('raphRouter - бенчмарки с параметрическими п
     const r = new RaphRouter<string>()
 
     const ORDERS = 5000 // число «корней» (orders)
-    const ITEMS_PER = 6 // совпадает с шаблоном ниже
+    const _ITEMS_PER = 6 // совпадает с шаблоном ниже
     const PAYLOAD = 'P'
 
     // Шаблоны с плейсхолдерами:

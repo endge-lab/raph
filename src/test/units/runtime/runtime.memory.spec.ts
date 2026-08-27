@@ -42,7 +42,7 @@ async function collectGarbage(): Promise<void> {
     if (typeof gc === 'function') {
       gc()
     }
-    const pressure = new Array(10_000).fill(pass)
+    const pressure = Array.from({ length: 10_000 }).fill(pass)
     if (pressure.length === 0) {
       throw new Error('unreachable')
     }

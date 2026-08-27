@@ -70,7 +70,7 @@ describe('raph derived memory cleanup', () => {
 
   it('reports heap before registration and after runtime cleanup', () => {
     const { kernel, runtime } = createDerivedFixture()
-    kernel.set('source', { payload: new Array(100).fill('x') })
+    kernel.set('source', { payload: Array.from({ length: 100 }).fill('x') })
     forceGc()
     const before = heapUsed()
     const count = stressEnabled() ? 100_000 : 10_000
@@ -108,7 +108,7 @@ describe('raph derived memory cleanup', () => {
 })
 
 function registerDisposableClosure(runtime: ReturnType<typeof createDerivedFixture>['runtime']): WeakRef<{ data: number[] }> {
-  const captured = { data: new Array(100_000).fill(1) }
+  const captured = { data: Array.from({ length: 100_000 }).fill(1) }
   const weak = new WeakRef(captured)
   runtime.derive({
     from: 'source',

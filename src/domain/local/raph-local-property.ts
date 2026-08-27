@@ -13,7 +13,7 @@ export class RaphLocalPropertyRuntime<P extends RaphProperties, K extends keyof 
     public readonly name: K,
     public readonly phase: string,
     public readonly propagation: RaphPropagation,
-    private readonly compute?: RaphLocalPropertyCompute<P, K>,
+    private readonly _compute?: RaphLocalPropertyCompute<P, K>,
     public readonly dependsOn: Array<keyof P> = [],
     public readonly defaultValue?: P[K],
   ) {}
@@ -38,8 +38,8 @@ export class RaphLocalPropertyRuntime<P extends RaphProperties, K extends keyof 
    * Выполняет внутреннюю операцию compute on.
    */
   computeOn(node: RaphNode<P>): void {
-    if (this.compute) {
-      node.setLocal(this.name, this.compute(node))
+    if (this._compute) {
+      node.setLocal(this.name, this._compute(node))
       return
     }
 
