@@ -35,9 +35,9 @@ interface NodeHandlerOptions {
   phase: string
 }
 
-const propertyMetadata = new WeakMap<Function, Map<string | symbol, PropertyOptions>>()
-const phaseMetadata = new WeakMap<Function, Map<string | symbol, PhaseOptions>>()
-const nodeHandlerMetadata = new WeakMap<Function, Map<string, string>>()
+const propertyMetadata = new WeakMap<object, Map<string | symbol, PropertyOptions>>()
+const phaseMetadata = new WeakMap<object, Map<string | symbol, PhaseOptions>>()
+const nodeHandlerMetadata = new WeakMap<object, Map<string, string>>()
 
 /**
  * Выполняет публичную операцию raph local property.

@@ -7,6 +7,8 @@ interface GraphNode {
   id: string
 }
 
+const EMPTY_SET_STR: ReadonlySet<string> = new Set()
+
 /**
  * Ациклический граф зависимостей (DAG) для Raph.
  * Хранит:
@@ -404,5 +406,3 @@ export class DepGraph<N extends GraphNode = RaphNode<any>> {
     return maxd
   }
 }
-
-const EMPTY_SET_STR: ReadonlySet<string> = new Set()

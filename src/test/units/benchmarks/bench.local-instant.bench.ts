@@ -132,6 +132,18 @@ function createBenchTree(size: number) {
   return { app, nodes, root }
 }
 
+const local10k = createBenchTree(10_000)
+
+let downState = false
+
+const down10k = createBenchTree(10_000)
+
+const manual1k = createBenchTree(1_000)
+
+const burst1k = createBenchTree(1_000)
+
+const empty1k = createBenchTree(1_000)
+
 describe('raph local/instant benchmarks', () => {
   const benchOptions = {
     iterations: 5,
@@ -169,10 +181,3 @@ describe('raph local/instant benchmarks', () => {
     empty1k.app.run()
   }, benchOptions)
 })
-
-const local10k = createBenchTree(10_000)
-const down10k = createBenchTree(10_000)
-const manual1k = createBenchTree(1_000)
-const burst1k = createBenchTree(1_000)
-const empty1k = createBenchTree(1_000)
-let downState = false

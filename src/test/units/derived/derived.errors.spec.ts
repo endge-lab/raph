@@ -11,6 +11,26 @@ import {
 } from '@/domain/types/derived.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
+class TargetFailingAdapter extends DefaultDataAdapter {
+  public failTarget = false
+
+  public override set(path: DataPathDef, value: unknown, opts?: { vars?: Record<string, any> }): void {
+    if (this.failTarget && DataPath.from(path).toStringPath().startsWith('target')) {
+      throw new Error('adapter target commit failed')
+    }
+    super.set(path, value, opts)
+  }
+}
+
+class DeleteFailingAdapter extends DefaultDataAdapter {
+  public override delete(path: DataPathDef): void {
+    if (DataPath.from(path).toStringPath().startsWith('target')) {
+      throw new Error('adapter cleanup failed')
+    }
+    super.delete(path)
+  }
+}
+
 describe('raph derived errors', () => {
   it('keeps last-good target, exposes error and retries on next mutation', () => {
     const { kernel, runtime } = createDerivedFixture()
@@ -154,23 +174,3 @@ describe('raph derived errors', () => {
     runtime.destroy()
   })
 })
-
-class TargetFailingAdapter extends DefaultDataAdapter {
-  public failTarget = false
-
-  public override set(path: DataPathDef, value: unknown, opts?: { vars?: Record<string, any> }): void {
-    if (this.failTarget && DataPath.from(path).toStringPath().startsWith('target')) {
-      throw new Error('adapter target commit failed')
-    }
-    super.set(path, value, opts)
-  }
-}
-
-class DeleteFailingAdapter extends DefaultDataAdapter {
-  public override delete(path: DataPathDef): void {
-    if (DataPath.from(path).toStringPath().startsWith('target')) {
-      throw new Error('adapter cleanup failed')
-    }
-    super.delete(path)
-  }
-}
