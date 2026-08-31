@@ -1465,10 +1465,17 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
       mode: localPhase.mode,
       always: localPhase.always,
       all: (ctxs) => {
+        const events = new Map<RaphNode<Props>, NonNullable<PhaseExecutorContext['events']>>()
+        for (const ctx of ctxs) {
+          if (ctx.events?.length) {
+            events.set(ctx.node as RaphNode<Props>, ctx.events)
+          }
+        }
         localPhase.run({
           frame: ctxs[0]?.frame ?? this.__frameContext,
           root: this._root,
           dirty: ctxs.map(ctx => ctx.node as RaphNode<Props>),
+          events: events.size > 0 ? events : undefined,
         })
       },
     }

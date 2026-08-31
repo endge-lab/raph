@@ -5,7 +5,7 @@ import type { PhaseName } from '@/domain/types/phase.types'
 /**
  * Описывает тип RaphNodeOptions.
  */
-interface RaphNodeOptions {
+export interface RaphNodeOptions {
   id?: string
   weight?: number
   meta?: Record<string, unknown>
@@ -15,7 +15,7 @@ interface RaphNodeOptions {
 /**
  * Описывает тип RaphAddChildOptions.
  */
-interface RaphAddChildOptions {
+export interface RaphAddChildOptions {
   invalidate?: boolean
 }
 

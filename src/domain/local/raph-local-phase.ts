@@ -6,6 +6,7 @@ import type {
 } from '@/domain/local/local.types'
 import type { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
 import type { RaphFrameContext, RaphProperties } from '@/domain/types/base.types'
+import type { PhaseEvent } from '@/domain/types/phase.types'
 
 /**
  * Хранит runtime-описание local phase и правила ее выполнения.
@@ -82,12 +83,14 @@ export class RaphLocalPhaseRuntime<P extends RaphProperties = RaphProperties> {
     frame: RaphFrameContext
     root: RaphNode<P>
     dirty: Array<RaphNode<P>>
+    events?: ReadonlyMap<RaphNode<P>, ReadonlyArray<PhaseEvent>>
   }): void {
     this.process({
       phase: this,
       frame: payload.frame,
       root: payload.root,
       dirty: payload.dirty,
+      events: payload.events,
     })
   }
 }

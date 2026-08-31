@@ -109,6 +109,7 @@ class LocalNode extends RaphNode<LocalProps> {
  */
 class LocalRuntime {
   readonly phases: Array<string> = []
+  readonly phaseEvents: Array<{ nodeId: string, paths: Array<string> }> = []
 
   /**
    * Выполняет действие before в рамках ответственности LocalRuntime.
@@ -124,6 +125,12 @@ class LocalRuntime {
   @RaphLocalPhase({ name: 'update', priority: 0 })
   update(payload: RaphLocalPhaseContext<LocalProps>): void {
     this.phases.push(`update:${payload.dirty.map(node => node.id).join(',')}`)
+    for (const [node, events] of payload.events ?? []) {
+      this.phaseEvents.push({
+        nodeId: node.id,
+        paths: events.map(event => event.canonical),
+      })
+    }
     Raph.processDirtyNodes({ payload })
   }
 
@@ -189,6 +196,21 @@ describe('raph local/instant runtime', () => {
     node.width = 7
 
     expect(node.doubleWidth).toBe(14)
+  })
+
+  it('передаёт data events соответствующей ноде local phase', () => {
+    const { app, runtime } = createRuntime()
+    const node = new LocalNode(app, 'observer')
+    app.addNode(node)
+    runtime.phaseEvents.length = 0
+    app.observeData(node, 'data.*', { phase: 'update' })
+
+    app.set('data.value', 1)
+
+    expect(runtime.phaseEvents).toEqual([{
+      nodeId: 'observer',
+      paths: ['data.value'],
+    }])
   })
 
   it('propagates down through the ordered tree without touching unrelated nodes', () => {

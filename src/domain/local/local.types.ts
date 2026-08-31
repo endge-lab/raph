@@ -1,6 +1,7 @@
 import type { RaphNode } from '@/domain/core/RaphNode'
 import type { RaphRuntime } from '@/domain/core/RaphRuntime'
 import type { RaphFrameContext, RaphProperties } from '@/domain/types/base.types'
+import type { PhaseEvent } from '@/domain/types/phase.types'
 
 /**
  * Описывает тип RaphLocalPhaseName.
@@ -95,6 +96,7 @@ export interface RaphLocalPhaseContext<P extends RaphProperties> {
   frame: RaphFrameContext
   root: RaphNode<P>
   dirty: Array<RaphNode<P>>
+  events?: ReadonlyMap<RaphNode<P>, ReadonlyArray<PhaseEvent>>
 }
 
 /**
