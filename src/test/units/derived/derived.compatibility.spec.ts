@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('raph derived compatibility fast path', () => {
-  it('preserves CRUD and transaction delivery when no derives are registered', () => {
+describe('быстрый путь совместимости производных данных Raph', () => {
+  it('сохраняет доставку CRUD и транзакций при отсутствии зарегистрированных derive', () => {
     const { kernel, runtime } = createDerivedFixture()
     const node = new RaphNode(runtime, { id: 'observer' })
     runtime.addNode(node)

@@ -107,8 +107,8 @@ function createBenchTree(size: number) {
     () => new BenchNode(),
   )
 
-  // Tree construction itself is not part of the benchmark. Local registration
-  // marks defaults dirty, so scheduler is paused until the fixture is complete.
+  // Само построение дерева не входит в benchmark. Локальная регистрация
+  // помечает defaults как dirty, поэтому scheduler приостановлен до готовности fixture.
   ;(app as any)._scheduler = () => {}
   ;(app as any)._schedulerPending = false
 
@@ -144,7 +144,7 @@ const burst1k = createBenchTree(1_000)
 
 const empty1k = createBenchTree(1_000)
 
-describe('raph local/instant benchmarks', () => {
+describe('бенчмарки local/instant Raph', () => {
   const benchOptions = {
     iterations: 5,
     warmupIterations: 1,

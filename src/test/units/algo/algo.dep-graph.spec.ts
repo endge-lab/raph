@@ -4,7 +4,7 @@ import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('dep Graph', () => {
+describe('граф зависимостей', () => {
   it('выполняет в порядке по depth, а внутри уровня - по weight (больше раньше)', () => {
     const app = new RaphApp()
     app.options({ scheduler: SchedulerType.Sync })
@@ -46,9 +46,9 @@ describe('dep Graph', () => {
     app.run()
 
     // Ожидаем:
-    // depth 0: A
+    // глубина 0: A
     // depth 1: D (weight 10) потом B (5) потом E (1)
-    // depth 2: C
+    // глубина 2: C
     expect(calls).toEqual(['A', 'D', 'B', 'E', 'C'])
   })
 })

@@ -4,8 +4,8 @@ import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphRuntime cleanup', () => {
-  it('removes observeData subscriptions on node remove and runtime destroy', () => {
+describe('очистка RaphRuntime', () => {
+  it('удаляет подписки observeData при удалении узла и уничтожении runtime', () => {
     const kernel = new RaphKernel()
     const runtime = kernel.createRuntime({ id: 'runtime', scheduler: SchedulerType.Sync })
     let calls = 0

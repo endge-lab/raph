@@ -4,8 +4,8 @@ import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphKernel transaction', () => {
-  it('coalesces invalidation and batches events per runtime', () => {
+describe('транзакция ядра Raph', () => {
+  it('объединяет invalidation и группирует события по runtime', () => {
     const kernel = new RaphKernel()
     const runtime = kernel.createRuntime({ id: 'runtime', scheduler: SchedulerType.Sync })
     const node = new RaphNode(runtime, { id: 'node' })

@@ -4,8 +4,8 @@ import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raph runtime/router lifecycle integration', () => {
-  it('returns router state to baseline after unique-path lifecycle cycles', () => {
+describe('интеграция lifecycle runtime и router Raph', () => {
+  it('возвращает состояние router к исходному после lifecycle-циклов уникальных путей', () => {
     const kernel = new RaphKernel()
     const runtime = kernel.createRuntime({ id: 'cycles', scheduler: SchedulerType.Sync })
     runtime.definePhases([{ name: 'update' as PhaseName, routes: [], traversal: 'dirty-only' }])
@@ -28,7 +28,7 @@ describe('raph runtime/router lifecycle integration', () => {
   })
 
   it.each([SchedulerType.Sync, SchedulerType.Microtask, SchedulerType.RAF])(
-    'never notifies a deleted node in %s scheduler',
+    'никогда не уведомляет удалённый узел в scheduler %s',
     async (scheduler) => {
       const kernel = new RaphKernel()
       const runtime = kernel.createRuntime({ id: `scheduler-${scheduler}`, scheduler })
@@ -50,7 +50,7 @@ describe('raph runtime/router lifecycle integration', () => {
     },
   )
 
-  it('does not remove routes owned by another runtime in a shared kernel', () => {
+  it('не удаляет routes другого runtime в общем ядре', () => {
     const kernel = new RaphKernel()
     const first = kernel.createRuntime({ id: 'first', scheduler: SchedulerType.Sync })
     const second = kernel.createRuntime({ id: 'second', scheduler: SchedulerType.Sync })

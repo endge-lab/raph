@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { full } from '@/domain/derived/strategies/full'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('raph derived full strategy', () => {
-  it('recomputes primitive, object and nested mutations synchronously', () => {
+describe('полная производная стратегия Raph', () => {
+  it('синхронно пересчитывает изменения примитивов, объектов и вложенных данных', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', { value: 2, stale: true })
     const handle = runtime.derive({
@@ -24,7 +24,7 @@ describe('raph derived full strategy', () => {
     runtime.destroy()
   })
 
-  it('supports arrays, aggregates, filter/sort and root reorder', () => {
+  it('поддерживает массивы, агрегаты, filter/sort и переупорядочивание root', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 2, active: true }, { id: 1, active: false }, { id: 3, active: true }])
     runtime.derive({
@@ -42,7 +42,7 @@ describe('raph derived full strategy', () => {
     runtime.destroy()
   })
 
-  it('replaces target and removes stale fields', () => {
+  it('заменяет target и удаляет устаревшие поля', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', { mode: 'long' })
     runtime.derive({
@@ -56,7 +56,7 @@ describe('raph derived full strategy', () => {
     runtime.destroy()
   })
 
-  it('supports null, undefined, manual notify, root delete and ancestor mutation', () => {
+  it('поддерживает null, undefined, ручной notify, удаление root и изменение предка', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('scope.source', null)
     let calls = 0

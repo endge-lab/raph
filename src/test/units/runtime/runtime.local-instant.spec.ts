@@ -11,8 +11,8 @@ interface Props {
   value: number
 }
 
-describe('raphRuntime local instant properties', () => {
-  it('updates local properties without using DataPath adapter operations', () => {
+describe('локальные немедленные свойства RaphRuntime', () => {
+  it('обновляет локальные свойства без операций адаптера DataPath', () => {
     const calls = {
       get: 0,
       set: 0,

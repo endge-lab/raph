@@ -26,7 +26,7 @@ describe('raphRouter - бенчмарки с параметрическими п
     // Шаблоны с плейсхолдерами:
     //   orders[id=$oid].items[id=$iid].price
     //   orders[id=$oid].total
-    //   users[id=$uid].profile.*        (deep)
+    //   users[id=$uid].profile.*        (глубокое совпадение)
     const addRes = time('[build] добавление масок с плейсхолдерами', () => {
       for (let i = 0; i < ORDERS; i++) {
         // Один и тот же шаблон добавляем один раз - он общий для всех путей,
@@ -123,8 +123,8 @@ describe('raphRouter - бенчмарки с параметрическими п
     r.add('FLT_ARR.legs[*]', 'LEG-STAR')
     r.add('FLT_ARR.legs[*].*', 'LEG-DEEP')
     // Параметры:
-    r.add('orders[id=$oid].*', 'ORD-DEEP') // capture oid
-    r.add('orders[id=$oid].items[id=$iid].*', 'ORD-ITEM-DEEP') // capture oid & iid
+    r.add('orders[id=$oid].*', 'ORD-DEEP') // захватываем oid
+    r.add('orders[id=$oid].items[id=$iid].*', 'ORD-ITEM-DEEP') // захватываем oid и iid
 
     // Прогрев:
     ;(r as any).matchIncludingPrefixWithParams('FLT_ARR')

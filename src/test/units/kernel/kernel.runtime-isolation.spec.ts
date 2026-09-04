@@ -4,8 +4,8 @@ import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphKernel runtime isolation', () => {
-  it('routes business data changes only to subscribed runtime lanes', () => {
+describe('изоляция runtime ядра Raph', () => {
+  it('направляет изменения бизнес-данных только подписанным runtime lanes', () => {
     const kernel = new RaphKernel()
     const nova = kernel.createRuntime({ id: 'nova', scheduler: SchedulerType.Sync })
     const lowCode = kernel.createRuntime({ id: 'low-code', scheduler: SchedulerType.Sync })

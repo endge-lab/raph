@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DataPath } from '@/domain/entities/DataPath'
 
-describe('bench.datapath-cache', () => {
+describe('бенчмарк cache DataPath', () => {
   const PATH = 'foo[3].bar[id=42].x.y[*].z'
 
   it('использует кэш сегментов при повторном разборе', () => {

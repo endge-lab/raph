@@ -2,7 +2,7 @@ import { afterAll, bench, describe } from 'vitest'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('derived empty-registry overhead', () => {
+describe('накладные расходы пустого реестра производных данных', () => {
   const baseline = fixture(false)
   const initialized = fixture(true)
 

@@ -8,7 +8,7 @@ function no(mask: string, target: string): void {
   expect(DataPath.match(mask, target)).toBe(false)
 }
 
-describe('dataPath.match', () => {
+describe('сопоставление DataPath', () => {
   it('точные ключи (без wildcard)', () => {
     ok('com.x', 'com.x')
     no('com.x', 'com.y')

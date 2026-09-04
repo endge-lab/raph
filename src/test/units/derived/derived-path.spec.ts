@@ -9,8 +9,8 @@ import { collectionByKey } from '@/domain/derived/strategies/collection-by-key'
 import { DataPath } from '@/domain/entities/DataPath'
 import { RaphDerivedPathError, RaphDerivedStrategyError } from '@/domain/types/derived.types'
 
-describe('raph derived path semantics', () => {
-  it('validates concrete paths and all segment overlap variants', () => {
+describe('семантика путей производных данных Raph', () => {
+  it('проверяет конкретные пути и все варианты пересечения сегментов', () => {
     expect(() => canonicalDerivedPath('', 'from')).toThrow(RaphDerivedPathError)
     expect(() => canonicalDerivedPath('rows.*', 'from')).toThrow(RaphDerivedPathError)
     expect(() => canonicalDerivedPath('rows[id=$id]', 'from')).toThrow(RaphDerivedPathError)
@@ -25,7 +25,7 @@ describe('raph derived path semantics', () => {
     expect(pathsOverlap(DataPath.from('rows.*'), DataPath.from('rows.*'))).toBe(true)
   })
 
-  it('classifies collection mutations and renders string/number selectors', () => {
+  it('классифицирует изменения коллекции и формирует строковые и числовые selectors', () => {
     const source = DataPath.from('rows')
     const record = (path: string) => ({
       kind: 'set' as const,
@@ -49,7 +49,7 @@ describe('raph derived path semantics', () => {
     expect(DataPath.from(escaped).segments()[1].pval).toBe('SU "101"')
   })
 
-  it('rejects an empty collection key', () => {
+  it('отклоняет пустой ключ коллекции', () => {
     expect(() => collectionByKey('  ')).toThrow(RaphDerivedStrategyError)
     expect(() => collectionByKey(null as any)).toThrow(RaphDerivedStrategyError)
   })

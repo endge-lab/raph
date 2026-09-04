@@ -8,7 +8,7 @@ import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphApp.scheduler (microtask)', () => {
+describe('проверка Scheduler RaphApp на microtask', () => {
   it('запускает выполнение в микротаске (не синхронно), затем выполняет each фазы', async () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Microtask })

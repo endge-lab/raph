@@ -4,7 +4,7 @@ import { RaphKernel } from '@/domain/core/RaphKernel'
 import { filterByKey } from '@/domain/derived/strategies/filter-by-key'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('derived filterByKey benchmarks', () => {
+describe('бенчмарки производной стратегии filterByKey', () => {
   const size = stressSize(10_000, 1_000_000)
   const bursts = isStress() ? [1, 2_000, 10_000] : [1, 100, 2_000]
   const fixtures: FilterFixture[] = []

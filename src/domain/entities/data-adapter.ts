@@ -32,7 +32,7 @@ export class DefaultDataAdapter implements DataAdapter {
   private _root: DataObject
   private _opts: Required<DefaultAdapterOptions>
 
-  /** WeakMap: array -> (paramKey -> (value -> index)) */
+  /** WeakMap: массив -> (ключ параметра -> (значение -> индекс)) */
   private _indexes: WeakMap<Array<any>, Map<string, Map<any, number>>>
     = new WeakMap()
 
@@ -88,7 +88,7 @@ export class DefaultDataAdapter implements DataAdapter {
     this._clearAllIndexes()
   }
 
-  // ====================== CRUD ======================
+  // ================= СОЗДАНИЕ, ЧТЕНИЕ, ИЗМЕНЕНИЕ, УДАЛЕНИЕ =================
 
   /** Получить значение по пути. */
   get(path: DataPathDef, opts?: { vars?: Record<string, any> }): unknown {

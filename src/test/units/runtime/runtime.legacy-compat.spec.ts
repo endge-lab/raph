@@ -4,8 +4,8 @@ import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphRuntime legacy compatibility', () => {
-  it('keeps phase.routes + track() delivery working through RaphApp', () => {
+describe('проверка Legacy-совместимость RaphRuntime', () => {
+  it('сохраняет доставку phase.routes и track() через RaphApp', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 

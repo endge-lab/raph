@@ -31,8 +31,8 @@ class DeleteFailingAdapter extends DefaultDataAdapter {
   }
 }
 
-describe('raph derived errors', () => {
-  it('keeps last-good target, exposes error and retries on next mutation', () => {
+describe('ошибки производных данных Raph', () => {
+  it('сохраняет последнюю корректную target, предоставляет ошибку и повторяет при следующем изменении', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     const handle = runtime.derive({
@@ -56,7 +56,7 @@ describe('raph derived errors', () => {
     runtime.destroy()
   })
 
-  it('rejects async compute and cleans failed registration', () => {
+  it('отклоняет асинхронный compute и очищает неудачную регистрацию', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     expect(() => runtime.derive({
@@ -68,7 +68,7 @@ describe('raph derived errors', () => {
     runtime.destroy()
   })
 
-  it('rejects reentrant store mutations from compute', () => {
+  it('отклоняет реентерабельные изменения Store из compute', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     expect(() => runtime.derive({
@@ -97,7 +97,7 @@ describe('raph derived errors', () => {
     runtime.destroy()
   })
 
-  it('continues independent branches and aggregates their compute errors', () => {
+  it('продолжает независимые ветви и агрегирует их ошибки compute', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     runtime.derive({
@@ -128,7 +128,7 @@ describe('raph derived errors', () => {
     runtime.destroy()
   })
 
-  it('forbids registry mutations from compute', () => {
+  it('запрещает изменения реестра из compute', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     expect(() => runtime.derive({
@@ -143,7 +143,7 @@ describe('raph derived errors', () => {
     runtime.destroy()
   })
 
-  it('wraps adapter commit errors in immediate and stabilization paths', () => {
+  it('оборачивает ошибки фиксации адаптера в путях immediate и стабилизации', () => {
     const adapter = new TargetFailingAdapter()
     const kernel = new RaphKernel({ adapter })
     const runtime = kernel.createRuntime({ scheduler: SchedulerType.Sync })
@@ -159,7 +159,7 @@ describe('raph derived errors', () => {
     runtime.destroy()
   })
 
-  it('preserves registration error when cleanup also fails', () => {
+  it('сохраняет ошибку регистрации при одновременной ошибке очистки', () => {
     const adapter = new DeleteFailingAdapter()
     const kernel = new RaphKernel({ adapter })
     const runtime = kernel.createRuntime({ scheduler: SchedulerType.Sync })

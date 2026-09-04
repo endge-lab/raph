@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 
-describe('router', () => {
+describe('маршрутизатор', () => {
   let router: RaphRouter
 
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('router', () => {
   }
 
   // Точные ключи без wildcard
-  it('matches exact keys', () => {
+  it('сопоставляет точные ключи', () => {
     router.add('com.x', 'H1')
     router.add('com.y', 'H2')
     router.add('data.a.b', 'H3')
@@ -30,7 +30,7 @@ describe('router', () => {
 
   // Обычный сегментный wildcard "*"
   // "*" в середине - матчит ровно 1 сегмент
-  it('matches single-segment wildcard "*" in the middle', () => {
+  it('сопоставляет wildcard одного сегмента "*" в середине', () => {
     router.add('com.*', 'W1')
     router.add('a.*.c', 'W2')
 
@@ -48,7 +48,7 @@ describe('router', () => {
 
   // Параметры в сегменте: [id=7], [id="x"], [id=*]
   // "*" в значении параметра - любое значение этого параметра
-  it('matches parameterized segments with exact or wildcard values', () => {
+  it('сопоставляет параметризованные сегменты с точными или wildcard-значениями', () => {
     // обе добавлены под одним и тем же namespace
     router.add('com[id=7].x', 'P1')
     router.add('com[*].x', 'PAny')
@@ -64,7 +64,7 @@ describe('router', () => {
   })
 
   // Несколько парамет ров, числа/строки, смешанные кавычки
-  it('matches multiple params and quoted/unquoted values', () => {
+  it('сопоставляет несколько params и значения в кавычках либо без них', () => {
     router.add('items[*][type="task"][gid=5].v', 'MP')
 
     expectSetEqual(router.match('items[id=1][type="task"][gid=5].v'), ['MP'])
@@ -78,7 +78,7 @@ describe('router', () => {
   })
 
   // Микс: точные + wildcard + greedy + параметры
-  it('matches combined patterns (mix of fixed, "*", "**" and params)', () => {
+  it('сопоставляет комбинированные patterns из фиксированных сегментов, "*", "**" и params', () => {
     router.add('root.level.*.leaf[*].*', 'C1')
 
     // 1) ровно один произвольный сегмент на месте "*"
@@ -94,7 +94,7 @@ describe('router', () => {
   })
 
   // Множественные обработчики на один маршрут
-  it('allows multiple handlers per the same pattern', () => {
+  it('разрешает несколько handlers для одного pattern', () => {
     router.add('com.x', 'H1')
     router.add('com.x', 'H2')
     router.add('com.x', 'H1') // дубликат - не должен дублироваться в выдаче
@@ -103,7 +103,7 @@ describe('router', () => {
   })
 
   // Удаление обработчиков/маршрутов
-  it('removes handlers/routes correctly', () => {
+  it('корректно удаляет handlers и routes', () => {
     router.add('com.x', 'H1')
     router.add('com.x', 'H2')
     router.add('com.*', 'W1')
@@ -122,7 +122,7 @@ describe('router', () => {
   })
 
   // Индексация по префиксу: независимые namespace-ветки
-  it('keeps independent namespaces under distinct prefixes', () => {
+  it('сохраняет независимые namespaces под разными prefixes', () => {
     router.add('com.*', 'C')
     router.add('data.*', 'D')
 
@@ -135,7 +135,7 @@ describe('router', () => {
 
   // Кэш-хит: повторные запросы того же пути
   // (невозможно проверить микротаймингом - просто функционально)
-  it('returns identical results on repeated queries (cache hit scenario)', () => {
+  it('возвращает одинаковые результаты повторных запросов при попадании в cache', () => {
     router.add('com.*', 'W')
     router.add('com.x', 'H')
     const r1 = router.match('com.x')
@@ -145,7 +145,7 @@ describe('router', () => {
   })
 
   // Параметры с кавычками и числами: совместимость парсера
-  it('parses and matches params with quotes and numbers correctly', () => {
+  it('корректно разбирает и сопоставляет params с кавычками и числами', () => {
     router.add('n[id="42"].m', 'Q1')
     router.add('n[id=42].m', 'Q2')
     router.add('n[*].m', 'QAny')
@@ -156,7 +156,7 @@ describe('router', () => {
   })
 
   // Сложный кейс: пересечение разных шаблонов
-  it('returns union of all matching handlers across overlapping patterns', () => {
+  it('возвращает объединение всех совпавших handlers пересекающихся patterns', () => {
     router.add('a.b.c', 'Exact')
     router.add('a.*.c', 'MidStar')
     router.add('a.*', 'Greedy')
@@ -174,7 +174,7 @@ describe('router', () => {
   })
 
   // Индекс/массивный сегмент: rows[0].name / rows[*].name
-  it('matches array-like addressing: rows[0].name and rows[*].name', () => {
+  it('сопоставляет адресацию массивов rows[0].name и rows[*].name', () => {
     router.add('rows[0].name', 'R0')
     router.add('rows[*].name', 'Rstar')
 
@@ -184,7 +184,7 @@ describe('router', () => {
   })
 
   // Маршруты с несколькими сегментами и суффиксным wildcard работают корректно
-  it('matches suffix wildcards after plain and parameterized segments', () => {
+  it('сопоставляет suffix-wildcards после обычных и параметризованных сегментов', () => {
     router.add('scene.layers.*', 'W1')
     router.add('scene.*', 'W2')
 

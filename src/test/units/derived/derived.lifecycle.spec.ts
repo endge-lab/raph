@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { RaphDerivedDisposedError } from '@/domain/types/derived.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('raph derived lifecycle', () => {
-  it('pauses without retaining mutations and resumes through full recompute', () => {
+describe('жизненный цикл производных данных Raph', () => {
+  it('приостанавливается без накопления изменений и возобновляется через полный пересчёт', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     const handle = runtime.derive({ from: 'source', to: 'target', compute: value => Number(value) * 2 })
@@ -23,7 +23,7 @@ describe('raph derived lifecycle', () => {
     runtime.destroy()
   })
 
-  it('disposes all kernel registrations through diagnostics delegate', () => {
+  it('освобождает все регистрации ядра через delegate диагностики', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     runtime.derive({ from: 'source', to: 'a', compute: value => value })
@@ -34,7 +34,7 @@ describe('raph derived lifecycle', () => {
     runtime.destroy()
   })
 
-  it('disposes idempotently, keeps target and clears all registry resources', () => {
+  it('идемпотентно освобождает, сохраняет target и очищает все ресурсы реестра', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 3)
     const handle = runtime.derive({ from: 'source', to: 'target', compute: value => value })
@@ -49,7 +49,7 @@ describe('raph derived lifecycle', () => {
     runtime.destroy()
   })
 
-  it('cleans derived nodes automatically on runtime reset', () => {
+  it('автоматически очищает производные узлы при reset runtime', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     const handle = runtime.derive({ from: 'source', to: 'target', compute: value => value })
@@ -58,7 +58,7 @@ describe('raph derived lifecycle', () => {
     expect(kernel.getDerivedSnapshot().registrations).toBe(0)
   })
 
-  it('supports manual full recompute and clears lastError', () => {
+  it('поддерживает ручной полный пересчёт и очищает lastError', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     let fail = true
@@ -83,7 +83,7 @@ describe('raph derived lifecycle', () => {
     runtime.destroy()
   })
 
-  it('allows the system node dispose operation to be repeated directly', () => {
+  it('разрешает напрямую повторять операцию dispose системного узла', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     const handle = runtime.derive({ from: 'source', to: 'target', compute: value => value })

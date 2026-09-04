@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
 import { DataPath } from '@/domain/entities/DataPath'
 
-describe('defaultDataAdapter edge cases', () => {
+describe('граничные случаи DefaultDataAdapter', () => {
   it('должен кидать ошибку при get с wildcard без параметров', () => {
     const adapter = new DefaultDataAdapter({ com: [] })
     expect(() => adapter.get('com[*]')).toThrow()

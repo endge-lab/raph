@@ -4,7 +4,7 @@ import { SegKind } from '@/domain/types/path.types'
 
 const kinds = (dp: DataPath) => dp.segments().map(s => s.kind)
 
-describe('dataPath.fromString / segments()', () => {
+describe('проверка DataPath.fromString и segments()', () => {
   it('разбирает простые ключи через точку', () => {
     const dp = DataPath.from('com.x.y')
     expect(kinds(dp)).toEqual([SegKind.Key, SegKind.Key, SegKind.Key])

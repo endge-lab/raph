@@ -4,7 +4,7 @@ import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('control flow subscriptions', () => {
+describe('подписки control-flow', () => {
   it('вызывает callback даже если пользовательские фазы не определены', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })

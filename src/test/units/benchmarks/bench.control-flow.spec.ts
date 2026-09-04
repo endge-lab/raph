@@ -8,8 +8,8 @@ import { SchedulerType } from '@/domain/types/base.types'
  * Проверяем не только скорость, но и то, что batching/callback dispatch
  * работают корректно под нагрузкой.
  */
-describe('bench.control-flow', () => {
-  it('flushes 1_000 control-flow notifications for one subscription', () => {
+describe('бенчмарк control-flow', () => {
+  it('обрабатывает 1000 уведомлений control-flow для одной подписки', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
@@ -42,7 +42,7 @@ describe('bench.control-flow', () => {
     )
   })
 
-  it('batches 1_000 notifications and fanouts them to many subscriptions', () => {
+  it('объединяет 1000 уведомлений и распределяет их по множеству подписок', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 

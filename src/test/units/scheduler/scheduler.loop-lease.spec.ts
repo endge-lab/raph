@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphApp loop leases', () => {
+describe('аренда цикла RaphApp', () => {
   let realRAF: typeof globalThis.requestAnimationFrame | undefined
   let realCAF: typeof globalThis.cancelAnimationFrame | undefined
   let rafSpy: ReturnType<typeof vi.fn>
@@ -27,7 +27,7 @@ describe('raphApp loop leases', () => {
     vi.useRealTimers()
   })
 
-  it('starts continuous loop while at least one lease is active', () => {
+  it('запускает непрерывный цикл, пока активен хотя бы один lease', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.AnimationFrame })
 
@@ -45,7 +45,7 @@ describe('raphApp loop leases', () => {
     expect(cafSpy).toHaveBeenCalled()
   })
 
-  it('does not stop a manually started loop when the last lease is released', () => {
+  it('не останавливает вручную запущенный цикл при освобождении последнего lease', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.AnimationFrame })
 

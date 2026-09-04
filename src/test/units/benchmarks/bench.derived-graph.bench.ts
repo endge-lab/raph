@@ -2,7 +2,7 @@ import { bench, describe } from 'vitest'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('derived graph benchmarks', () => {
+describe('бенчмарки графа производных данных', () => {
   bench('chain depth 20 stabilization', () => {
     const kernel = new RaphKernel()
     const runtime = kernel.createRuntime({ scheduler: SchedulerType.Sync })

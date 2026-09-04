@@ -122,13 +122,13 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
   private __animationFrameId: number | null = null
   private __upsResetTimeout: number | null = null
 
-  // Events per second
+  // Событий в секунду
   private __eps = 0
   private __lastEPSUpdate = performance.now()
   private __epsCount = 0
   private __epsResetTimeout: number | null = null
 
-  // Changed nodes per second
+  // Изменённых узлов в секунду
   private __nps = 0
   private __npsCount = 0
   private __lastNPSUpdate = performance.now()
@@ -1303,7 +1303,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     RAPH_EVENTS.emit('node:untracked', { node, path })
   }
 
-  /** Read-only snapshot used by live debug projections. */
+  /** Snapshot только для чтения, используемый проекциями live-отладки. */
   getTrackedMasks(node: RaphNode<any>): ReadonlySet<string> {
     return this._nodeRouter.masksFor(node)
   }
@@ -1513,7 +1513,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
   }
 
   //
-  // GETTERS / SETTERS
+  // МЕТОДЫ ЧТЕНИЯ И ИЗМЕНЕНИЯ
   //
 
   /**

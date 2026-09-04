@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 
-describe('raphRouter memory cleanup', () => {
-  it('releases an untracked payload and its callback', async () => {
+describe('очистка памяти RaphRouter', () => {
+  it('освобождает payload после untrack и его callback', async () => {
     const refs = registerThenRemovePayload()
     await collectGarbage()
 
@@ -10,7 +10,7 @@ describe('raphRouter memory cleanup', () => {
     expect(refs.callback.deref()).toBeUndefined()
   })
 
-  it('does not retain unique-route lifecycle cycles beyond the memory budget', async () => {
+  it('не удерживает циклы lifecycle уникальных routes сверх бюджета памяти', async () => {
     runUniqueRouteCycle(10_000, 0)
     await collectGarbage()
     const before = heapUsed()

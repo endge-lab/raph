@@ -3,7 +3,7 @@ import { RaphDebug } from '@/domain/core/RaphDebug'
 import { EventBus } from '@/utils/EventBus'
 
 /**
- * Shared Raph runtime constants and singleton diagnostics.
+ * Общие runtime-константы Raph и singleton-диагностика.
  */
 export const RAPH_MAX_UPS = 144
 export const RAPH_WEIGHT_LIMIT = 100

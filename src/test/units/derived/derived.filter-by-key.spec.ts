@@ -6,8 +6,8 @@ import { DataPath } from '@/domain/entities/DataPath'
 import { RaphDerivedStrategyError } from '@/domain/types/derived.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('raph derived filterByKey strategy', () => {
-  it('normalizes, freezes and validates the strategy descriptor', () => {
+describe('производная стратегия filterByKey Raph', () => {
+  it('нормализует, замораживает и проверяет descriptor стратегии', () => {
     const strategy = filterByKey('  flightId  ')
     expect(strategy).toEqual({ kind: 'filter-by-key', key: 'flightId' })
     expect(Object.isFrozen(strategy)).toBe(true)
@@ -16,7 +16,7 @@ describe('raph derived filterByKey strategy', () => {
     expect(() => filterByKey(null as any)).toThrow(RaphDerivedStrategyError)
   })
 
-  it('recomputes only changed keys and updates filtered membership in source order', () => {
+  it('пересчитывает только изменённые ключи и обновляет отфильтрованный состав в исходном порядке', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [
       { id: 1, name: 'Alpha' },
@@ -56,7 +56,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('supports transformed accepted rows and emits no target write for rejected-to-rejected updates', () => {
+  it('поддерживает преобразованные принятые строки и не записывает target при обновлениях rejected-to-rejected', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [
       { id: 1, visible: true, value: 10 },
@@ -85,7 +85,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('detaches fallback-cloned snapshots with functions, dates, arrays and cycles', () => {
+  it('отделяет fallback-клоны snapshots с функциями, датами, массивами и циклами', () => {
     const { kernel, runtime } = createDerivedFixture()
     const source: any = {
       id: 1,
@@ -113,7 +113,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('batches changed keys and handles insert/delete without scanning unaffected rows', () => {
+  it('объединяет изменённые ключи и обрабатывает insert/delete без сканирования незатронутых строк', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, visible: true }, { id: 2, visible: false }])
     const compute = vi.fn((rows: Array<{ id: number, visible: boolean }>) => rows.filter(row => row.visible))
@@ -136,7 +136,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('sorts a reverse mutation batch into source order before compute', () => {
+  it('сортирует обратный пакет изменений в исходный порядок до compute', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [
       { id: 1, visible: true, value: 1 },
@@ -159,7 +159,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('keeps rejected inserts and deletes silent while materializing accepted inserts/deletes', () => {
+  it('не публикует отклонённые вставки и удаления, материализуя принятые', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, visible: true }])
     const handle = runtime.derive({
@@ -183,7 +183,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('falls back to full recompute for root, index and key-field mutations', () => {
+  it('переходит к полному пересчёту при изменениях root, index и key-field', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, visible: true }, { id: 2, visible: true }])
     const compute = vi.fn((rows: Array<{ id: number, visible: boolean }>) => rows.filter(row => row.visible))
@@ -202,7 +202,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('uses a full first computation when immediate is false', () => {
+  it('использует полное первое вычисление при immediate=false', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, visible: true }])
     const handle = runtime.derive({
@@ -219,7 +219,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('recomputes the full collection explicitly when an external predicate changes', () => {
+  it('явно пересчитывает всю коллекцию при изменении внешнего предиката', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, text: 'SU101' }, { id: 2, text: 'S7202' }])
     let search = 'su'
@@ -238,7 +238,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('supports escaped string keys on the incremental path', () => {
+  it('поддерживает экранированные строковые ключи в инкрементальном пути', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 'SU "101"', visible: true, value: 1 }])
     runtime.derive({
@@ -253,7 +253,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('rejects outputs that are not an ordered subset of input', () => {
+  it('отклоняет outputs, не являющиеся упорядоченным подмножеством input', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1 }, { id: 2 }])
 
@@ -275,7 +275,7 @@ describe('raph derived filterByKey strategy', () => {
     { name: 'output item without key', source: [{ id: 1 }], compute: () => [{}] },
     { name: 'duplicate output key', source: [{ id: 1 }, { id: 2 }], compute: () => [{ id: 1 }, { id: 1 }] },
     { name: 'foreign output key', source: [{ id: 1 }], compute: () => [{ id: 2 }] },
-  ])('rejects $name without committing a target', ({ source, compute }) => {
+  ])('отклоняет $name без фиксации target', ({ source, compute }) => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', source)
     expect(() => runtime.derive({
@@ -289,7 +289,7 @@ describe('raph derived filterByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('keeps the last-good target after invalid incremental output and recovers with a full retry', () => {
+  it('сохраняет последнюю корректную target после некорректного инкрементального output и восстанавливается полным повтором', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, visible: true, value: 1 }, { id: 2, visible: true, value: 2 }])
     let invalid = false

@@ -19,7 +19,7 @@ function computeExecutor({ node }: PhaseExecutorContext): void {
   }
 }
 
-describe('raphSignal (DAG)', () => {
+describe('сигнал Raph в DAG', () => {
   it('plain signal: get/set работает и шлёт notify', () => {
     Raph.options({ scheduler: SchedulerType.Sync })
 

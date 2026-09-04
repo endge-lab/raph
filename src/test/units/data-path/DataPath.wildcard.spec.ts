@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DataPath } from '@/domain/entities/DataPath'
 
-describe('dataPath.fromString - wildcardDynamic', () => {
+describe('проверка DataPath.fromString и wildcardDynamic', () => {
   it('подставляет известные vars и заменяет неизвестные на [*] (индекс) и * (ключ)', () => {
     const dp = DataPath.fromString('$store.legs[$i].carrier', {
       vars: { store: 'FLT_ARR' }, // $store известен

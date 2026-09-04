@@ -221,7 +221,7 @@ export class DataPath {
       s = out
     }
 
-    // $key (dot)
+    // $key через точку
     s = s.replace(/(^|\.)(\$[a-z_$][\w$]*)(?=\.|\[|$)/gi, (_m, lead, v) => {
       const name = v.slice(1)
       const val = get(name)
@@ -539,7 +539,7 @@ export class DataPath {
           break
         case SegKind.Wildcard:
           // одиночный wildcard - совпадает с любым одним сегментом
-          // (Key | Index | Param | Wildcard)
+          // (ключ | индекс | параметр | wildcard)
           break
         case SegKind.Param:
           if (ts.kind !== SegKind.Param) {

@@ -18,7 +18,7 @@ function measure(fn: () => void, iter: number): Perf {
   return { opsPerSec, ms }
 }
 
-describe('defaultDataAdapter - perf & correctness (indexed vs non-indexed)', () => {
+describe('проверка DefaultDataAdapter: производительность и корректность с индексом и без него', () => {
   // три размера массива
   const SIZES = [10_000, 100_000, 500_000] as const
   // количество операций под каждый размер (чтобы не упираться в таймаут)
@@ -35,7 +35,7 @@ describe('defaultDataAdapter - perf & correctness (indexed vs non-indexed)', () 
       const base = Array.from({ length: SIZE }, (_, i) => ({ id: i, x: 0 }))
 
       it(
-        'gET: correctness + indexed is faster',
+        'операция GET: корректность и преимущество индексированного режима',
         () => {
           const iter = ITERS[SIZE]
           // два адаптера с одинаковыми данными
@@ -92,7 +92,7 @@ describe('defaultDataAdapter - perf & correctness (indexed vs non-indexed)', () 
       )
 
       it(
-        'sET: correctness + indexed not slower (should be faster)',
+        'операция SET: корректность и отсутствие замедления индексированного режима',
         () => {
           const iter = ITERS[SIZE]
           const aNoIdx = new DefaultDataAdapter(

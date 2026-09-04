@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { RaphKernel, RaphNode, RaphSchedulerType } from '@/main'
 
-describe('raphNode reparent', () => {
-  it('removes the previous graph edge when a node changes parent', () => {
+describe('смена родителя RaphNode', () => {
+  it('удаляет предыдущее ребро графа при смене родителя узла', () => {
     const runtime = new RaphKernel().createRuntime({
       id: 'node-reparent',
       scheduler: RaphSchedulerType.Sync,

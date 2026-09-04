@@ -6,7 +6,7 @@ import type {
 import { describe, expect, it, vi } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 
-describe('raphApp.definePhases', () => {
+describe('определение фаз RaphApp', () => {
   it('сохраняет фазы в массиве с сохранением порядка', () => {
     const raph = new RaphApp()
 

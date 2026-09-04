@@ -4,7 +4,7 @@ import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphApp frame context', () => {
+describe('контекст кадра RaphApp', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(0)
@@ -14,7 +14,7 @@ describe('raphApp frame context', () => {
     vi.useRealTimers()
   })
 
-  it('passes the same frame context to each and all executors', () => {
+  it('передаёт одинаковый контекст кадра исполнителям each и all', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
@@ -52,7 +52,7 @@ describe('raphApp frame context', () => {
     expect(raph.frame.delta).toBe(0)
   })
 
-  it('calculates delta, elapsed and clamps large frame gaps', () => {
+  it('вычисляет delta и elapsed и ограничивает большие разрывы между кадрами', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 

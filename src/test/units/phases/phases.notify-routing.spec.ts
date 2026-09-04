@@ -32,7 +32,7 @@ function buildTree(raph: RaphApp): any {
   return { a, b, a1, b1, b2 }
 }
 
-describe('raphApp.notify routing', () => {
+describe('маршрутизация notify RaphApp', () => {
   beforeEach(() => {
     vi.useRealTimers()
   })

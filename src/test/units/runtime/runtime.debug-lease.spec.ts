@@ -13,7 +13,7 @@ function createDebugHarness() {
   return { app, debug, events }
 }
 
-describe('raph debug leases', () => {
+describe('отладочные leases Raph', () => {
   const cleanups: Array<() => void> = []
 
   afterEach(() => {
@@ -22,7 +22,7 @@ describe('raph debug leases', () => {
     }
   })
 
-  it('keeps debug active until the last nested lease is released', () => {
+  it('сохраняет debug активным до освобождения последнего вложенного lease', () => {
     const { app, debug, events } = createDebugHarness()
     const first = debug.acquire()
     const second = debug.acquire()
@@ -41,7 +41,7 @@ describe('raph debug leases', () => {
     expect(debug.getFlat()).toEqual([])
   })
 
-  it('makes release idempotent and preserves compatible manual debug', () => {
+  it('делает release идемпотентным и сохраняет совместимый ручной debug', () => {
     const { app, debug, events } = createDebugHarness()
     debug.enable(true)
     cleanups.push(() => debug.enable(false))
@@ -58,7 +58,7 @@ describe('raph debug leases', () => {
     expect(debug.getFlat()).toEqual([])
   })
 
-  it('keeps routes equal to live partial and full subscriptions', () => {
+  it('сохраняет routes равными активным частичным и полным подпискам', () => {
     const { app, debug, events } = createDebugHarness()
     const lease = debug.acquire()
     cleanups.push(() => lease.release())
@@ -74,7 +74,7 @@ describe('raph debug leases', () => {
     expect(debug.getFlat()[0].routes).toEqual([])
   })
 
-  it('hydrates routes that existed before the first lease', () => {
+  it('восстанавливает routes, существовавшие до первого lease', () => {
     const { app, debug } = createDebugHarness()
     const node = new RaphNode(app, { id: 'pre-existing' })
     app.addNode(node)
@@ -89,7 +89,7 @@ describe('raph debug leases', () => {
     ])
   })
 
-  it('removes a deleted node even when it previously had routes', () => {
+  it('удаляет узел, даже если ранее у него были routes', () => {
     const { app, debug, events } = createDebugHarness()
     const lease = debug.acquire()
     cleanups.push(() => lease.release())

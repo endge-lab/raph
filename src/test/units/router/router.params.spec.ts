@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 
-describe('raphRouter.matchWithParams', () => {
+describe('сопоставление RaphRouter с params', () => {
   let r: RaphRouter<string>
 
   beforeEach(() => {
     r = new RaphRouter<string>()
   })
 
-  it('captures params for [id=$var] placeholders', () => {
+  it('захватывает params для placeholders [id=$var]', () => {
     const r = new RaphRouter<string>()
 
     // Маска с плейсхолдерами: [id=$oid], [id=$iid]
@@ -21,7 +21,7 @@ describe('raphRouter.matchWithParams', () => {
     expect(res[0].params).toEqual({ oid: 42, iid: 7 })
   })
 
-  it('coexists with deep wildcard masks', () => {
+  it('сосуществует с масками глубокого wildcard', () => {
     const r = new RaphRouter<string>()
     r.add('root.*', 'DEEP')
     r.add('root.a[id=$x].b', 'CAP')
@@ -41,7 +41,7 @@ describe('raphRouter.matchWithParams', () => {
     expect(deep.params).toEqual({})
   })
 
-  it('exact param match still works (no captures)', () => {
+  it('точное сопоставление param работает без захватов', () => {
     const r = new RaphRouter<string>()
     r.add('users[id=7].name', 'U7N')
 

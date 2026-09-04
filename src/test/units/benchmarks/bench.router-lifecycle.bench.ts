@@ -1,7 +1,7 @@
 import { bench, describe } from 'vitest'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 
-describe('router lifecycle benchmarks', () => {
+describe('бенчмарки lifecycle router', () => {
   bench('cold match / 10k unique routes', () => {
     const router = createRouter(10_000)
     for (let index = 0; index < 10_000; index++) {

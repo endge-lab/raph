@@ -4,8 +4,8 @@ import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphApp frame context overhead', () => {
-  it('runs 10k sync frames with frame context under a small local budget', () => {
+describe('накладные расходы контекста кадра RaphApp', () => {
+  it('выполняет 10 тысяч синхронных кадров с контекстом в рамках малого локального бюджета', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
     raph.definePhases([

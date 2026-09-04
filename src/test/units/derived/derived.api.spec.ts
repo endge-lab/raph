@@ -5,8 +5,8 @@ import { full } from '@/domain/derived/strategies/full'
 import { RaphDerivedPathError, RaphDerivedTargetWriteError } from '@/domain/types/derived.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('raph derived API', () => {
-  it('exposes derive and transaction on the default static runtime', () => {
+describe('проверка API производных данных Raph', () => {
+  it('предоставляет derive и transaction в стандартном статическом runtime', () => {
     Raph.set('derivedStatic.source', 2)
     const handle = Raph.derive({
       id: 'static-double',
@@ -21,7 +21,7 @@ describe('raph derived API', () => {
     Raph.app.reset()
   })
 
-  it('creates a system node and exposes lifecycle snapshot', () => {
+  it('создаёт системный узел и предоставляет snapshot lifecycle', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.value', 2)
     const handle = runtime.derive({
@@ -40,7 +40,7 @@ describe('raph derived API', () => {
     runtime.destroy()
   })
 
-  it('attaches a system node to root before explicit runtime init', () => {
+  it('присоединяет системный узел к корню до явной инициализации runtime', () => {
     const { kernel } = createDerivedFixture()
     const runtime = kernel.createRuntime({ id: 'not-initialized' })
     kernel.set('uninitialized.source', 2)
@@ -56,7 +56,7 @@ describe('raph derived API', () => {
     runtime.destroy()
   })
 
-  it('supports immediate=false and rejects invalid paths and duplicate ids', () => {
+  it('поддерживает immediate=false и отклоняет некорректные пути и повторяющиеся ID', () => {
     const { runtime } = createDerivedFixture()
     const handle = runtime.derive({
       id: 'later',
@@ -73,7 +73,7 @@ describe('raph derived API', () => {
     runtime.destroy()
   })
 
-  it('protects an active target and releases it after dispose', () => {
+  it('защищает активную target и освобождает её после dispose', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     const handle = runtime.derive({ from: 'source', to: 'target', compute: value => value })

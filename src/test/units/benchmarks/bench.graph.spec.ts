@@ -73,8 +73,8 @@ function time<T>(fn: () => T): { ms: number, res: T } {
  *  - скорость expandByTraversal (down/up)
  *  - отсутствие циклов (добавление циклического ребра запрещено)
  */
-describe('depGraph bench & correctness', () => {
-  it('builds a large DAG, keeps depths sane, expands fast enough', () => {
+describe('бенчмарк и корректность DepGraph', () => {
+  it('строит большой DAG, сохраняет разумную глубину и достаточно быстро разворачивает его', () => {
     const app = new RaphApp()
 
     // Параметры: ~3906 узлов (6 уровней по 5 ветвей)
@@ -166,7 +166,7 @@ describe('depGraph bench & correctness', () => {
     expect(cycOk).toBe(false)
   })
 
-  it('deep chain: sizes are exact; logs timings', () => {
+  it('глубокая цепочка: точные размеры и запись времени', () => {
     const N = 15000
     const { g, nodes } = buildDeepChain(N)
 
@@ -202,7 +202,7 @@ describe('depGraph bench & correctness', () => {
     )
   })
 
-  it('regular tree: non-overlapping seeds produce disjoint union down; logs timings', () => {
+  it('обычное дерево: непересекающиеся seeds дают непересекающееся объединение вниз и записывают время', () => {
     const BR = 7
     const LVL = 6 // суммарно ~5461 нода
     const { g, byLevel, total } = buildRegularTree(BR, LVL)
@@ -243,7 +243,7 @@ describe('depGraph bench & correctness', () => {
     )
   })
 
-  it('dirty-only returns the base set verbatim; logs timings', () => {
+  it('dirty-only возвращает базовый набор без изменений и записывает время', () => {
     const N = 5000
     const { g, nodes } = buildDeepChain(N)
 

@@ -83,7 +83,7 @@ export class RaphDebug {
     this._syncEnabled()
   }
 
-  /** Keep debug active for the lifetime of an explicit inspection session. */
+  /** Сохраняет debug активным на протяжении явной сессии инспекции. */
   acquire(): RaphDebugLease {
     const token = Symbol('raph-debug-lease')
     this._leases.add(token)
@@ -180,7 +180,7 @@ export class RaphDebug {
     return forest
   }
 
-  // ================== INTERNAL ==================
+  // ================== ВНУТРЕННЕЕ ==================
 
   /**
    * Подписаться на события Raph и начать сбор debug-данных.

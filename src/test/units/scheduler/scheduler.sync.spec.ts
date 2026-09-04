@@ -7,12 +7,12 @@ import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphApp.scheduler-sync', () => {
+describe('синхронный scheduler RaphApp', () => {
   beforeEach(() => {
     vi.useRealTimers()
   })
 
-  it('executes phase synchronously on set()', () => {
+  it('синхронно выполняет фазу при set()', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
@@ -39,7 +39,7 @@ describe('raphApp.scheduler-sync', () => {
     expect(calls[0]).toEqual({ phase: 'sync-phase', nodeId: 'n1' })
   })
 
-  it('executes synchronously on notify() as well', () => {
+  it('также выполняется синхронно при notify()', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
@@ -62,7 +62,7 @@ describe('raphApp.scheduler-sync', () => {
     expect(exec).toHaveBeenCalledTimes(1)
   })
 
-  it('does not require ticks; two consecutive sets cause two immediate executions (no batching)', () => {
+  it('не требует ticks: два последовательных set вызывают два немедленных выполнения без объединения', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
@@ -86,7 +86,7 @@ describe('raphApp.scheduler-sync', () => {
     expect(exec).toHaveBeenCalledTimes(2)
   })
 
-  it('respects traversal=dirty-and-down synchronously', () => {
+  it('синхронно учитывает traversal=dirty-and-down', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 

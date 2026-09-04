@@ -35,7 +35,7 @@ function makeTree(raph: RaphApp) {
   return { A, B, C, D, E, F }
 }
 
-describe('raphApp.traversal', () => {
+describe('обход RaphApp', () => {
   beforeEach(() => {
     vi.useRealTimers()
   })

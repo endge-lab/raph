@@ -2,7 +2,7 @@ import { bench, describe } from 'vitest'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('derived lifecycle benchmarks', () => {
+describe('бенчмарки lifecycle производных данных', () => {
   bench('register/dispose 10k handles', () => {
     const kernel = new RaphKernel()
     const runtime = kernel.createRuntime({ scheduler: SchedulerType.Sync })

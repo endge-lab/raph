@@ -12,7 +12,7 @@ interface LocalProps {
   value: number
 }
 
-describe('raph kernel/runtime lane benchmarks', () => {
+describe('бенчмарки ядра и runtime lane Raph', () => {
   const benchOptions = {
     iterations: 5,
     warmupIterations: 1,

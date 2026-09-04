@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 
-describe('raph runtime memory cleanup', () => {
-  it('releases a removed node and its observer callback', async () => {
+describe('очистка памяти runtime Raph', () => {
+  it('освобождает удалённый узел и его callback observer', async () => {
     const refs = createAndRemoveNode()
     await collectGarbage()
 

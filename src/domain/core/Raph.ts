@@ -84,7 +84,7 @@ export class Raph {
   }
 
   //
-  // PUBLIC API
+  // ПУБЛИЧНЫЙ API
   //
 
   /**

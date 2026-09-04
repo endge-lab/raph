@@ -2,7 +2,7 @@ import { afterAll, bench, describe } from 'vitest'
 import { RaphKernel } from '@/domain/core/RaphKernel'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('derived full benchmarks', () => {
+describe('бенчмарки производной стратегии full', () => {
   const size = stressSize(1_000, 1_000_000)
   const rows = Array.from({ length: size }, (_, id) => ({ id, value: id % 100, nested: { active: id % 2 === 0 } }))
   const derived = fixture(rows)

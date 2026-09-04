@@ -13,20 +13,20 @@ export class RaphRouter<P = string> {
   private _payloadMasks = new Map<P, Set<string>>()
   private _branchSizes = new WeakMap<object, number>()
 
-  // --- Versioning for caches ---
+  // --- Версионирование кешей ---
   private _version = 0
 
-  // --- Caches ---
+  // --- Кеши ---
   private _segCache = new Map<string, ReturnType<DataPath['segments']>>()
   private _matchCache = new Map<string, { v: number, res: Set<P> }>()
-  private _prefixCache = new Map<string, { v: number, res: Set<P> }>() // cache for collectByPrefix
+  private _prefixCache = new Map<string, { v: number, res: Set<P> }>() // кеш для collectByPrefix
 
   private static readonly _MAX_SEG_CACHE = 20_000
   private static readonly _MAX_MATCH_CACHE = 50_000
   private static readonly _MAX_PREFIX_CACHE = 50_000
 
   // -------------------------
-  // Helpers: caches / keys
+  // Вспомогательные сущности: кеши и ключи
   // -------------------------
   /**
    * Выполняет внутреннюю операцию to key.
@@ -102,8 +102,8 @@ export class RaphRouter<P = string> {
    */
   private _bumpVersion(): void {
     this._version++
-    // Cached Sets hold payloads strongly. Drop them immediately when the trie
-    // changes so an untracked runtime node can be collected without waiting
+    // Кешированные Sets удерживают payload сильными ссылками. Удаляем их сразу после изменения trie,
+    // чтобы неотслеживаемый runtime-узел можно было собрать без ожидания
     // for another 1024 mutations.
     this._matchCache.clear()
     this._prefixCache.clear()
@@ -212,7 +212,7 @@ export class RaphRouter<P = string> {
   }
 
   // -------------------------
-  // Public API
+  // Публичный API
   // -------------------------
 
   /** Зарегистрировать маршрут (маску) с полезной нагрузкой */
@@ -756,7 +756,7 @@ export class RaphRouter<P = string> {
           // нет однозначного узла-три, просто ничего не добавляем
         }
 
-        // param literal
+        // литерал параметра
         if (node.param && s.kind === SegKind.Param) {
           const bucket = node.param[s.pkey!]
           if (bucket) {

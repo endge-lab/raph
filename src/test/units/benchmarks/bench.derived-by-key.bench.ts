@@ -3,7 +3,7 @@ import { RaphKernel } from '@/domain/core/RaphKernel'
 import { collectionByKey } from '@/domain/derived/strategies/collection-by-key'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('derived collectionByKey benchmarks', () => {
+describe('бенчмарки производной стратегии collectionByKey', () => {
   const size = stressSize(10_000, 1_000_000)
   const bursts = isStress() ? [1, 100, 10_000] : [1, 10, 100, 1_000]
   const fixtures: Array<ReturnType<typeof fixture>> = []

@@ -7,8 +7,8 @@ import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
  *  - смешанные массивы/параметры: rows[id=...].items[idx].value
  * Проверяем корректность финального состояния и печатаем время.
  */
-describe('defaultDataAdapter deep & nested set() bench', () => {
-  it('deep key chains and mixed array/param writes', () => {
+describe('бенчмарк глубокого и вложенного set() DefaultDataAdapter', () => {
+  it('глубокие цепочки ключей и смешанные записи массивов и params', () => {
     const adapter = new DefaultDataAdapter({}, { autoCreate: true })
 
     // Глубокие ключевые цепочки

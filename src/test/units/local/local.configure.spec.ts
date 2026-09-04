@@ -165,8 +165,8 @@ function createRuntime() {
   return { runtime, ...configured }
 }
 
-describe('raph local/instant runtime', () => {
-  it('sets a local property and runs only the related phase once per node', async () => {
+describe('локальный немедленный runtime Raph', () => {
+  it('задаёт локальное свойство и однократно выполняет только связанную фазу для узла', async () => {
     const { app, runtime } = createRuntime()
     const node = new LocalNode(app, 'n1')
     app.options({ scheduler: RaphSchedulerType.Microtask })
@@ -188,7 +188,7 @@ describe('raph local/instant runtime', () => {
     expect(node.afterCalls).toEqual(['n1:22'])
   })
 
-  it('keeps dependsOn compute order inside a local phase', () => {
+  it('сохраняет порядок compute dependsOn внутри локальной фазы', () => {
     const { app } = createRuntime()
     const node = new LocalNode(app, 'n1')
     app.addNode(node)
@@ -213,7 +213,7 @@ describe('raph local/instant runtime', () => {
     }])
   })
 
-  it('propagates down through the ordered tree without touching unrelated nodes', () => {
+  it('распространяет вниз по упорядоченному дереву без затрагивания несвязанных узлов', () => {
     const { app, runtime } = createRuntime()
     const parent = new LocalNode(app, 'parent')
     const child = new LocalNode(app, 'child')
@@ -232,7 +232,7 @@ describe('raph local/instant runtime', () => {
     expect(runtime.phases).toContain('update:parent,child')
   })
 
-  it('runs always phases and mode=all phases with the app root/tree', () => {
+  it('выполняет фазы always и mode=all с корнем и деревом приложения', () => {
     const { app, runtime } = createRuntime()
     const first = new LocalNode(app, 'first')
     const second = new LocalNode(app, 'second')
@@ -247,7 +247,7 @@ describe('raph local/instant runtime', () => {
     expect(runtime.phases).toContain('render:__root__,first,second')
   })
 
-  it('schedules local dirty work through the selected scheduler', async () => {
+  it('планирует локальную dirty-работу через выбранный scheduler', async () => {
     const { app } = createRuntime()
     const spy = vi.fn()
     const node = new LocalNode(app, 'n1')
@@ -264,7 +264,7 @@ describe('raph local/instant runtime', () => {
     expect(spy).toHaveBeenCalledWith('n1:6')
   })
 
-  it('reset clears tree nodes and local dirty queues', () => {
+  it('reset очищает узлы дерева и локальные dirty-очереди', () => {
     const { app } = createRuntime()
     const node = new LocalNode(app, 'n1')
     app.addNode(node)

@@ -7,7 +7,7 @@ import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphApp.scheduler-raf', () => {
+describe('планировщик rAF RaphApp', () => {
   let rafSpy: ReturnType<typeof vi.fn>
   let cafSpy: ReturnType<typeof vi.fn>
   let realRAF: typeof globalThis.requestAnimationFrame | undefined
@@ -43,7 +43,7 @@ describe('raphApp.scheduler-raf', () => {
     vi.useRealTimers()
   })
 
-  it('executes phase on the next animation frame (not immediately)', () => {
+  it('выполняет фазу на следующем кадре анимации, а не сразу', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.AnimationFrame })
 
@@ -79,7 +79,7 @@ describe('raphApp.scheduler-raf', () => {
     expect(calls[0]).toEqual({ phase: 'raf-phase', node: 'n1' })
   })
 
-  it('coalesces multiple notifications into a single frame', () => {
+  it('объединяет несколько уведомлений в один кадр', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.AnimationFrame })
 
@@ -115,7 +115,7 @@ describe('raphApp.scheduler-raf', () => {
     expect(ctx.phase).toBe('raf-phase')
   })
 
-  it('schedules a new frame after each dirty mark, but still batches work per frame', () => {
+  it('планирует новый кадр после каждой dirty-метки, сохраняя пакетную работу на кадр', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.AnimationFrame })
 
@@ -158,7 +158,7 @@ describe('raphApp.scheduler-raf', () => {
     expect(rafSpy.mock.calls.length).toBeGreaterThanOrEqual(rafCallsBefore + 1)
   })
 
-  it('respects traversal=dirty-and-down under RAF', () => {
+  it('учитывает traversal=dirty-and-down в RAF', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.AnimationFrame })
 

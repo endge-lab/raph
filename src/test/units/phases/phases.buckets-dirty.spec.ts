@@ -26,7 +26,7 @@ function findBucketIndex(q: ReturnType<typeof getPhaseDirty>, n: RaphNode) {
   return undefined
 }
 
-describe('raphApp.dirty-buckets (Map + MinHeap)', () => {
+describe('проверка Dirty-buckets RaphApp на Map и MinHeap', () => {
   it('складывает ноды в buckets по индексу приоритета; heap/inHeap получают индекс бакета (lazy alloc)', () => {
     const app = new RaphApp()
     app.options({ scheduler: SchedulerType.Microtask })

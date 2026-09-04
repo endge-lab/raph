@@ -23,9 +23,9 @@ const EMPTY_SET_STR: ReadonlySet<string> = new Set()
  */
 export class DepGraph<N extends GraphNode = RaphNode<any>> {
   private _nodes = new Map<string, N>()
-  private _children = new Map<string, Set<string>>() // id -> Set(child ids)
-  private _parents = new Map<string, Set<string>>() // id -> Set(parent ids)
-  private _depth = new Map<string, number>() // id -> depth
+  private _children = new Map<string, Set<string>>() // id -> набор id дочерних узлов
+  private _parents = new Map<string, Set<string>>() // id -> набор id родительских узлов
+  private _depth = new Map<string, number>() // id -> глубина
   private _roots = new Set<string>() // кэш узлов без родителей
 
   //

@@ -12,7 +12,7 @@ import { SchedulerType } from '@/domain/types/base.types'
  * - Пороговые значения намеренно заданы с запасом для работы в CI.
  */
 
-describe('bench.track-x1_000_000', () => {
+describe('бенчмарк track на 1 миллион вызовов', () => {
   const NODE_COUNT = 1000
   const DEPS_PER_NODE = 1000 // 1000 * 1000 = 1_000_000
   const TOTAL_DEPS = NODE_COUNT * DEPS_PER_NODE

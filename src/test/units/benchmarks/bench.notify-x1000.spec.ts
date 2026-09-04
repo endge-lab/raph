@@ -18,11 +18,11 @@ import { SchedulerType } from '@/domain/types/base.types'
  * [bench.notify x1000] total=1316.789ms, per op ~1.3168ms
  * [bench.notify fanout x1000] total=4669.211ms
  */
-describe('bench.notify x1_000', () => {
+describe('бенчмарк notify на 1000 вызовов', () => {
   //
   //
   //
-  it('notifies 1_000 times (sync scheduler) and executes phase for tracked node', () => {
+  it('отправляет 1000 уведомлений синхронным scheduler и выполняет фазу отслеживаемого узла', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 
@@ -72,7 +72,7 @@ describe('bench.notify x1_000', () => {
   //
   //
   //
-  it('notifies 1_000 times with small tree (dirty-and-down) to simulate fanout', () => {
+  it('отправляет 1000 уведомлений в малом дереве dirty-and-down для имитации fanout', () => {
     const raph = new RaphApp()
     raph.options({ scheduler: SchedulerType.Sync })
 

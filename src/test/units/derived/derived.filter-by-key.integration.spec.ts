@@ -8,8 +8,8 @@ import { filterByKey } from '@/domain/derived/strategies/filter-by-key'
 import { SchedulerType } from '@/domain/types/base.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('raph derived filterByKey integration', () => {
-  it('stabilizes a two-stage filtered graph once per transaction', () => {
+describe('интеграция производной стратегии filterByKey Raph', () => {
+  it('однократно стабилизирует двухэтапный фильтрованный граф на транзакцию', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [
       { id: 1, visible: true, priority: true, value: 1 },
@@ -59,7 +59,7 @@ describe('raph derived filterByKey integration', () => {
     runtime.destroy()
   })
 
-  it('delivers only materialized keyed changes to phases after stabilization', () => {
+  it('доставляет фазам после стабилизации только материализованные изменения по ключам', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [
       { id: 1, visible: true, value: 1 },
@@ -100,7 +100,7 @@ describe('raph derived filterByKey integration', () => {
     runtime.destroy()
   })
 
-  it('propagates keyed membership changes across runtimes sharing one kernel', () => {
+  it('распространяет изменения состава по ключам между runtime одного ядра', () => {
     const kernel = new RaphKernel()
     const sourceRuntime = kernel.createRuntime({ id: 'source-runtime', scheduler: SchedulerType.Sync })
     const consumerRuntime = kernel.createRuntime({ id: 'consumer-runtime', scheduler: SchedulerType.Sync })
@@ -137,7 +137,7 @@ describe('raph derived filterByKey integration', () => {
     consumerRuntime.destroy()
   })
 
-  it('coalesces paused keyed mutations into one full resume recompute', () => {
+  it('объединяет приостановленные изменения по ключам в один полный пересчёт при resume', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, visible: true }, { id: 2, visible: false }])
     const compute = vi.fn((rows: Array<{ id: number, visible: boolean }>) => rows.filter(row => row.visible))

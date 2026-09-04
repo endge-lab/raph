@@ -7,7 +7,7 @@ import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphApp notify CRUD', () => {
+describe('проверка CRUD уведомлений RaphApp', () => {
   let raph: RaphApp
   let executorSpy: ReturnType<typeof vi.fn>
 

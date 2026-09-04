@@ -6,14 +6,14 @@ function rootOf(router: RaphRouter<unknown>) {
   return (router as unknown as { _root: Record<string, unknown> })._root
 }
 
-describe('raphRouter lifecycle', () => {
+describe('жизненный цикл RaphRouter', () => {
   it.each([
     ['exact', 'orders.rows.name', 'orders.rows.name'],
     ['wildcard', 'orders.*.name', 'orders.any.name'],
     ['deep wildcard', 'orders.*', 'orders.any.deep'],
     ['literal param', 'orders[id=7].name', 'orders[id=7].name'],
     ['captured param', 'orders[id=$id].name', 'orders[id=8].name'],
-  ])('prunes an isolated %s branch and permits rebuilding it', (_kind, mask, path) => {
+  ])('удаляет изолированную ветвь %s и разрешает её повторное построение', (_kind, mask, path) => {
     const router = new RaphRouter<object>()
     const payload = {}
     router.add(mask, payload)
@@ -34,7 +34,7 @@ describe('raphRouter lifecycle', () => {
     expect(router.match(path)).toContain(payload)
   })
 
-  it('preserves adjacent trie branches during partial and full untrack', () => {
+  it('сохраняет соседние ветви trie при частичном и полном untrack', () => {
     const router = new RaphRouter<object>()
     const first = {}
     const second = {}
@@ -52,7 +52,7 @@ describe('raphRouter lifecycle', () => {
     expect(router.match('orders.active.total')).toEqual(new Set([second]))
   })
 
-  it('handles duplicate track and repeated untrack idempotently', () => {
+  it('идемпотентно обрабатывает повторные track и untrack', () => {
     const router = new RaphRouter<object>()
     const payload = {}
     router.add('rows.current', payload)
@@ -65,7 +65,7 @@ describe('raphRouter lifecycle', () => {
     expect(router.match('rows.current')).toEqual(new Set())
   })
 
-  it('invalidates match and prefix caches immediately on removal', () => {
+  it('сразу инвалидирует caches match и prefix при удалении', () => {
     const router = new RaphRouter<object>()
     const payload = {}
     router.add('rows.current.value', payload)
@@ -85,7 +85,7 @@ describe('raphRouter lifecycle', () => {
     expect(router.match('rows.current.value')).toEqual(new Set())
   })
 
-  it('removes every payload index when a mask is cleared without a payload', () => {
+  it('удаляет каждый индекс payload при очистке маски без payload', () => {
     const router = new RaphRouter<object>()
     const first = {}
     const second = {}
@@ -98,7 +98,7 @@ describe('raphRouter lifecycle', () => {
     expect(router.match('rows.current')).toEqual(new Set())
   })
 
-  it('bounds global DataPath string caches for unique runtime paths', () => {
+  it('ограничивает глобальные строковые caches DataPath для уникальных runtime-путей', () => {
     DataPath._cacheFromString.clear()
     DataPath._cacheSegments.clear()
     for (let index = 0; index < 20_500; index++) {

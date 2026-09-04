@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('raph derived memory cleanup', () => {
-  it('releases deterministic registry resources after repeated create/dispose', () => {
+describe('очистка памяти производных данных Raph', () => {
+  it('освобождает детерминированные ресурсы реестра после повторных create/dispose', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     const count = stressEnabled() ? 100_000 : 10_000
@@ -31,7 +31,7 @@ describe('raph derived memory cleanup', () => {
     runtime.destroy()
   })
 
-  it('cleans chains, fan-out, paused and failed registrations', () => {
+  it('очищает цепочки, fan-out, приостановленные и неудачные регистрации', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     const count = stressEnabled() ? 10_000 : 1_000
@@ -68,7 +68,7 @@ describe('raph derived memory cleanup', () => {
     runtime.destroy()
   })
 
-  it('reports heap before registration and after runtime cleanup', () => {
+  it('сообщает heap до регистрации и после очистки runtime', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', { payload: Array.from({ length: 100 }).fill('x') })
     forceGc()
@@ -97,7 +97,7 @@ describe('raph derived memory cleanup', () => {
     expect(kernel.getDerivedSnapshot().registrations).toBe(0)
   })
 
-  it('reports WeakRef collection of a disposed compute closure', () => {
+  it('сообщает о сборке WeakRef освобождённого замыкания compute', () => {
     const { kernel, runtime } = createDerivedFixture()
     const weak = registerDisposableClosure(runtime)
     forceGc()

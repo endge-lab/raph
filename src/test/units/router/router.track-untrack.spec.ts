@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { RaphApp } from '@/domain/core/RaphApp'
 import { RaphNode } from '@/domain/core/RaphNode'
 
-describe('raphApp track/untrack (router-based)', () => {
+describe('проверка Track/untrack RaphApp на основе router', () => {
   function makeRaphWithPhase(route: string) {
     const raph = new RaphApp()
     const fired: Array<RaphNode> = []

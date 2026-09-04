@@ -4,8 +4,8 @@ import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphRuntime.observeData', () => {
-  it('marks a node dirty in the requested phase without phase.routes', () => {
+describe('наблюдение данных RaphRuntime', () => {
+  it('помечает узел изменённым в запрошенной фазе без phase.routes', () => {
     const kernel = new RaphKernel()
     const runtime = kernel.createRuntime({ id: 'runtime', scheduler: SchedulerType.Sync })
     const node = new RaphNode(runtime, { id: 'node' })

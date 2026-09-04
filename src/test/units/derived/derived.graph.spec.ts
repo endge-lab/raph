@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { RaphDerivedCycleError, RaphDerivedTargetWriteError } from '@/domain/types/derived.types'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('raph derived graph', () => {
-  it('stabilizes chains and fan-out before returning from source mutation', () => {
+describe('граф производных данных Raph', () => {
+  it('стабилизирует цепочки и fan-out до возврата из изменения источника', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('a', 1)
     runtime.derive({ id: 'a-b', from: 'a', to: 'b', compute: value => Number(value) + 1 })
@@ -18,7 +18,7 @@ describe('raph derived graph', () => {
     runtime.destroy()
   })
 
-  it('detects direct, indirect and target-prefix conflicts without leaking registration', () => {
+  it('обнаруживает прямые, косвенные и prefix-конфликты target без утечки регистрации', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('a', 1)
     runtime.derive({ id: 'a-b', from: 'a', to: 'b', compute: value => value })
@@ -28,7 +28,7 @@ describe('raph derived graph', () => {
     runtime.destroy()
   })
 
-  it('continues a downstream branch after removing an intermediate derive with target cleanup', () => {
+  it('продолжает нижележащую ветвь после удаления промежуточного derive с очисткой target', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 2)
     const middle = runtime.derive({

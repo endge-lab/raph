@@ -4,8 +4,8 @@ import { RaphNode } from '@/domain/core/RaphNode'
 import { RaphRouter } from '@/domain/core/RaphRouter'
 import { SchedulerType } from '@/domain/types/base.types'
 
-describe('raphApp Base', () => {
-  it('base', () => {
+describe('базовый RaphApp', () => {
+  it('базовый сценарий', () => {
     //
     Raph.options({
       scheduler: SchedulerType.Sync,
@@ -18,7 +18,7 @@ describe('raphApp Base', () => {
     Raph.app.addNode(B)
   })
 
-  it('test', () => {
+  it('тестовый сценарий', () => {
     //
     Raph.options({
       scheduler: SchedulerType.Sync,
@@ -52,7 +52,7 @@ describe('raphApp Base', () => {
     }
   }
 
-  it('matches exact keys', () => {
+  it('сопоставляет точные ключи', () => {
     const router = new RaphRouter()
     router.add('FLT_ARR.attrs[*].items[name="ArrivalModelType"].text[*]', 'H1')
 

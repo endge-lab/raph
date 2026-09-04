@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
 
-describe('raph derived transactions', () => {
-  it('coalesces nested transactions and delivers source/target after stabilization', () => {
+describe('транзакции производных данных Raph', () => {
+  it('объединяет вложенные транзакции и доставляет source/target после стабилизации', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', { value: 1 })
     const compute = vi.fn((source: any) => source.value * 2)
@@ -31,7 +31,7 @@ describe('raph derived transactions', () => {
     runtime.destroy()
   })
 
-  it('aggregates callback and derived failures', () => {
+  it('агрегирует ошибки callback и производных данных', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source', 1)
     runtime.derive({

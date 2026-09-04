@@ -3,11 +3,11 @@ import { collectionByKey } from '@/domain/derived/strategies/collection-by-key'
 import { RaphDerivedStrategyError } from '@/domain/types/derived.types'
 import { createDerivedFixture, projectRows } from '../../../units/derived/derived.fixtures.ts'
 
-describe('raph derived collectionByKey strategy', () => {
+describe('производная стратегия collectionByKey Raph', () => {
   it.each([
     { name: 'undefined output', emptyOutput: undefined },
     { name: 'empty array output', emptyOutput: [] },
-  ])('waits for an initially unavailable collection with $name', ({ emptyOutput }) => {
+  ])('ожидает изначально недоступную коллекцию $name', ({ emptyOutput }) => {
     const { kernel, runtime } = createDerivedFixture()
     const compute = vi.fn((rows: any[] | undefined) => rows
       ? rows.map(row => ({ id: row.id, label: row.name }))
@@ -29,7 +29,7 @@ describe('raph derived collectionByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('batches updates by key and processes merge/add/delete incrementally', () => {
+  it('объединяет обновления по ключу и инкрементально обрабатывает merge/add/delete', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [
       { id: 1, name: 'A', value: 1 },
@@ -68,7 +68,7 @@ describe('raph derived collectionByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('recomputes an item after field deletion and falls back to full for key/index/root changes', () => {
+  it('пересчитывает элемент после удаления поля и переходит к full при изменении key/index/root', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, name: 'A', value: 1 }, { id: 2, name: 'B', value: 2 }])
     const compute = vi.fn(projectRows)
@@ -83,7 +83,7 @@ describe('raph derived collectionByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('validates cardinality, key uniqueness and order without partial commits', () => {
+  it('проверяет кардинальность, уникальность ключей и порядок без частичных фиксаций', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1 }, { id: 2 }])
     expect(() => runtime.derive({
@@ -111,7 +111,7 @@ describe('raph derived collectionByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('preserves source order across add/delete and batches a compute failure atomically', () => {
+  it('сохраняет исходный порядок при add/delete и атомарно объединяет ошибку compute', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, value: 1 }, { id: 2, value: 2 }])
     let fail = false
@@ -146,7 +146,7 @@ describe('raph derived collectionByKey strategy', () => {
     runtime.destroy()
   })
 
-  it('uses a full first computation when immediate is false', () => {
+  it('использует полное первое вычисление при immediate=false', () => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, value: 1 }])
     const compute = vi.fn((rows: any[]) => rows.map(row => ({ id: row.id, value: row.value * 2 })))
@@ -168,7 +168,7 @@ describe('raph derived collectionByKey strategy', () => {
     { name: 'non-object item', compute: () => [1, 2] },
     { name: 'missing key', compute: () => [{}, {}] },
     { name: 'duplicate output key', compute: () => [{ id: 1 }, { id: 1 }] },
-  ])('rejects $name', ({ compute }) => {
+  ])('отклоняет $name', ({ compute }) => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1 }, { id: 2 }])
     expect(() => runtime.derive({
@@ -185,7 +185,7 @@ describe('raph derived collectionByKey strategy', () => {
     { name: 'non-array incremental result', next: () => ({}) },
     { name: 'wrong incremental cardinality', next: () => [] },
     { name: 'wrong incremental key order', next: () => [{ id: 2 }] },
-  ])('keeps last-good target for $name', ({ next }) => {
+  ])('сохраняет последнюю корректную target для $name', ({ next }) => {
     const { kernel, runtime } = createDerivedFixture()
     kernel.set('source.rows', [{ id: 1, value: 1 }])
     let invalid = false
