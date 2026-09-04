@@ -6,7 +6,7 @@ import { RaphKernel } from '@/domain/core/RaphKernel'
 import { RaphNode } from '@/domain/core/RaphNode'
 import { filterByKey } from '@/domain/derived/strategies/filter-by-key'
 import { SchedulerType } from '@/domain/types/base.types'
-import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
+import { createDerivedFixture } from './derived.fixtures.ts'
 
 describe('интеграция производной стратегии filterByKey Raph', () => {
   it('однократно стабилизирует двухэтапный фильтрованный граф на транзакцию', () => {

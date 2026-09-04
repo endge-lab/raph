@@ -3,7 +3,7 @@ import { Raph } from '@/domain/core/Raph'
 import { RaphDerivedNode } from '@/domain/derived/RaphDerivedNode'
 import { full } from '@/domain/derived/strategies/full'
 import { RaphDerivedPathError, RaphDerivedTargetWriteError } from '@/domain/types/derived.types'
-import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
+import { createDerivedFixture } from './derived.fixtures.ts'
 
 describe('проверка API производных данных Raph', () => {
   it('предоставляет derive и transaction в стандартном статическом runtime', () => {

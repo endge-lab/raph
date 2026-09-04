@@ -9,7 +9,7 @@ import {
   RaphDerivedReentrancyError,
   RaphDerivedStrategyError,
 } from '@/domain/types/derived.types'
-import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
+import { createDerivedFixture } from './derived.fixtures.ts'
 
 class TargetFailingAdapter extends DefaultDataAdapter {
   public failTarget = false

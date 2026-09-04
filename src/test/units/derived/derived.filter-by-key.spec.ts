@@ -4,7 +4,7 @@ import { keyedPath } from '@/domain/derived/derived-path'
 import { filterByKey } from '@/domain/derived/strategies/filter-by-key'
 import { DataPath } from '@/domain/entities/DataPath'
 import { RaphDerivedStrategyError } from '@/domain/types/derived.types'
-import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
+import { createDerivedFixture } from './derived.fixtures.ts'
 
 describe('производная стратегия filterByKey Raph', () => {
   it('нормализует, замораживает и проверяет descriptor стратегии', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { RaphDerivedCycleError, RaphDerivedTargetWriteError } from '@/domain/types/derived.types'
-import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
+import { createDerivedFixture } from './derived.fixtures.ts'
 
 describe('граф производных данных Raph', () => {
   it('стабилизирует цепочки и fan-out до возврата из изменения источника', () => {

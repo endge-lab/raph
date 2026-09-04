@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
+import { createDerivedFixture } from './derived.fixtures.ts'
 
 describe('очистка памяти производных данных Raph', () => {
   it('освобождает детерминированные ресурсы реестра после повторных create/dispose', () => {

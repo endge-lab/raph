@@ -1,7 +1,7 @@
 import type { PhaseExecutorContext, PhaseName } from '@/domain/types/phase.types'
 import { describe, expect, it, vi } from 'vitest'
 import { RaphNode } from '@/domain/core/RaphNode'
-import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
+import { createDerivedFixture } from './derived.fixtures.ts'
 
 describe('транзакции производных данных Raph', () => {
   it('объединяет вложенные транзакции и доставляет source/target после стабилизации', () => {

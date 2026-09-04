@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { full } from '@/domain/derived/strategies/full'
-import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
+import { createDerivedFixture } from './derived.fixtures.ts'
 
 describe('полная производная стратегия Raph', () => {
   it('синхронно пересчитывает изменения примитивов, объектов и вложенных данных', () => {

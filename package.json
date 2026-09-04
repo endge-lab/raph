@@ -1,7 +1,7 @@
 {
   "name": "@endge/raph",
   "type": "module",
-  "version": "3.0.20",
+  "version": "3.0.21",
   "private": false,
   "description": "Reactive application pipeline & router (Raph) - core library",
   "license": "Apache-2.0",

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { collectionByKey } from '@/domain/derived/strategies/collection-by-key'
 import { RaphDerivedStrategyError } from '@/domain/types/derived.types'
-import { createDerivedFixture, projectRows } from '../../../units/derived/derived.fixtures.ts'
+import { createDerivedFixture, projectRows } from './derived.fixtures.ts'
 
 describe('производная стратегия collectionByKey Raph', () => {
   it.each([

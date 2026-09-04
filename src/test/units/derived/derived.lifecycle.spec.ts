@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { RaphDerivedDisposedError } from '@/domain/types/derived.types'
-import { createDerivedFixture } from '../../../units/derived/derived.fixtures.ts'
+import { createDerivedFixture } from './derived.fixtures.ts'
 
 describe('жизненный цикл производных данных Raph', () => {
   it('приостанавливается без накопления изменений и возобновляется через полный пересчёт', () => {
