@@ -155,6 +155,54 @@ export class DefaultDataAdapter implements DataAdapter {
     return cur
   }
 
+  /** Проверить существование пути, не смешивая отсутствующее значение с undefined. */
+  has(path: DataPathDef, opts?: { vars?: Record<string, any> }): boolean {
+    const segs = DataPath.from(path, opts).segments()
+    let cur: any = this._root
+
+    for (const segment of segs) {
+      if (cur == null) {
+        return false
+      }
+      switch (segment.kind) {
+        case SegKind.Key: {
+          let key: any = segment.key
+          if (typeof key === 'string' && key.startsWith('$') && opts?.vars) {
+            const name = key.slice(1)
+            if (Object.hasOwn(opts.vars, name)) {
+              key = opts.vars[name]
+            }
+          }
+          if ((typeof cur !== 'object' && typeof cur !== 'function') || !Object.hasOwn(cur, key)) {
+            return false
+          }
+          cur = cur[key]
+          break
+        }
+        case SegKind.Index:
+          if (!Array.isArray(cur) || !Object.hasOwn(cur, segment.index as number)) {
+            return false
+          }
+          cur = cur[segment.index as number]
+          break
+        case SegKind.Param: {
+          if (!Array.isArray(cur)) {
+            return false
+          }
+          const index = this._findIndexByParam(cur, segment.pkey!, segment.pval!, opts)
+          if (index < 0 || !Object.hasOwn(cur, index)) {
+            return false
+          }
+          cur = cur[index]
+          break
+        }
+        case SegKind.Wildcard:
+          throw new Error('has: wildcard "*" без параметров не поддерживается')
+      }
+    }
+    return true
+  }
+
   /** Установить значение по пути. */
   set(
     path: DataPathDef,

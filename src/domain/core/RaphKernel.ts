@@ -12,6 +12,14 @@ import type {
   RaphDerivedOptions,
 } from '@/domain/types/derived.types'
 import type {
+  RaphMetaMutationCause,
+  RaphMetaObserver,
+  RaphMetaReadOptions,
+  RaphMetaWriteOptions,
+  RaphObserveMetaOptions,
+  RaphPendingMetaMutationEvent,
+} from '@/domain/types/meta.types'
+import type {
   RaphDataObserver,
   RaphKernelPendingEvent,
   RaphObserveDataOptions,
@@ -22,6 +30,10 @@ import { RaphRuntime } from '@/domain/core/RaphRuntime'
 import { RaphDerivedManager } from '@/domain/derived/RaphDerivedManager'
 import { DefaultDataAdapter } from '@/domain/entities/data-adapter'
 import { DataPath } from '@/domain/entities/DataPath'
+import { RaphMeta } from '@/domain/meta/RaphMeta'
+import { RaphMetaStore } from '@/domain/meta/RaphMetaStore'
+import { RaphMetaWatch } from '@/domain/reactivity/RaphMetaWatch'
+import { SegKind } from '@/domain/types/path.types'
 
 /**
  * Управляет shared data-store и маршрутизацией business data events между runtime lanes.
@@ -33,9 +45,15 @@ export class RaphKernel {
   private readonly _runtimes = new Set<RaphRuntime<any>>()
   private readonly _dataObservers = new Set<RaphDataObserver<any>>()
   private readonly _dataObserverRouter = new RaphRouter<RaphDataObserver<any>>()
+  private readonly _metaStore = new RaphMetaStore()
+  private readonly _metaObservers = new Set<RaphMetaObserver<any>>()
+  private readonly _metaObserverRouter = new RaphRouter<RaphMetaObserver<any>>()
+  private readonly _meta: RaphMeta
   private _dataObserverCounter = 0
+  private _metaObserverCounter = 0
   private _transactionDepth = 0
   private readonly _pendingEvents: Array<RaphDerivedMutationRecord> = []
+  private readonly _pendingMetaEvents: RaphPendingMetaMutationEvent[] = []
   private _derivedManager: RaphDerivedManager | null = null
 
   /**
@@ -44,6 +62,7 @@ export class RaphKernel {
   constructor(options: { id?: string, adapter?: DataAdapter } = {}) {
     this.id = options.id ?? 'kernel'
     this._dataAdapter = options.adapter ?? new DefaultDataAdapter()
+    this._meta = new RaphMeta(this)
   }
 
   /**
@@ -71,6 +90,7 @@ export class RaphKernel {
   unregisterRuntime(runtime: RaphRuntime<any>): void {
     this._derivedManager?.disposeRuntime(runtime)
     this.removeDataObserversByRuntime(runtime)
+    this.removeMetaObserversByRuntime(runtime)
     this._runtimes.delete(runtime)
   }
 
@@ -164,6 +184,59 @@ export class RaphKernel {
     }
   }
 
+  /** Регистрирует observer отдельного Meta-plane. */
+  registerMetaObserver<Props extends RaphProperties>(
+    runtime: RaphRuntime<Props>,
+    node: RaphMetaObserver<Props>['node'],
+    mask: DataPathDef,
+    options: RaphObserveMetaOptions,
+  ): () => void {
+    if (options.namespace !== undefined) {
+      this._assertNamespace(options.namespace)
+    }
+    const observer: RaphMetaObserver<Props> = {
+      id: `__metaObserver.${this._metaObserverCounter++}`,
+      runtime,
+      node,
+      mask,
+      phase: options.phase,
+      traversal: options.traversal,
+      namespace: options.namespace,
+      vars: options.vars,
+      wildcardDynamic: options.wildcardDynamic,
+    }
+    const route = DataPath.from(mask, {
+      vars: options.vars,
+      wildcardDynamic: options.wildcardDynamic,
+    })
+    this._metaObserverRouter.add(route, observer)
+    this._metaObservers.add(observer)
+    return () => {
+      this._metaObserverRouter.remove(route, observer)
+      this._metaObservers.delete(observer)
+    }
+  }
+
+  /** Снимает все Meta observers runtime lane. */
+  removeMetaObserversByRuntime(runtime: RaphRuntime<any>): void {
+    for (const observer of [...this._metaObservers]) {
+      if (observer.runtime === runtime) {
+        this._metaObserverRouter.removePayload(observer)
+        this._metaObservers.delete(observer)
+      }
+    }
+  }
+
+  /** Снимает Meta observers конкретной runtime-ноды. */
+  removeMetaObserversByNode(runtime: RaphRuntime<any>, node: RaphMetaObserver['node']): void {
+    for (const observer of [...this._metaObservers]) {
+      if (observer.runtime === runtime && observer.node === node) {
+        this._metaObserverRouter.removePayload(observer)
+        this._metaObservers.delete(observer)
+      }
+    }
+  }
+
   /**
    * Выполняет transaction с отложенной доставкой dirty events.
    */
@@ -209,6 +282,63 @@ export class RaphKernel {
     return this._dataAdapter.get(path, opts)
   }
 
+  /** Проверяет существование data owner, сохраняя различие с undefined value. */
+  has(path: DataPathDef, opts?: { vars?: Record<string, any> }): boolean {
+    if (this._dataAdapter.has) {
+      return this._dataAdapter.has(path, opts)
+    }
+    return adapterHasFallback(this._dataAdapter, path, opts)
+  }
+
+  /** Читает metadata одного namespace либо все namespaces exact data path. */
+  getMeta(path: DataPathDef, namespace?: string, options?: RaphMetaReadOptions): unknown {
+    if (namespace !== undefined) {
+      this._assertNamespace(namespace)
+    }
+    return this._metaStore.get(this._metaPath(path, options), namespace)
+  }
+
+  /** Проверяет наличие metadata exact data path. */
+  hasMeta(path: DataPathDef, namespace?: string, options?: RaphMetaReadOptions): boolean {
+    if (namespace !== undefined) {
+      this._assertNamespace(namespace)
+    }
+    return this._metaStore.has(this._metaPath(path, options), namespace)
+  }
+
+  /** Устанавливает пользовательскую metadata существующего data owner. */
+  setMeta(path: DataPathDef, namespace: string, value: unknown, options?: RaphMetaWriteOptions): void {
+    this._assertNamespace(namespace)
+    const canonical = this._metaPath(path, options)
+    this._assertExactMetaPath(canonical)
+    this._assertMetaOwner(canonical)
+    this._metaStore.set(canonical, namespace, value)
+    this._recordMetaMutation('set', canonical, namespace, 'explicit', options)
+  }
+
+  /** Объединяет пользовательскую metadata существующего data owner. */
+  mergeMeta(path: DataPathDef, namespace: string, value: unknown, options?: RaphMetaWriteOptions): void {
+    this._assertNamespace(namespace)
+    const canonical = this._metaPath(path, options)
+    this._assertExactMetaPath(canonical)
+    this._assertMetaOwner(canonical)
+    this._metaStore.merge(canonical, namespace, value)
+    this._recordMetaMutation('merge', canonical, namespace, 'explicit', options)
+  }
+
+  /** Удаляет namespace exact path либо metadata всего адресного поддерева. */
+  deleteMeta(path: DataPathDef, namespace?: string, options?: RaphMetaWriteOptions): void {
+    if (namespace !== undefined) {
+      this._assertNamespace(namespace)
+    }
+    const canonical = this._metaPath(path, options)
+    this._assertExactMetaPath(canonical)
+    const removed = this._metaStore.delete(canonical, namespace)
+    for (const removedPath of removed) {
+      this._recordMetaMutation('delete', removedPath, namespace ?? null, 'explicit', options)
+    }
+  }
+
   /**
    * Записывает значение по пути.
    */
@@ -220,8 +350,16 @@ export class RaphKernel {
     if (this._derivedManager?.size) {
       this._derivedManager.assertExternalMutationAllowed(path)
     }
-    this._dataAdapter.set(path, value, opts)
-    this._recordMutation('set', path, opts)
+    if (this._metaStore.size === 0) {
+      this._dataAdapter.set(path, value, opts)
+      this._recordMutation('set', path, opts)
+      return
+    }
+    this._mutateWithMetaLifecycle(() => {
+      this._dataAdapter.set(path, value, opts)
+      this._recordMutation('set', path, opts)
+      this._pruneReplacedOwners(path, opts)
+    })
   }
 
   /**
@@ -235,8 +373,16 @@ export class RaphKernel {
     if (this._derivedManager?.size) {
       this._derivedManager.assertExternalMutationAllowed(path)
     }
-    this._dataAdapter.merge(path, value, opts)
-    this._recordMutation('merge', path, opts)
+    if (this._metaStore.size === 0) {
+      this._dataAdapter.merge(path, value, opts)
+      this._recordMutation('merge', path, opts)
+      return
+    }
+    this._mutateWithMetaLifecycle(() => {
+      this._dataAdapter.merge(path, value, opts)
+      this._recordMutation('merge', path, opts)
+      this._pruneReplacedOwners(path, opts)
+    })
   }
 
   /**
@@ -249,8 +395,22 @@ export class RaphKernel {
     if (this._derivedManager?.size) {
       this._derivedManager.assertExternalMutationAllowed(path)
     }
-    this._dataAdapter.delete(path, opts)
-    this._recordMutation('delete', path, opts)
+    if (this._metaStore.size === 0) {
+      this._dataAdapter.delete(path, opts)
+      this._recordMutation('delete', path, opts)
+      return
+    }
+    this._mutateWithMetaLifecycle(() => {
+      this._dataAdapter.delete(path, opts)
+      this._recordMutation('delete', path, opts)
+      const canonical = DataPath.from(path, { vars: opts?.vars })
+      for (const removedPath of this._metaStore.deleteSubtree(canonical)) {
+        this._recordMetaMutation('delete', removedPath, null, 'owner-delete', opts)
+      }
+      for (const removedPath of this._metaStore.pruneMissingSiblings(canonical, candidate => this.has(candidate))) {
+        this._recordMetaMutation('delete', removedPath, null, 'owner-delete', opts)
+      }
+    })
   }
 
   /**
@@ -271,6 +431,14 @@ export class RaphKernel {
    */
   setDataAdapter(adapter: DataAdapter): void {
     this._dataAdapter = adapter
+    const removedPaths = this._metaStore.clear()
+    if (removedPaths.length) {
+      this.transaction(() => {
+        for (const path of removedPaths) {
+          this._recordMetaMutation('delete', path, null, 'clear')
+        }
+      })
+    }
   }
 
   /**
@@ -281,7 +449,9 @@ export class RaphKernel {
     for (const key of Object.keys(root)) {
       delete root[key]
     }
+    this._metaStore.clear()
     this._pendingEvents.length = 0
+    this._pendingMetaEvents.length = 0
     this._transactionDepth = 0
   }
 
@@ -289,20 +459,38 @@ export class RaphKernel {
    * Выполняет внутреннюю операцию flush pending events.
    */
   private _flushPendingEvents(): void {
-    if (this._pendingEvents.length === 0) {
+    if (this._pendingEvents.length === 0 && this._pendingMetaEvents.length === 0) {
       return
     }
-
     const mutations = this._pendingEvents.splice(0)
-    this._stabilizeAndDeliver(mutations)
+    const metaEvents = this._pendingMetaEvents.splice(0)
+    const runtimesToInvalidate = new Set<RaphRuntime<any>>()
+    let errors: Error[] = []
+    if (mutations.length) {
+      const result = this._derivedManager?.size
+        ? this._derivedManager.stabilize(mutations)
+        : { records: mutations, errors: [] }
+      errors = result.errors
+      this._deliverEvents(result.records.map(record => ({
+        path: record.originalPath,
+        opts: record.opts,
+      })), runtimesToInvalidate, false)
+    }
+    this._deliverMetaEvents(metaEvents, runtimesToInvalidate, false)
+    for (const runtime of runtimesToInvalidate) {
+      runtime.invalidate()
+    }
+    this._throwDerivedErrors(errors)
   }
 
   /**
    * Выполняет внутреннюю операцию deliver events.
    */
-  private _deliverEvents(events: Array<RaphKernelPendingEvent>): void {
-    const runtimesToInvalidate = new Set<RaphRuntime<any>>()
-
+  private _deliverEvents(
+    events: Array<RaphKernelPendingEvent>,
+    runtimesToInvalidate = new Set<RaphRuntime<any>>(),
+    invalidateRuntimes = true,
+  ): void {
     for (const pending of events) {
       const invalidate = pending.opts?.invalidate ?? true
       const canonical = DataPath.from(pending.path, {
@@ -330,8 +518,37 @@ export class RaphKernel {
       }
     }
 
-    for (const runtime of runtimesToInvalidate) {
-      runtime.invalidate()
+    if (invalidateRuntimes) {
+      for (const runtime of runtimesToInvalidate) {
+        runtime.invalidate()
+      }
+    }
+  }
+
+  /** Доставляет Meta events только Meta observers, не затрагивая derived/data routes. */
+  private _deliverMetaEvents(
+    events: RaphPendingMetaMutationEvent[],
+    runtimesToInvalidate = new Set<RaphRuntime<any>>(),
+    invalidateRuntimes = true,
+  ): void {
+    for (const event of events) {
+      const observers = this._metaObserverRouter.match(event.path)
+      for (const observer of observers) {
+        if (observer.namespace !== undefined && observer.namespace !== event.namespace && event.namespace !== null) {
+          continue
+        }
+        if (observer.node instanceof RaphMetaWatch) {
+          observer.node.enqueue(event)
+        }
+        if (observer.runtime.enqueueMetaObserver(observer, event) && event.invalidate) {
+          runtimesToInvalidate.add(observer.runtime)
+        }
+      }
+    }
+    if (invalidateRuntimes) {
+      for (const runtime of runtimesToInvalidate) {
+        runtime.invalidate()
+      }
     }
   }
 
@@ -352,6 +569,27 @@ export class RaphKernel {
       return
     }
     this._stabilizeAndDeliver([mutation])
+  }
+
+  private _recordMetaMutation(
+    kind: RaphPendingMetaMutationEvent['kind'],
+    path: DataPath,
+    namespace: string | null,
+    cause: RaphMetaMutationCause,
+    options?: RaphMetaWriteOptions,
+  ): void {
+    const event: RaphPendingMetaMutationEvent = {
+      kind,
+      path,
+      namespace,
+      cause,
+      invalidate: options?.invalidate ?? true,
+    }
+    if (this._transactionDepth > 0) {
+      this._pendingMetaEvents.push(event)
+      return
+    }
+    this._deliverMetaEvents([event])
   }
 
   /** Выполняет derived fast-path и публикует events только после стабилизации. */
@@ -378,6 +616,10 @@ export class RaphKernel {
         opts: record.opts,
       })))
     }
+    this._throwDerivedErrors(errors)
+  }
+
+  private _throwDerivedErrors(errors: Error[]): void {
     if (errors.length === 1) {
       throw errors[0]
     }
@@ -394,6 +636,46 @@ export class RaphKernel {
       )
     }
     return this._derivedManager
+  }
+
+  private _mutateWithMetaLifecycle(mutate: () => void): void {
+    if (this._transactionDepth > 0) {
+      mutate()
+      return
+    }
+    this.transaction(mutate)
+  }
+
+  private _pruneReplacedOwners(path: DataPathDef, options?: { invalidate?: boolean, vars?: Record<string, any> }): void {
+    if (this._metaStore.size === 0) {
+      return
+    }
+    const canonical = DataPath.from(path, { vars: options?.vars })
+    for (const removedPath of this._metaStore.pruneMissing(canonical, candidate => this.has(candidate))) {
+      this._recordMetaMutation('delete', removedPath, null, 'owner-replaced', options)
+    }
+  }
+
+  private _metaPath(path: DataPathDef, options?: RaphMetaReadOptions): DataPath {
+    return DataPath.from(path, { vars: options?.vars })
+  }
+
+  private _assertNamespace(namespace: string): void {
+    if (!String(namespace ?? '').trim()) {
+      throw new Error('[RaphMeta] namespace must not be empty.')
+    }
+  }
+
+  private _assertExactMetaPath(path: DataPath): void {
+    if (path.segments().some(segment => segment.kind === SegKind.Wildcard)) {
+      throw new Error('[RaphMeta] wildcard paths are read-only observation masks.')
+    }
+  }
+
+  private _assertMetaOwner(path: DataPath): void {
+    if (!this.has(path)) {
+      throw new Error(`[RaphMeta] Owner data path does not exist: "${path.toStringPath()}".`)
+    }
   }
 
   /**
@@ -416,4 +698,51 @@ export class RaphKernel {
   get data(): DataObject {
     return this._dataAdapter.root()
   }
+
+  /** Возвращает kernel-bound Meta facade; watch доступен через runtime-bound facade. */
+  get meta(): RaphMeta {
+    return this._meta
+  }
+}
+
+function adapterHasFallback(
+  adapter: DataAdapter,
+  path: DataPathDef,
+  options?: { vars?: Record<string, any> },
+): boolean {
+  const segments = DataPath.from(path, { vars: options?.vars }).segments()
+  let current: any = adapter.root()
+  for (const segment of segments) {
+    if (current == null) {
+      return false
+    }
+    switch (segment.kind) {
+      case SegKind.Key:
+        if ((typeof current !== 'object' && typeof current !== 'function') || !Object.hasOwn(current, segment.key as any)) {
+          return false
+        }
+        current = current[segment.key as any]
+        break
+      case SegKind.Index:
+        if (!Array.isArray(current) || !Object.hasOwn(current, segment.index as number)) {
+          return false
+        }
+        current = current[segment.index as number]
+        break
+      case SegKind.Param: {
+        if (!Array.isArray(current)) {
+          return false
+        }
+        const index = current.findIndex(item => item != null && item[segment.pkey!] === segment.pval)
+        if (index < 0) {
+          return false
+        }
+        current = current[index]
+        break
+      }
+      case SegKind.Wildcard:
+        throw new Error('has: wildcard "*" без параметров не поддерживается')
+    }
+  }
+  return true
 }

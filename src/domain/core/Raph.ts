@@ -7,6 +7,7 @@ import type {
   RaphLocalPhaseContext,
   RaphLocalPropertyDescriptor,
 } from '@/domain/local/local.types'
+import type { RaphMeta } from '@/domain/meta/RaphMeta'
 import type {
   DataObject,
   DataPathDef,
@@ -48,6 +49,7 @@ import { RaphPropagation } from '@/domain/local/local.types'
 import { RaphLocalPhaseRuntime } from '@/domain/local/raph-local-phase'
 import { RaphLocalPropertyRuntime } from '@/domain/local/raph-local-property'
 import { RaphEffect } from '@/domain/reactivity/RaphEffect'
+import { RaphMetaWatch } from '@/domain/reactivity/RaphMetaWatch'
 import { RaphSignal } from '@/domain/reactivity/RaphSignal'
 import { RaphWatch } from '@/domain/reactivity/RaphWatch'
 
@@ -359,6 +361,11 @@ export class Raph {
     return this.app.get(path, opts)
   }
 
+  /** Проверить существование data path, включая значение undefined. */
+  static has(path: DataPathDef, opts?: { vars?: Record<string, any> }): boolean {
+    return this.app.has(path, opts)
+  }
+
   /**
    * Установить значение в default app.
    */
@@ -555,6 +562,11 @@ export class Raph {
     return Raph.app.data
   }
 
+  /** Вернуть отдельный пользовательский Meta-plane default runtime. */
+  static get meta(): RaphMeta {
+    return Raph.app.meta
+  }
+
   /**
    * Выполняет внутреннюю операцию make descriptor computed local.
    */
@@ -648,9 +660,9 @@ export class Raph {
         name: '__watch' as PhaseName,
         traversal: 'dirty-only',
         routes: ['*'],
-        nodes: (node: RaphNode) => node instanceof RaphWatch,
+        nodes: (node: RaphNode) => node instanceof RaphWatch || node instanceof RaphMetaWatch,
         each: (ctx: PhaseExecutorContext) => {
-          (ctx.node as RaphWatch).run(ctx)
+          ;(ctx.node as RaphWatch | RaphMetaWatch).run(ctx)
         },
       },
     ]

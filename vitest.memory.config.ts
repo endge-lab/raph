@@ -11,6 +11,7 @@ export default defineConfig({
       'src/test/units/derived/**/*.memory.spec.ts',
       'src/test/units/router/**/*.memory.spec.ts',
       'src/test/units/runtime/**/*.memory.spec.ts',
+      'src/test/units/meta/**/*.memory.spec.ts',
     ],
     pool: 'threads',
     testTimeout: 30_000,

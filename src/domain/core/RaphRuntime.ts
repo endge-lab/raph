@@ -21,6 +21,7 @@ import type {
   ControlFlowSubscriptionId,
 } from '@/domain/types/control-flow.types'
 import type { RaphDerivedManagerSnapshot, RaphDerivedOptions } from '@/domain/types/derived.types'
+import type { RaphMetaMutationEvent, RaphMetaObserver, RaphObserveMetaOptions } from '@/domain/types/meta.types'
 import type {
   PhaseEvent,
   PhaseExecutorContext,
@@ -43,6 +44,7 @@ import { DataPath } from '@/domain/entities/DataPath'
 import { DepGraph } from '@/domain/entities/DepGraph'
 import { MinHeap } from '@/domain/entities/MinHeap'
 import { RaphPropagation } from '@/domain/local/local.types'
+import { RaphMeta } from '@/domain/meta/RaphMeta'
 import { SchedulerType } from '@/domain/types/base.types'
 import { SegKind } from '@/domain/types/path.types'
 
@@ -64,6 +66,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
   // Подмодули
   //
   private readonly _kernel: RaphKernel
+  private readonly _meta: RaphMeta
   private _nodeRouter: RaphRouter<RaphNode<any>> = new RaphRouter()
   private _phaseRouter: RaphRouter<PhaseName> = new RaphRouter()
   private _graph: DepGraph<RaphNode<any>> = new DepGraph()
@@ -146,6 +149,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
   constructor(options: RaphRuntimeOptions & { kernel: RaphKernel }) {
     this.id = options.id ?? 'runtime'
     this._kernel = options.kernel
+    this._meta = new RaphMeta(this._kernel, this)
     this._root = new RaphNode<Props>(this, { id: '__root__', type: '__root__' })
     this._kernel.registerRuntime(this)
     if (options.scheduler !== undefined) {
@@ -276,6 +280,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
   removeNode(node: RaphNode<any>): void {
     this.unsubscribeOwner(node)
     this._kernel.removeDataObserversByNode(this, node)
+    this._kernel.removeMetaObserversByNode(this, node)
     if (node.parent) {
       const siblings = node.parent.children
       const index = siblings.indexOf(node)
@@ -293,6 +298,7 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
   unregisterNode(node: RaphNode<any>): void {
     this.unsubscribeOwner(node)
     this._kernel.removeDataObserversByNode(this, node)
+    this._kernel.removeMetaObserversByNode(this, node)
     this._graph.removeNode(node.id)
     RAPH_EVENTS.emit('nodes:changed', { graph: this._graph })
   }
@@ -704,6 +710,15 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     return this._kernel.registerDataObserver(this, node, mask, options)
   }
 
+  /** Подписывает runtime-ноду на отдельный Meta-plane. */
+  observeMeta(
+    node: RaphNode<any>,
+    mask: DataPathDef,
+    options: RaphObserveMetaOptions,
+  ): () => void {
+    return this._kernel.registerMetaObserver(this, node, mask, options)
+  }
+
   /**
    * Ставит direct data observer в dirty queue.
    */
@@ -735,6 +750,29 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
       })
     }
 
+    return true
+  }
+
+  /** Ставит Meta observer в ту же phase queue, не создавая data notification. */
+  enqueueMetaObserver(observer: RaphMetaObserver<any>, mutation: RaphMetaMutationEvent): boolean {
+    if (observer.runtime !== this) {
+      return false
+    }
+    const phaseName = observer.phase as PhaseName
+    if (!this._phasesMap.has(phaseName)) {
+      return false
+    }
+    const event = this._createPhaseEvent(mutation.path)
+    const nodes = this._resolveObserverNodes(observer.node, observer.traversal ?? 'dirty-only')
+    if (nodes.length === 0) {
+      return false
+    }
+    for (const node of nodes) {
+      this.dirty(phaseName, node, {
+        invalidate: false,
+        event: node === observer.node ? event : undefined,
+      })
+    }
     return true
   }
 
@@ -1022,6 +1060,11 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     return this._kernel.get(path, opts)
   }
 
+  /** Проверяет существование data path, включая значение undefined. */
+  has(path: DataPathDef, opts?: { vars?: Record<string, any> }): boolean {
+    return this._kernel.has(path, opts)
+  }
+
   /**
    * Установить значение по пути и отправить notify.
    */
@@ -1206,12 +1249,18 @@ export class RaphRuntime<Props extends RaphProperties = RaphProperties> {
     this._nodeRouter.removeAll()
     this._kernel.disposeRuntimeDerived(this)
     this._kernel.removeDataObserversByRuntime(this)
+    this._kernel.removeMetaObserversByRuntime(this)
     this._controlFlowRegistry.clear()
     this._controlFlowQueue.clear()
     this._dirty.clear()
     this._graph = new DepGraph<RaphNode<any>>()
     this._ready = false
     this._destroyed = false
+  }
+
+  /** Возвращает runtime-bound фасад пользовательской metadata. */
+  get meta(): RaphMeta {
+    return this._meta
   }
 
   /**

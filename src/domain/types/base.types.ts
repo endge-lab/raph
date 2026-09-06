@@ -31,6 +31,10 @@ export type DataPathDef
  */
 export interface DataAdapter {
   root: () => DataObject
+  has?: (
+    path: DataPathDef,
+    opts?: { vars?: Record<string, any> },
+  ) => boolean
   get: (
     path: DataPathDef,
     opts?: { vars?: Record<string, any> },

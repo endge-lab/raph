@@ -2,7 +2,7 @@
 
 Reactive application pipeline, graph scheduler, and path router for complex state flows.
 
-Raph also supports synchronous materialized dependencies between store branches through `Raph.derive()`. See [`src/docs/5_Derived.md`](src/docs/5_Derived.md) for strategies, transactions, and lifecycle rules.
+Raph also supports synchronous materialized dependencies between store branches through `Raph.derive()` and a separate reactive Meta-plane bound to existing data paths. See [`src/docs/5_Derived.md`](src/docs/5_Derived.md) and [`src/docs/6_Meta.md`](src/docs/6_Meta.md).
 
 `@endge/raph` is a low-level runtime for applications where updates are driven by:
 
@@ -173,9 +173,11 @@ Main methods:
 - `Raph.effect(fn, opts?)`
 - `Raph.watch(maskOrMasks, cb, opts?)`
 - `Raph.get(path, opts?)`
+- `Raph.has(path, opts?)`
 - `Raph.set(path, value, opts?)`
 - `Raph.merge(path, value, opts?)`
 - `Raph.delete(path, opts?)`
+- `Raph.meta.get/has/set/merge/delete/watch(...)`
 - `Raph.createNode(opts?)`
 - `Raph.track(node, mask, opts?)`
 - `Raph.subscribe(node, maskOrMasks, callback, opts?)`
