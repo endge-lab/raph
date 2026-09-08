@@ -4,6 +4,7 @@ import type {
   DataPathDef,
   DefaultAdapterOptions,
 } from '@/domain/types/base.types'
+import { createDataDraft } from '@/domain/entities/data-draft'
 import { DataPath } from '@/domain/entities/DataPath'
 import { SegKind } from '@/domain/types/path.types'
 
@@ -29,6 +30,7 @@ import { SegKind } from '@/domain/types/path.types'
  *   - Индексы автоматически инвалидируются при операциях splice / грубых заменах.
  */
 export class DefaultDataAdapter implements DataAdapter {
+  private _sourceIndex: ((array: any[], key: string, value: unknown) => number | undefined) | null = null
   private _root: DataObject
   private _opts: Required<DefaultAdapterOptions>
 
@@ -50,6 +52,21 @@ export class DefaultDataAdapter implements DataAdapter {
       indexEnabled: opts?.indexEnabled ?? true,
       indexStrategy: opts?.indexStrategy ?? 'eager-all-keys',
     }
+  }
+
+  /**
+   * Isolated synchronous preflight projection; only touched properties are allocated.
+   * The source must remain unchanged until validation finishes. Not a persisted snapshot.
+   */
+  fork(): DefaultDataAdapter {
+    const projection = new DefaultDataAdapter({}, this._opts)
+    const draft = createDataDraft(this._root, array => projection._indexDirty.set(array, true))
+    projection._root = draft.root
+    projection._sourceIndex = (array, key, value) => {
+      const source = draft.unchangedArray(array, key)
+      return source ? this._findIndexByParam(source, key, value) : undefined
+    }
+    return projection
   }
 
   /** Обновить настройки адаптера. */
@@ -610,6 +627,11 @@ export class DefaultDataAdapter implements DataAdapter {
   ): number {
     if (typeof pval === 'string' && pval.startsWith('$')) {
       pval = this.get(pval, opts)
+    }
+
+    const sourceIndex = this._sourceIndex?.(arr, pkey, pval)
+    if (sourceIndex !== undefined) {
+      return sourceIndex
     }
 
     if (!this._opts.indexEnabled) {
