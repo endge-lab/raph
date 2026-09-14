@@ -2,6 +2,7 @@ node_modules
 dist
 coverage
 *.log
+.eslintcache
 pnpm-lock.yaml
 
 src/**/*.js
