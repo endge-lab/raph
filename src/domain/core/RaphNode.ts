@@ -36,7 +36,7 @@ export class RaphNode<P extends RaphProperties = RaphProperties> {
   //
 
   //
-  private _id: string
+  private readonly _id: string
 
   // тип узла, по умолчанию 'default'
   private _type: string = 'default'
